@@ -2,5 +2,11 @@
 	"name": "Assets",
 	"description": "Croogo Assets Management Plugin",
 	"author": "Rachman Chavik - Xintesa",
-	"authorEmail": "contact@xintesa.com"
+	"authorEmail": "contact@xintesa.com",
+
+	"dependencies": {
+		"plugins": [
+			"Imagine"
+		]
+	}
 }

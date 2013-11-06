@@ -6,6 +6,15 @@ $this->Html
 	->addCrumb('', '/admin', array('icon' => 'home'))
 	->addCrumb(__d('croogo', 'Attachments'), '/' . $this->request->url);
 
+$this->start('actions');
+
+echo $this->Croogo->adminAction(
+	__d('croogo', 'New %s', __d('croogo', 'Attachment')),
+	array('action' => 'add'),
+	array('button' => 'success')
+);
+
+$this->end();
 ?>
 <table class="table table-striped">
 <?php
@@ -27,35 +36,35 @@ $this->Html
 	$rows = array();
 	foreach ($attachments as $attachment) {
 		$actions = array();
-		$actions[] = $this->Croogo->adminRowActions($attachment['Attachment']['id']);
+		$actions[] = $this->Croogo->adminRowActions($attachment['AssetsAttachment']['id']);
 		$actions[] = $this->Croogo->adminRowAction('',
-			array('controller' => 'attachments', 'action' => 'edit', $attachment['Attachment']['id']),
+			array('controller' => 'assets_attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id']),
 			array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit this item'))
 		);
 		$actions[] = $this->Croogo->adminRowAction('',
-			array('controller' => 'attachments', 'action' => 'delete', $attachment['Attachment']['id']),
+			array('controller' => 'assets_attachments', 'action' => 'delete', $attachment['AssetsAttachment']['id']),
 			array('icon' => 'trash', 'tooltip' => __d('croogo', 'Remove this item')),
 			__d('croogo', 'Are you sure?'));
 
-		$mimeType = explode('/', $attachment['Attachment']['mime_type']);
+		$mimeType = explode('/', $attachment['AssetsAttachment']['mime_type']);
 		$mimeType = $mimeType['0'];
 		if ($mimeType == 'image') {
-			$imgUrl = $this->Image->resize('/uploads/' . $attachment['Attachment']['slug'], 100, 200, true, array('class' => 'img-polaroid', 'alt' => $attachment['Attachment']['title']));
-			$thumbnail = $this->Html->link($imgUrl, $attachment['Attachment']['path'],
-			array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['Attachment']['title']));
+			$imgUrl = $this->AssetsImage->resize($attachment['AssetsAttachment']['path'], 100, 200, true, array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title']));
+			$thumbnail = $this->Html->link($imgUrl, $attachment['AssetsAttachment']['path'],
+			array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title']));
 		} else {
-			$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png', array('alt' => $attachment['Attachment']['mime_type'])) . ' ' . $attachment['Attachment']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['Attachment']['slug']) . ')';
+			$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png', array('alt' => $attachment['AssetsAttachment']['mime_type'])) . ' ' . $attachment['AssetsAttachment']['mime_type'] . ' (' . $this->Assets->filename2ext($attachment['AssetsAttachment']['path']) . ')';
 		}
 
 		$actions = $this->Html->div('item-actions', implode(' ', $actions));
 
 		$rows[] = array(
-			$attachment['Attachment']['id'],
+			$attachment['AssetsAttachment']['id'],
 			$thumbnail,
-			$attachment['Attachment']['title'],
+			$attachment['AssetsAttachment']['title'],
 			$this->Html->link(
-				$this->Html->url($attachment['Attachment']['path'], true),
-				$attachment['Attachment']['path'],
+				$this->Html->url($attachment['AssetsAttachment']['path'], true),
+				$attachment['AssetsAttachment']['path'],
 				array(
 					'target' => '_blank',
 				)

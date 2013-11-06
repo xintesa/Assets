@@ -1,20 +1,20 @@
 <?php
 
-App::uses('FileManagerAppController', 'FileManager.Controller');
+App::uses('AssetsAppController', 'Assets.Controller');
 
 /**
  * Attachments Controller
  *
  * This file will take care of file uploads (with rich text editor integration).
  *
- * @category FileManager.Controller
- * @package  Croogo.FileManager.Controller
- * @version  1.0
+ * @category Assets.Controller
+ * @package  Assets.Controller
  * @author   Fahad Ibnay Heylaal <contact@fahad19.com>
+ * @author   Rachman Chavik <contact@xintesa.com>
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link     http://www.croogo.org
  */
-class AttachmentsController extends FileManagerAppController {
+class AssetsAttachmentsController extends AssetsAppController {
 
 /**
  * Models used by the Controller
@@ -22,7 +22,7 @@ class AttachmentsController extends FileManagerAppController {
  * @var array
  * @access public
  */
-	public $uses = array('FileManager.Attachment');
+	public $uses = array('Assets.AssetsAttachment');
 
 /**
  * Helpers used by the Controller
@@ -30,36 +30,7 @@ class AttachmentsController extends FileManagerAppController {
  * @var array
  * @access public
  */
-	public $helpers = array('FileManager.FileManager', 'Text', 'Croogo.Image');
-
-/**
- * Provides backwards compatibility access to the deprecated properties
- */
-	public function __get($name) {
-		switch ($name) {
-			case 'type':
-			case 'uploadsDir':
-				return $this->Attachment->{$name};
-			break;
-			default:
-				return parent::__get($name);
-		}
-	}
-
-/**
- * Provides backwards compatibility access for settings values to deprecated
- * properties
- */
-	public function __set($name, $val) {
-		switch ($name) {
-			case 'type':
-			case 'uploadsDir':
-				return $this->Attachment->{$name} = $val;
-			break;
-			default:
-				return parent::__set($name, $val);
-		}
-	}
+	public $helpers = array('FileManager.FileManager', 'Text', 'Assets.AssetsImage');
 
 /**
  * Before executing controller actions
@@ -69,20 +40,6 @@ class AttachmentsController extends FileManagerAppController {
  */
 	public function beforeFilter() {
 		parent::beforeFilter();
-
-		// Comment, Category, Tag not needed
-		$this->Attachment->unbindModel(array(
-			'hasMany' => array('Comment'),
-			'hasAndBelongsToMany' => array('Category', 'Tag'))
-		);
-
-		$this->Attachment->type = $this->type;
-		$this->Attachment->Behaviors->attach('Tree', array(
-			'scope' => array(
-				$this->Attachment->alias . '.type' => $this->type,
-			)
-		));
-		$this->set('type', $this->Attachment->type);
 
 		if ($this->action == 'admin_add') {
 			$this->Security->csrfCheck = false;
@@ -98,8 +55,8 @@ class AttachmentsController extends FileManagerAppController {
 	public function admin_index() {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
-		$this->Attachment->recursive = 0;
-		$this->paginate['Attachment']['order'] = 'Attachment.created DESC';
+		$this->AssetsAttachment->recursive = 0;
+		$this->paginate['AssetsAttachment']['order'] = 'AssetsAttachment.created DESC';
 		$this->set('attachments', $this->paginate());
 	}
 
@@ -118,13 +75,13 @@ class AttachmentsController extends FileManagerAppController {
 
 		if ($this->request->is('post') || !empty($this->request->data)) {
 
-			if (empty($this->data['Attachment'])) {
-				$this->Attachment->invalidate('file', __d('croogo', 'Upload failed. Please ensure size does not exceed the server limit.'));
+			if (empty($this->data['AssetsAttachment'])) {
+				$this->AssetsAttachment->invalidate('file', __d('croogo', 'Upload failed. Please ensure size does not exceed the server limit.'));
 				return;
 			}
 
-			$this->Attachment->create();
-			if ($this->Attachment->save($this->request->data)) {
+			$this->AssetsAttachment->create();
+			if ($this->AssetsAttachment->saveAll($this->request->data)) {
 
 				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'default', array('class' => 'success'));
 
@@ -158,7 +115,7 @@ class AttachmentsController extends FileManagerAppController {
 			return $this->redirect(array('action' => 'index'));
 		}
 		if (!empty($this->request->data)) {
-			if ($this->Attachment->save($this->request->data)) {
+			if ($this->AssetsAttachment->save($this->request->data)) {
 				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'default', array('class' => 'success'));
 				return $this->redirect(array('action' => 'index'));
 			} else {
@@ -166,7 +123,7 @@ class AttachmentsController extends FileManagerAppController {
 			}
 		}
 		if (empty($this->request->data)) {
-			$this->request->data = $this->Attachment->read(null, $id);
+			$this->request->data = $this->AssetsAttachment->read(null, $id);
 		}
 	}
 
@@ -183,7 +140,9 @@ class AttachmentsController extends FileManagerAppController {
 			return $this->redirect(array('action' => 'index'));
 		}
 
-		if ($this->Attachment->delete($id)) {
+		$this->AssetsAttachment->begin();
+		if ($this->AssetsAttachment->delete($id)) {
+			$this->AssetsAttachment->commit();
 			$this->Session->setFlash(__d('croogo', 'Attachment deleted'), 'default', array('class' => 'success'));
 			return $this->redirect(array('action' => 'index'));
 		} else {

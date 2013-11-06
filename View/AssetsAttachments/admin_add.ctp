@@ -4,14 +4,14 @@ $this->extend('/Common/admin_edit');
 
 $this->Html
 	->addCrumb('', '/admin', array('icon' => 'home'))
-	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'file_manager', 'controller' => 'attachments', 'action' => 'index'))
+	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
 	->addCrumb(__d('croogo', 'Upload'), '/' . $this->request->url);
 
-$formUrl = array('controller' => 'attachments', 'action' => 'add');
+$formUrl = array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'add');
 if (isset($this->params['named']['editor'])) {
 	$formUrl['editor'] = 1;
 }
-echo $this->Form->create('Attachment', array('url' => $formUrl, 'type' => 'file'));
+echo $this->Form->create('AssetsAttachment', array('url' => $formUrl, 'type' => 'file'));
 
 ?>
 <div class="row-fluid">
@@ -27,7 +27,18 @@ echo $this->Form->create('Attachment', array('url' => $formUrl, 'type' => 'file'
 
 			<div id="attachment-upload" class="tab-pane">
 			<?php
-			echo $this->Form->input('file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
+			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
+			echo $this->Form->input('excerpt', array('label' => __d('croogo', 'Caption')));
+			echo $this->Form->input('title');
+			echo $this->Form->input('status', array('type' => 'hidden', 'value' => true));
+			echo $this->Form->input('AssetsAsset.adapter', array(
+				'type' => 'hidden',
+				'value' => 'Assets',
+			));
+			echo $this->Form->input('AssetsAsset.model', array(
+				'type' => 'hidden',
+				'value' => 'AssetsAttachment',
+			));
 			?>
 			</div>
 

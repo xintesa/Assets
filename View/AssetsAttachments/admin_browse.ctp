@@ -31,26 +31,26 @@
 		foreach ($attachments as $attachment):
 			$actions = array();
 			$actions[] = $this->Croogo->adminRowAction('',
-				array('controller' => 'attachments', 'action' => 'edit', $attachment['Attachment']['id'], 'editor' => 1),
+				array('controller' => 'attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
 				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
 			);
 			$actions[] = $this->Croogo->adminRowAction('', array(
 				'controller' => 'attachments',
 				'action' => 'delete',
-				$attachment['Attachment']['id'],
+				$attachment['AssetsAttachment']['id'],
 				'editor' => 1,
 			), array('icon' => 'trash', 'tooltip' => __d('croogo', 'Delete')), __d('croogo', 'Are you sure?'));
 
-			$mimeType = explode('/', $attachment['Attachment']['mime_type']);
+			$mimeType = explode('/', $attachment['AssetsAttachment']['mime_type']);
 			$mimeType = $mimeType['0'];
 			if ($mimeType == 'image') {
-				$thumbnail = $this->Html->link($this->Image->resize($attachment['Attachment']['path'], 100, 200), $attachment['Attachment']['path'], array(
+				$thumbnail = $this->Html->link($this->Image->resize($attachment['AssetsAttachment']['path'], 100, 200), $attachment['AssetsAttachment']['path'], array(
 					'class' => 'thickbox',
 					'escape' => false,
-					'title' => $attachment['Attachment']['title'],
+					'title' => $attachment['AssetsAttachment']['title'],
 				));
 			} else {
-				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['Attachment']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['Attachment']['slug']) . ')';
+				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAttachment']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['AssetsAttachment']['slug']) . ')';
 				$thumbnail = $this->Html->link($thumbnail, '#', array(
 					'escape' => false,
 				));
@@ -59,19 +59,19 @@
 			$actions = $this->Html->div('item-actions', implode(' ', $actions));
 
 			$insertCode = $this->Html->link('', '#', array(
-				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['Attachment']['slug'] . "');",
+				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
 				'icon' => 'paper-clip',
 				'tooltip' => __d('croogo', 'Insert')
 			));
 
 			$rows[] = array(
-				$attachment['Attachment']['id'],
+				$attachment['AssetsAttachment']['id'],
 				$thumbnail,
-				$attachment['Attachment']['title'],
+				$attachment['AssetsAttachment']['title'],
 				$insertCode,
-				$this->Html->link(Router::url($attachment['Attachment']['path']),
-					$attachment['Attachment']['path'],
-					array('onclick' => "Croogo.Wysiwyg.choose('" . $attachment['Attachment']['slug'] . "');")
+				$this->Html->link(Router::url($attachment['AssetsAttachment']['path']),
+					$attachment['AssetsAttachment']['path'],
+					array('onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');")
 				),
 				$actions,
 			);

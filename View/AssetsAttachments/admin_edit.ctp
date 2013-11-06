@@ -4,10 +4,10 @@ $this->extend('/Common/admin_edit');
 
 $this->Html
 	->addCrumb('', '/admin', array('icon' => 'home'))
-	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'file_manager', 'controller' => 'attachments', 'action' => 'index'))
-	->addCrumb($this->data['Attachment']['title'], '/' . $this->request->url);
+	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
+	->addCrumb($this->data['AssetsAttachment']['title'], '/' . $this->request->url);
 
-echo $this->Form->create('Attachment', array('url' => array('controller' => 'attachments', 'action' => 'edit')));
+echo $this->Form->create('AssetsAttachment', array('url' => array('controller' => 'assets_attachments', 'action' => 'edit')));
 
 ?>
 <div class="row-fluid">
@@ -25,14 +25,14 @@ echo $this->Form->create('Attachment', array('url' => array('controller' => 'att
 			<?php
 				echo $this->Form->input('id');
 
-				$fileType = explode('/', $this->data['Attachment']['mime_type']);
+				$fileType = explode('/', $this->data['AssetsAttachment']['mime_type']);
 				$fileType = $fileType['0'];
 				if ($fileType == 'image') {
-					$imgUrl = $this->Image->resize('/uploads/' . $this->data['Attachment']['slug'], 200, 300, true, array('class' => 'img-polaroid'));
+					$imgUrl = $this->AssetsImage->resize('/uploads/' . $this->data['AssetsAttachment']['slug'], 200, 300, true, array('class' => 'img-polaroid'));
 				} else {
-					$imgUrl = $this->Html->image('/croogo/img/icons/' . $this->Filemanager->mimeTypeToImage($this->data['Attachment']['mime_type'])) . ' ' . $this->data['Attachment']['mime_type'];
+					$imgUrl = $this->Html->image('/croogo/img/icons/' . $this->Filemanager->mimeTypeToImage($this->data['AssetsAttachment']['mime_type'])) . ' ' . $this->data['AssetsAttachment']['mime_type'];
 				}
-				echo $this->Html->link($imgUrl, $this->data['Attachment']['path'], array(
+				echo $this->Html->link($imgUrl, $this->data['AssetsAttachment']['path'], array(
 					'class' => 'thickbox pull-right',
 				));
 				$this->Form->inputDefaults(array(
@@ -48,13 +48,13 @@ echo $this->Form->create('Attachment', array('url' => array('controller' => 'att
 
 				echo $this->Form->input('file_url', array(
 					'label' => __d('croogo', 'File URL'),
-					'value' => Router::url($this->data['Attachment']['path'], true),
+					'value' => Router::url($this->data['AssetsAttachment']['path'], true),
 					'readonly' => 'readonly')
 				);
 
 				echo $this->Form->input('file_type', array(
 					'label' => __d('croogo', 'Mime Type'),
-					'value' => $this->data['Attachment']['mime_type'],
+					'value' => $this->data['AssetsAttachment']['mime_type'],
 					'readonly' => 'readonly')
 				);
 
