@@ -9,9 +9,6 @@ class LocalAttachmentBehavior extends ModelBehavior {
 		$this->settings[$model->alias] = $config;
 	}
 
-	protected function _filestat($path, &$data) {
-	}
-
 	public function beforeSave(Model $model, $options = array()) {
 		$setting = $this->settings[$model->alias];
 		$storage =& $model->data[$model->alias];
