@@ -23,14 +23,11 @@ Croogo::mergeConfig('Wysiwyg.actions', array(
 ));
 
 App::uses('StorageManager', 'Assets.Lib');
-StorageManager::config('Assets', array(
+StorageManager::config('LegacyLocalAttachment', array(
 	'adapterOptions' => array(WWW_ROOT . 'uploads', true),
 	'adapterClass' => '\Gaufrette\Adapter\Local',
 	'class' => '\Gaufrette\Filesystem',
 ));
-
-// TODO: This needs to be dynamic
-Croogo::hookBehavior('AssetsAsset', 'Assets.LocalAttachment');
 
 CroogoNav::add('media.children.attachments', array(
 	'title' => __d('croogo', 'Attachments'),

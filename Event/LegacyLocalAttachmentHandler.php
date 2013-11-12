@@ -1,16 +1,19 @@
 <?php
 
-App::uses('ModelBehavior', 'Model');
+App::uses('CakeEventListener', 'Event');
 App::uses('StorageManager', 'Assets.Lib');
 
-class LocalAttachmentBehavior extends ModelBehavior {
+class LegacyLocalAttachmentHandler extends Object implements CakeEventListener {
 
-	public function setup(Model $model, $config = array()) {
-		$this->settings[$model->alias] = $config;
+	public function implementedEvents() {
+		return array(
+			'FileStorage.beforeSave' => 'onBeforeSave',
+			'FileStorage.beforeDelete' => 'onBeforeDelete',
+		);
 	}
 
-	public function beforeSave(Model $model, $options = array()) {
-		$setting = $this->settings[$model->alias];
+	public function onBeforeSave($Event) {
+		$model = $Event->subject();
 		$storage =& $model->data[$model->alias];
 
 		if (empty($storage['file'])) {
@@ -49,7 +52,8 @@ class LocalAttachmentBehavior extends ModelBehavior {
 		}
 	}
 
-	public function beforeDelete(Model $model, $cascade = true) {
+	public function onBeforeDelete($Event) {
+		$model = $Event->subject();
 		$fields = array('adapter', 'path');
 		$data = $model->findById($model->id, $fields);
 		$asset =& $data['AssetsAsset'];
