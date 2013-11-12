@@ -28,13 +28,17 @@ echo $this->Form->create('AssetsAttachment', array('url' => $formUrl, 'type' => 
 			<div id="attachment-upload" class="tab-pane">
 			<?php
 			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
+			echo $this->Form->input('AssetsAsset.adapter', array(
+				'type' => 'select',
+				'default' => 'LegacyLocalAttachment',
+				'options' => StorageManager::configured(),
+			));
+			$this->Form->inputDefaults(array(
+				'class' => 'span8',
+			));
 			echo $this->Form->input('excerpt', array('label' => __d('croogo', 'Caption')));
 			echo $this->Form->input('title');
 			echo $this->Form->input('status', array('type' => 'hidden', 'value' => true));
-			echo $this->Form->input('AssetsAsset.adapter', array(
-				'type' => 'hidden',
-				'value' => 'Assets',
-			));
 			echo $this->Form->input('AssetsAsset.model', array(
 				'type' => 'hidden',
 				'value' => 'AssetsAttachment',
