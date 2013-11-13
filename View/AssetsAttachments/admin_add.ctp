@@ -30,7 +30,7 @@ echo $this->Form->create('AssetsAttachment', array('url' => $formUrl, 'type' => 
 			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
 			echo $this->Form->input('AssetsAsset.adapter', array(
 				'type' => 'select',
-				'default' => 'LegacyLocalAttachment',
+				'default' => 'LocalAttachment',
 				'options' => StorageManager::configured(),
 			));
 			$this->Form->inputDefaults(array(

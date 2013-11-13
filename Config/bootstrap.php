@@ -23,6 +23,12 @@ Croogo::mergeConfig('Wysiwyg.actions', array(
 ));
 
 App::uses('StorageManager', 'Assets.Lib');
+StorageManager::config('LocalAttachment', array(
+	'description' => 'Local Attachment',
+	'adapterOptions' => array(WWW_ROOT . 'assets', true),
+	'adapterClass' => '\Gaufrette\Adapter\Local',
+	'class' => '\Gaufrette\Filesystem',
+));
 StorageManager::config('LegacyLocalAttachment', array(
 	'description' => 'Local Attachment (Legacy)',
 	'adapterOptions' => array(WWW_ROOT . 'uploads', true),
