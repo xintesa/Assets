@@ -63,13 +63,12 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 			return true;
 		}
 		$model = $Event->subject();
-		$fields = array('adapter', 'path');
+		$fields = array('adapter', 'filename');
 		$data = $model->findById($model->id, $fields);
 		$asset =& $data['AssetsAsset'];
-		$key = str_replace('/uploads/', '', $asset['path']);
 		$adapter = StorageManager::adapter($asset['adapter']);
-		if ($adapter->has($key)) {
-			$adapter->delete($key);
+		if ($adapter->has($asset['filename'])) {
+			$adapter->delete($asset['filename']);
 		}
 		return $model->deleteAll(array('parent_asset_id' => $model->id), true, true);
 	}
@@ -88,13 +87,10 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 			return;
 		}
 		$src = $imgTags->item(0)->getAttribute('src');
-		if ($src[0] == '/') {
-			$src = substr($src, 1);
-		}
 		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
 		$Asset =& $Attachment->AssetsAsset;
 		$Attachment->contain('AssetsAsset');
-		$attachment = $Attachment->createFromFile($src);
+		$attachment = $Attachment->createFromFile(WWW_ROOT . $src);
 
 		$hash = $attachment['AssetsAttachment']['hash'];
 
@@ -106,8 +102,15 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		}
 
 		$path = $attachment['AssetsAttachment']['import_path'];
-		$parentPath = '/uploads/' . substr($path, strpos($path, '_') + 1);
-		$parent = $Attachment->findByPath($parentPath);
+		$parts = pathinfo($path);
+		if (strpos($parts['filename'], '.') === false) {
+			list($filename,) = explode('.', $parts['filename'], 2);
+		} else {
+			$filename = substr($parts['filename'], 0, strrpos($parts['filename'], '.'));
+		}
+		$hash = sha1_file(WWW_ROOT . $parts['dirname'] . '/' . $filename . '.' . $parts['extension']);
+
+		$parent = $Attachment->findByHash($hash);
 
 		$asset = $Asset->create(array(
 			'parent_asset_id' => $parent['AssetsAsset']['id'],
