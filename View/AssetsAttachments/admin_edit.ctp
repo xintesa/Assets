@@ -27,8 +27,12 @@ echo $this->Form->create('AssetsAttachment', array('url' => array('controller' =
 
 				$fileType = explode('/', $this->data['AssetsAsset']['mime_type']);
 				$fileType = $fileType['0'];
+				$path = $this->data['AssetsAsset']['path'];
 				if ($fileType == 'image') {
-					$imgUrl = $this->AssetsImage->resize('/uploads/' . $this->data['AssetsAttachment']['slug'], 200, 300, true, array('class' => 'img-polaroid'));
+					$imgUrl = $this->AssetsImage->resize($path, 200, 300,
+						array('adapter' => $this->data['AssetsAsset']['adapter']),
+						array('class' => 'img-polaroid')
+					);
 				} else {
 					$imgUrl = $this->Html->image('/croogo/img/icons/' . $this->Filemanager->mimeTypeToImage($this->data['AssetsAttachment']['mime_type'])) . ' ' . $this->data['AssetsAttachment']['mime_type'];
 				}

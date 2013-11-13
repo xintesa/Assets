@@ -50,7 +50,10 @@ $this->end();
 		$mimeType = $mimeType['0'];
 		$path = $attachment['AssetsAsset']['path'];
 		if ($mimeType == 'image') {
-			$imgUrl = $this->AssetsImage->resize($path, 100, 200, true, array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title']));
+			$imgUrl = $this->AssetsImage->resize($path, 100, 200,
+				array('adapter' => $attachment['AssetsAsset']['adapter']),
+				array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
+			);
 			$thumbnail = $this->Html->link($imgUrl, $path,
 				array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
 			);

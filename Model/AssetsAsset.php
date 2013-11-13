@@ -14,7 +14,8 @@ class AssetsAsset extends AssetsAppModel {
 	public function beforeSave($options = array()) {
 		$Event = Croogo::dispatchEvent('FileStorage.beforeSave', $this, array(
 			'record' => $this->data,
-			'storage' => StorageManager::adapter($this->data[$this->alias]['adapter'])));
+			'adapter' => $this->data[$this->alias]['adapter'],
+		));
 		if ($Event->isStopped()) {
 			return false;
 		}
@@ -27,6 +28,7 @@ class AssetsAsset extends AssetsAppModel {
 		}
 		$Event = Croogo::dispatchEvent('FileStorage.beforeDelete', $this, array(
 			'cascade' => $cascade,
+			'adapter' => $this->field('adapter'),
 		));
 		if ($Event->isStopped()) {
 			return false;
