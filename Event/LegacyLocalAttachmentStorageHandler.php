@@ -1,9 +1,10 @@
 <?php
 
+App::uses('BaseStorageHandler', 'Assets.Event');
 App::uses('CakeEventListener', 'Event');
 App::uses('StorageManager', 'Assets.Lib');
 
-class LegacyLocalAttachmentHandler extends Object implements CakeEventListener {
+class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEventListener {
 
 	public function implementedEvents() {
 		return array(
@@ -14,6 +15,10 @@ class LegacyLocalAttachmentHandler extends Object implements CakeEventListener {
 	}
 
 	public function onBeforeSave($Event) {
+		if (!$this->_check($Event)) {
+			return true;
+		}
+
 		$model = $Event->subject();
 		$storage =& $model->data[$model->alias];
 
@@ -54,22 +59,30 @@ class LegacyLocalAttachmentHandler extends Object implements CakeEventListener {
 	}
 
 	public function onBeforeDelete($Event) {
+		if (!$this->_check($Event)) {
+			return true;
+		}
 		$model = $Event->subject();
 		$fields = array('adapter', 'path');
 		$data = $model->findById($model->id, $fields);
 		$asset =& $data['AssetsAsset'];
-		StorageManager::adapter($asset['adapter'])->delete(
-			str_replace('/uploads/', '', $asset['path'])
-		);
+		$key = str_replace('/uploads/', '', $asset['path']);
+		$adapter = StorageManager::adapter($asset['adapter']);
+		if ($adapter->has($key)) {
+			$adapter->delete($key);
+		}
 		return $model->deleteAll(array('parent_asset_id' => $model->id), true, true);
 	}
 
-	public function onResizeImage($event) {
-		if (!$event->data['result']) {
+	public function onResizeImage($Event) {
+		if (!$this->_check($Event)) {
+			return true;
+		}
+		if (!$Event->data['result']) {
 			return true;
 		}
 		$doc = new DOMDocument();
-		$doc->loadHTML($event->data['result']);
+		$doc->loadHTML($Event->data['result']);
 		$imgTags = $doc->getElementsByTagName('img');
 		if ($imgTags->length == 0) {
 			return;

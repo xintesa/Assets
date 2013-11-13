@@ -2,6 +2,6 @@
 
 $config = array(
 	'EventHandlers' => array(
-		'Assets.LegacyLocalAttachmentHandler',
+		'Assets.LegacyLocalAttachmentStorageHandler',
 	),
 );
