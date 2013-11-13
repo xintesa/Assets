@@ -57,15 +57,11 @@ class AssetsAttachment extends AssetsAppModel {
 		if (isset($this->data['AssetsAsset']['file']['name'])) {
 			$file = $this->data['AssetsAsset']['file'];
 			$attachment =& $this->data[$this->alias];
-			$attachment['path'] = '/uploads/' . $file['name'];
 			if (empty($attachment['title'])) {
 				$attachment['title'] = $file['name'];
 			}
 			if (empty($attachment['slug'])) {
 				$attachment['slug'] = $file['name'];
-			}
-			if (empty($attachment['mime_type'])) {
-				$attachment['mime_type'] = $file['type'];
 			}
 			if (empty($attachment['hash'])) {
 				$attachment['hash'] = sha1_file($file['tmp_name']);

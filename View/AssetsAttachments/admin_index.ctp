@@ -46,14 +46,16 @@ $this->end();
 			array('icon' => 'trash', 'tooltip' => __d('croogo', 'Remove this item')),
 			__d('croogo', 'Are you sure?'));
 
-		$mimeType = explode('/', $attachment['AssetsAttachment']['mime_type']);
+		$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
 		$mimeType = $mimeType['0'];
+		$path = $attachment['AssetsAsset']['path'];
 		if ($mimeType == 'image') {
-			$imgUrl = $this->AssetsImage->resize($attachment['AssetsAttachment']['path'], 100, 200, true, array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title']));
-			$thumbnail = $this->Html->link($imgUrl, $attachment['AssetsAttachment']['path'],
-			array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title']));
+			$imgUrl = $this->AssetsImage->resize($path, 100, 200, true, array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title']));
+			$thumbnail = $this->Html->link($imgUrl, $path,
+				array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
+			);
 		} else {
-			$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png', array('alt' => $attachment['AssetsAttachment']['mime_type'])) . ' ' . $attachment['AssetsAttachment']['mime_type'] . ' (' . $this->Assets->filename2ext($attachment['AssetsAttachment']['path']) . ')';
+			$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png', array('alt' => $mimeType)) . ' ' . $mimeType . ' (' . $this->Assets->filename2ext($attachment['AssetsAttachment']['path']) . ')';
 		}
 
 		$actions = $this->Html->div('item-actions', implode(' ', $actions));
@@ -63,8 +65,8 @@ $this->end();
 			$thumbnail,
 			$attachment['AssetsAttachment']['title'],
 			$this->Html->link(
-				$this->Html->url($attachment['AssetsAttachment']['path'], true),
-				$attachment['AssetsAttachment']['path'],
+				$this->Html->url($path, true),
+				$path,
 				array(
 					'target' => '_blank',
 				)
