@@ -94,7 +94,7 @@ class AssetsAttachment extends AssetsAppModel {
 			return sprintf('%s is duplicate to asset: %s', str_replace(APP, '', $file), $firstDupe);
 			return false;
 		}
-		$path = '/' . str_replace(WWW_ROOT, '', $file);
+		$path = str_replace(WWW_ROOT, '', $file);
 		$asset = $this->create(array(
 			'path' => $path,
 			'import_path' => $path,
