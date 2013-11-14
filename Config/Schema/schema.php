@@ -42,7 +42,7 @@ class AssetSchema extends CakeSchema {
  */
 	public $assets = array(
 		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
-		'parent_asset_id' => array('type' => 'integer', 'null' => true, 'default' => null ),
+		'parent_asset_id' => array('type' => 'integer', 'null' => true, 'default' => null),
 		'foreign_key' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
 		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
 		'filename' => array('type' => 'string', 'null' => false, 'default' => null),
@@ -58,5 +58,15 @@ class AssetSchema extends CakeSchema {
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'ix_assets_hash' => array('column' => array('hash')),
 		),
+	);
+
+	public $asset_usages = array(
+		'id' => array('type' => 'integer', 'null' => false, 'default' => null, 'key' => 'primary'),
+		'asset_id' => array('type' => 'integer', 'null' => false, 'default' => null),
+		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
+		'foreign_key' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
+		'type' => array('type' => 'string', 'length' => 20, 'null' => true, 'default' => null),
+		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 	);
 }
