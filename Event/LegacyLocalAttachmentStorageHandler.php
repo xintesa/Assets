@@ -104,7 +104,7 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		$path = $attachment['AssetsAttachment']['import_path'];
 		$parts = pathinfo($path);
 		if (strpos($parts['filename'], '.') === false) {
-			list($filename,) = explode('.', $parts['filename'], 2);
+			list($filename, ) = explode('.', $parts['filename'], 2);
 		} else {
 			$filename = substr($parts['filename'], 0, strrpos($parts['filename'], '.'));
 		}

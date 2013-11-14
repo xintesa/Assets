@@ -21,7 +21,7 @@ class AssetsAttachment extends AssetsAppModel {
 			'dependent' => true,
 			'conditions' => array(
 				'parent_asset_id' => null,
-				'model'  => 'AssetsAttachment',
+				'model' => 'AssetsAttachment',
 			),
 		),
 	);
@@ -75,6 +75,7 @@ class AssetsAttachment extends AssetsAppModel {
  *
  * @param $file string Path to file
  * @return array|string Array of data or error message
+ * @throws InvalidArgumentException
  */
 	public function createFromFile($file) {
 		if (!file_exists($file)) {
@@ -92,7 +93,6 @@ class AssetsAttachment extends AssetsAppModel {
 		if ($duplicate) {
 			$firstDupe = $duplicate[0]['AssetsAttachment']['id'];
 			return sprintf('%s is duplicate to asset: %s', str_replace(APP, '', $file), $firstDupe);
-			return false;
 		}
 		$path = str_replace(WWW_ROOT, '', $file);
 		$asset = $this->create(array(
@@ -161,6 +161,7 @@ class AssetsAttachment extends AssetsAppModel {
  * @param $dir array|string Path to import
  * @param $regex string Regex to filter files to import
  * @param $options array
+ * @throws InvalidArgumentException
  */
 	public function importTask($dirs = array(), $regex = '.*', $options = array()) {
 		$options = Hash::merge(array(
@@ -187,12 +188,6 @@ class AssetsAttachment extends AssetsAppModel {
 			}
 
 			return $this->_createImportTask($files, $options);
-			if (!empty($task['data'])) {
-				if ($this->importTask($task, $options)) {
-					return $task;
-				}
-			}
-			return false;
 		}
 	}
 

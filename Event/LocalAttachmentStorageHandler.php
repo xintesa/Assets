@@ -109,7 +109,7 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEv
 
 		$path = $attachment['AssetsAttachment']['import_path'];
 		$parts = pathinfo($path);
-		list($filename,) = explode('.', $parts['filename'], 2);
+		list($filename, ) = explode('.', $parts['filename'], 2);
 		$hash = sha1_file(WWW_ROOT . $parts['dirname'] . '/' . $filename . '.' . $parts['extension']);
 		$parent = $Attachment->findByHash($hash);
 
