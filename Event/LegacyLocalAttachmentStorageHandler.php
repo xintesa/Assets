@@ -24,7 +24,7 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 
 		if (empty($storage['file'])) {
 			if (isset($storage['path']) && empty($storage['filename'])) {
-				$path = WWW_ROOT . $storage['path'];
+				$path = rtrim(WWW_ROOT, '/') . $storage['path'];
 				$fp = fopen($path, 'r');
 				$stat = fstat($fp);
 				$finfo = new finfo(FILEINFO_MIME_TYPE);
@@ -90,7 +90,7 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
 		$Asset =& $Attachment->AssetsAsset;
 		$Attachment->contain('AssetsAsset');
-		$attachment = $Attachment->createFromFile(WWW_ROOT . $src);
+		$attachment = $Attachment->createFromFile(rtrim(WWW_ROOT, '/') . $src);
 
 		$hash = $attachment['AssetsAttachment']['hash'];
 
