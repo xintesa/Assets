@@ -16,8 +16,6 @@ class AssetSchema extends CakeSchema {
 		'body' => array('type' => 'text', 'null' => false, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 		'excerpt' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 		'status' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
-		'mime_type' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 100, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
-		'path' => array('type' => 'string', 'null' => false, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 		'sticky' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'visibility_roles' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 		'hash' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),

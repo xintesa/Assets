@@ -151,4 +151,16 @@ class StorageManager {
 		return $engineObject;
 	}
 
+	public function configured() {
+		$_this = StorageManager::getInstance();
+		$config = array();
+		foreach ($_this->_adapterConfig as $k => $v) {
+			if (empty($v['description'])) {
+				continue;
+			}
+			$config[$k] = $v['description'];
+		}
+		return $config;
+	}
+
 }

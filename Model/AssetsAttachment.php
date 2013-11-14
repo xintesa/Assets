@@ -21,7 +21,7 @@ class AssetsAttachment extends AssetsAppModel {
 			'dependent' => true,
 			'conditions' => array(
 				'parent_asset_id' => null,
-				'model'  => 'AssetsAttachment',
+				'model' => 'AssetsAttachment',
 			),
 		),
 	);
@@ -57,15 +57,11 @@ class AssetsAttachment extends AssetsAppModel {
 		if (isset($this->data['AssetsAsset']['file']['name'])) {
 			$file = $this->data['AssetsAsset']['file'];
 			$attachment =& $this->data[$this->alias];
-			$attachment['path'] = '/uploads/' . $file['name'];
 			if (empty($attachment['title'])) {
 				$attachment['title'] = $file['name'];
 			}
 			if (empty($attachment['slug'])) {
 				$attachment['slug'] = $file['name'];
-			}
-			if (empty($attachment['mime_type'])) {
-				$attachment['mime_type'] = $file['type'];
 			}
 			if (empty($attachment['hash'])) {
 				$attachment['hash'] = sha1_file($file['tmp_name']);
@@ -79,6 +75,7 @@ class AssetsAttachment extends AssetsAppModel {
  *
  * @param $file string Path to file
  * @return array|string Array of data or error message
+ * @throws InvalidArgumentException
  */
 	public function createFromFile($file) {
 		if (!file_exists($file)) {
@@ -96,9 +93,8 @@ class AssetsAttachment extends AssetsAppModel {
 		if ($duplicate) {
 			$firstDupe = $duplicate[0]['AssetsAttachment']['id'];
 			return sprintf('%s is duplicate to asset: %s', str_replace(APP, '', $file), $firstDupe);
-			return false;
 		}
-		$path = '/' . str_replace(WWW_ROOT, '', $file);
+		$path = str_replace(rtrim(WWW_ROOT, '/'), '', $file);
 		$asset = $this->create(array(
 			'path' => $path,
 			'import_path' => $path,
@@ -147,7 +143,7 @@ class AssetsAttachment extends AssetsAppModel {
 				continue;
 			}
 			$task['data'][$i]['AssetsAsset']['model'] = $this->alias;
-			$task['data'][$i]['AssetsAsset']['adapter'] = 'Assets';
+			$task['data'][$i]['AssetsAsset']['adapter'] = 'LegacyLocalAttachment';
 			$task['data'][$i]['AssetsAsset']['path'] = $source['from'];
 			$result = $this->saveAll($task['data'][$i], array('atomic' => true));
 			if ($result) {
@@ -165,6 +161,7 @@ class AssetsAttachment extends AssetsAppModel {
  * @param $dir array|string Path to import
  * @param $regex string Regex to filter files to import
  * @param $options array
+ * @throws InvalidArgumentException
  */
 	public function importTask($dirs = array(), $regex = '.*', $options = array()) {
 		$options = Hash::merge(array(
@@ -191,12 +188,6 @@ class AssetsAttachment extends AssetsAppModel {
 			}
 
 			return $this->_createImportTask($files, $options);
-			if (!empty($task['data'])) {
-				if ($this->importTask($task, $options)) {
-					return $task;
-				}
-			}
-			return false;
 		}
 	}
 
