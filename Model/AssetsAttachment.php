@@ -143,7 +143,7 @@ class AssetsAttachment extends AssetsAppModel {
 				continue;
 			}
 			$task['data'][$i]['AssetsAsset']['model'] = $this->alias;
-			$task['data'][$i]['AssetsAsset']['adapter'] = 'Assets';
+			$task['data'][$i]['AssetsAsset']['adapter'] = 'LegacyLocalAttachment';
 			$task['data'][$i]['AssetsAsset']['path'] = $source['from'];
 			$result = $this->saveAll($task['data'][$i], array('atomic' => true));
 			if ($result) {
