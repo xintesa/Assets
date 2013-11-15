@@ -1,3 +1,7 @@
+<style>
+.popover-content { word-wrap: break-word; }
+a i[class^=icon]:hover { text-decoration: none; }
+</style>
 <div class="attachments index">
 
 	<h2><?php echo $title_for_layout; ?></h2>
@@ -18,11 +22,11 @@
 	<table class="table table-striped">
 	<?php
 		$tableHeaders = $this->Html->tableHeaders(array(
-			$this->Paginator->sort('id', __d('croogo', 'Id')),
+			$this->Paginator->sort('AssetsAsset.id', __d('croogo', 'Id')),
 			'&nbsp;',
 			$this->Paginator->sort('title', __d('croogo', 'Title')),
-			'&nbsp;',
-			__d('croogo', 'URL'),
+			$this->Paginator->sort('filename', __d('croogo', 'Filename')),
+			$this->Paginator->sort('filesize', __d('croogo', 'Size')),
 			__d('croogo', 'Actions'),
 		));
 		echo $tableHeaders;
@@ -30,6 +34,11 @@
 		$rows = array();
 		foreach ($attachments as $attachment):
 			$actions = array();
+			$actions[] = $this->Html->link('', '#', array(
+				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
+				'icon' => 'paper-clip',
+				'tooltip' => __d('croogo', 'Insert')
+			));
 			$actions[] = $this->Croogo->adminRowAction('',
 				array('controller' => 'attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
 				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
@@ -44,7 +53,7 @@
 			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
 			$mimeType = $mimeType['0'];
 			if ($mimeType == 'image') {
-				$thumbnail = $this->Html->link($this->Image->resize($attachment['AssetsAsset']['path'], 100, 200), $attachment['AssetsAsset']['path'], array(
+				$thumbnail = $this->Html->link($this->AssetsImage->resize($attachment['AssetsAsset']['path'], 100, 200), $attachment['AssetsAsset']['path'], array(
 					'class' => 'thickbox',
 					'escape' => false,
 					'title' => $attachment['AssetsAttachment']['title'],
@@ -58,21 +67,29 @@
 
 			$actions = $this->Html->div('item-actions', implode(' ', $actions));
 
-			$insertCode = $this->Html->link('', '#', array(
-				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
-				'icon' => 'paper-clip',
-				'tooltip' => __d('croogo', 'Insert')
+			$url = $this->Html->link(
+				Router::url($attachment['AssetsAsset']['path']),
+				$attachment['AssetsAsset']['path'],
+				array(
+					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
+					'target' => '_blank',
+				)
+			);
+			$urlPopover = $this->Croogo->adminRowAction('', '#', array(
+				'class' => 'popovers',
+				'icon' => 'link',
+				'data-title' => __d('croogo', 'URL'),
+				'data-html' => true,
+				'data-placement' => 'top',
+				'data-content' => $url,
 			));
 
 			$rows[] = array(
-				$attachment['AssetsAttachment']['id'],
+				$attachment['AssetsAsset']['id'],
 				$thumbnail,
 				$attachment['AssetsAttachment']['title'],
-				$insertCode,
-				$this->Html->link(Router::url($attachment['AssetsAsset']['path']),
-					$attachment['AssetsAsset']['path'],
-					array('onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');")
-				),
+				$attachment['AssetsAsset']['filename'] . '&nbsp;' . $urlPopover,
+				$this->Number->toReadableSize($attachment['AssetsAsset']['filesize']),
 				$actions,
 			);
 		endforeach;
@@ -97,3 +114,6 @@
 		<div class="counter"><?php echo $this->Paginator->counter(array('format' => __d('croogo', 'Page %page% of %pages%, showing %current% records out of %count% total, starting on record %start%, ending on %end%'))); ?></div>
 	</div>
 </div>
+<?php
+
+$this->Js->buffer("$('.popovers').popover().on('click', function() { return false; });");
