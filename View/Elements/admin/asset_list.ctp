@@ -52,13 +52,45 @@ $browseUrl = array_merge(
 	)
 );
 
-$this->append('actions');
-echo $this->Croogo->adminAction(__d('croogo', 'Attachments'), $browseUrl,
-	array('rel' => 'browse')
+$uploadUrl = array(
+	'admin' => true,
+	'plugin' => 'assets',
+	'controller' => 'assets_attachments',
+	'action' => 'add',
+	'editor' => true,
+	'?' => array(
+		'model' => $model,
+		'foreign_key' => $id,
+	),
 );
-$this->end();
 
 ?>
+<div class="row-fluid">
+	<div class="span12">
+		<div class="actions pull-right">
+			<ul class="nav-buttons">
+			<?php
+				echo $this->Croogo->adminAction(__d('assets', 'Browse'),
+					$browseUrl,
+					array(
+						'icon' => 'folder-open',
+						'iconSize' => 'small',
+						'rel' => 'browse',
+					)
+				);
+				echo $this->Croogo->adminAction(__d('assets', 'Upload'),
+					$uploadUrl,
+					array(
+						'icon' => 'upload-alt',
+						'iconSize' => 'small',
+						'rel' => 'browse',
+					)
+				);
+			?>
+			</ul>
+		</div>
+	</div>
+</div>
 <div class="row-fluid">
 	<div class="span12">
 		<table class="table">
