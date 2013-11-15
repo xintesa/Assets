@@ -18,12 +18,24 @@ $headers = array(
 	__d('croogo', 'Size'),
 );
 
+if (!$this->Helpers->loaded('AssetsImage')) {
+	$this->AssetsImage = $this->Helpers->load('Assets.AssetsImage');
+}
+
 $rows = array();
 foreach ($assets as $asset):
 	$row = $action = array();
-	$row[] = $this->Html->image($asset['AssetsAsset']['path'],
-	array('width' => 100, 'class' => 'img-polaroid')
+	$path = $asset['AssetsAsset']['path'];
+	$imgUrl = $this->AssetsImage->resize($path, 100, 200,
+		array('adapter' => $asset['AssetsAsset']['adapter']),
+		array('class' => 'img-polaroid', 'alt' => $asset['AssetsAttachment']['title'])
 	);
+	$thumbnail = $this->Html->link($imgUrl, $path,
+		array('escape' => false, 'class' => 'thickbox', 'title' => $asset['AssetsAttachment']['title'])
+	);
+
+
+	$row[] = $thumbnail;
 	$row[] = $asset['AssetsAssetUsage']['type'];
 	$row[] = $this->Number->toReadableSize($asset['AssetsAsset']['filesize']);
 

@@ -53,7 +53,7 @@ a i[class^=icon]:hover { text-decoration: none; }
 			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
 			$mimeType = $mimeType['0'];
 			if ($mimeType == 'image') {
-				$thumbnail = $this->Html->link($this->AssetsImage->resize($attachment['AssetsAsset']['path'], 100, 200), $attachment['AssetsAsset']['path'], array(
+				$thumbnail = $this->Html->link($this->AssetsImage->resize($attachment['AssetsAsset']['path'], 100, 200, array(), array('class' => 'img-polaroid')), $attachment['AssetsAsset']['path'], array(
 					'class' => 'thickbox',
 					'escape' => false,
 					'title' => $attachment['AssetsAttachment']['title'],
