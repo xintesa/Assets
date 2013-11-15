@@ -7,14 +7,9 @@ $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
 $id = $this->data[$model][$primaryKey];
 
 $Asset = ClassRegistry::init('Assets.AssetsAssetUsage');
-$assets = $Asset->find('all', array(
-	'contain' => array(
-		'AssetsAsset',
-	),
-	'conditions' => array(
-		$Asset->escapeField('model') => $model,
-		$Asset->escapeField('foreign_key') => $id,
-	),
+$assets = $Asset->find('modelAssets', array(
+	'model' => $model,
+	'foreign_key' => $id,
 ));
 
 $headers = array(
