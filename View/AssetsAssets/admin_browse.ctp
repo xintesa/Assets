@@ -27,8 +27,10 @@ a i[class^=icon]:hover { text-decoration: none; }
 		$tableHeaders = $this->Html->tableHeaders(array(
 			$this->Paginator->sort('AssetsAsset.id', __d('croogo', 'Id')),
 			'&nbsp;',
-			$this->Paginator->sort('title', __d('croogo', 'Title')),
-			$this->Paginator->sort('filename', __d('croogo', 'Filename')),
+			$this->Paginator->sort('title', __d('croogo', 'Title')) . ' ' .
+			$this->Paginator->sort('filename', __d('croogo', 'Filename')) . ' ' .
+			$this->Paginator->sort('width', __d('assets', 'Width')) . ' ' .
+			$this->Paginator->sort('height', __d('assets', 'Height')) . ' ' .
 			$this->Paginator->sort('filesize', __d('croogo', 'Size')),
 			__d('croogo', 'Actions'),
 		));
@@ -43,11 +45,11 @@ a i[class^=icon]:hover { text-decoration: none; }
 				'tooltip' => __d('croogo', 'Insert')
 			));
 			$actions[] = $this->Croogo->adminRowAction('',
-				array('controller' => 'attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
+				array('controller' => 'assets_attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
 				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
 			);
 			$actions[] = $this->Croogo->adminRowAction('', array(
-				'controller' => 'attachments',
+				'controller' => 'assets_attachments',
 				'action' => 'delete',
 				$attachment['AssetsAttachment']['id'],
 				'editor' => 1,
@@ -87,12 +89,27 @@ a i[class^=icon]:hover { text-decoration: none; }
 				'data-content' => $url,
 			));
 
+			$title = $this->Html->para(null, $attachment['AssetsAttachment']['title']);
+			$title .= $this->Html->para(null,
+				$this->Text->truncate(
+					$attachment['AssetsAsset']['filename'], 30
+				) . '&nbsp;' . $urlPopover,
+				array('title' => $attachment['AssetsAsset']['filename'])
+			);
+
+			$title .= $this->Html->para(null, 'Dimension: ' .
+				$attachment['AssetsAsset']['width'] . ' x ' .
+				$attachment['AssetsAsset']['height']
+			);
+
+			$title .= $this->Html->para(null,
+				'Size: ' .$this->Number->toReadableSize($attachment['AssetsAsset']['filesize'])
+			);
+
 			$rows[] = array(
 				$attachment['AssetsAsset']['id'],
 				$thumbnail,
-				$attachment['AssetsAttachment']['title'],
-				$attachment['AssetsAsset']['filename'] . '&nbsp;' . $urlPopover,
-				$this->Number->toReadableSize($attachment['AssetsAsset']['filesize']),
+				$title,
 				$actions,
 			);
 		endforeach;
