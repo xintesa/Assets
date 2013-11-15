@@ -14,6 +14,7 @@ class AssetsAsset extends AssetsAppModel {
 	public $hasMany = array(
 		'AssetsAssetUsage' => array(
 			'className' => 'Assets.AssetsAssetUsage',
+			'dependent' => true,
 		),
 	);
 
