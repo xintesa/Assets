@@ -20,4 +20,17 @@ class BaseStorageHandler extends Object {
 		return $this->_storage;
 	}
 
+/**
+ * TODO: refactor this out and use Imagine in the future
+ */
+	protected function __getImageInfo($path) {
+		if (!file_exists($path)) {
+			return array();
+		}
+		$size = getimagesize($path);
+		list($width, $height) = $size;
+		$mimeType = $size['mime'];
+		return compact('width', 'height', 'mimeType');
+	}
+
 }

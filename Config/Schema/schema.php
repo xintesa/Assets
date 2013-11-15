@@ -47,6 +47,8 @@ class AssetSchema extends CakeSchema {
 		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
 		'filename' => array('type' => 'string', 'null' => false, 'default' => null),
 		'filesize' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 16),
+		'width' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 16),
+		'height' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 16),
 		'mime_type' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
 		'extension' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 5),
 		'hash' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
