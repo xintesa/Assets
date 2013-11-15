@@ -46,15 +46,19 @@ class AssetsAssetsController extends AssetsAppController {
 		$this->AssetsAsset->recursive = 0;
 		$this->paginate['AssetsAttachment']['order'] = 'AssetsAttachment.created DESC';
 
-		if (isset($this->request->query['model']) && isset($this->request->query['foriegn_key'])) {
+		if (!empty($this->request->query)) {
+			$query = $this->request->query;
+			$conditions = array('AssetsAssetUsage.asset_id = AssetsAsset.id');
+			if (isset($query['model'])) {
+				$conditions['AssetsAssetUsage.model'] = $query['model'];
+			}
+			if (isset($query['foreign_key'])) {
+				$conditions['AssetsAssetUsage.foreign_key'] = $query['foreign_key'];
+			}
 			$this->paginate['AssetsAsset']['joins'][] = array(
 				'table' => 'asset_usages',
 				'alias' => 'AssetsAssetUsage',
-				'conditions' => array(
-					'AssetsAssetUsage.asset_id = AssetsAsset.id',
-					'AssetsAssetUsage.model' => $this->request->query['model'],
-					'AssetsAssetUsage.foreign_key' => $this->request->query['foreign_key'],
-				),
+				'conditions' => $conditions,
 			);
 		}
 
