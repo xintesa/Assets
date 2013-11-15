@@ -12,7 +12,10 @@ a i[class^=icon]:hover { text-decoration: none; }
 			<?php
 				echo $this->Croogo->adminAction(
 					__d('croogo', 'New Attachment'),
-					array('action' => 'add', 'editor' => 1)
+					array_merge(
+						array('controller' => 'assets_attachments', 'action' => 'add', 'editor' => 1),
+						array('?' => $this->request->query)
+					)
 				);
 			?>
 			</ul>

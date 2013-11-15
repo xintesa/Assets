@@ -13,6 +13,9 @@ if (isset($this->params['named']['editor'])) {
 }
 echo $this->Form->create('AssetsAttachment', array('url' => $formUrl, 'type' => 'file'));
 
+$model = isset($this->request->query['model']) ? $this->request->query['model'] : null;
+$foreignKey = isset($this->request->query['foreign_key']) ? $this->request->query['foreign_key'] : null;
+
 ?>
 <div class="row-fluid">
 	<div class="span8">
@@ -27,6 +30,15 @@ echo $this->Form->create('AssetsAttachment', array('url' => $formUrl, 'type' => 
 
 			<div id="attachment-upload" class="tab-pane">
 			<?php
+			$assetUsage = 'AssetsAsset.AssetsAssetUsage.0.';
+			echo $this->Form->input($assetUsage . 'model', array(
+				'type' => 'hidden',
+				'value' => $model,
+			));
+			echo $this->Form->input($assetUsage . 'foreign_key', array(
+				'type' => 'hidden',
+				'value' => $foreignKey,
+			));
 			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
 			echo $this->Form->input('AssetsAsset.adapter', array(
 				'type' => 'select',

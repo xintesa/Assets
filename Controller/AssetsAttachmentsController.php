@@ -81,15 +81,27 @@ class AssetsAttachmentsController extends AssetsAppController {
 			}
 
 			$this->AssetsAttachment->create();
-			if ($this->AssetsAttachment->saveAll($this->request->data)) {
+			$saved = $this->AssetsAttachment->saveAll(
+				$this->request->data,
+				array('deep' => true)
+			);
 
+			if ($saved) {
 				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'default', array('class' => 'success'));
-
-				if (isset($this->request->params['named']['editor'])) {
-					return $this->redirect(array('action' => 'browse'));
-				} else {
-					return $this->redirect(array('action' => 'index'));
+				$url = array();
+				if (isset($this->request->data['AssetsAsset']['AssetsAssetUsage'][0])) {
+					$usage = $this->request->data['AssetsAsset']['AssetsAssetUsage'][0];
+					if (!empty($usage['model']) && !empty($usage['foreign_key'])) {
+						$url['?']['model'] = $usage['model'];
+						$url['?']['foreign_key'] = $usage['foreign_key'];
+					}
 				}
+				if (isset($this->request->params['named']['editor'])) {
+					$url = array_merge($url, array('action' => 'browse'));
+				} else {
+					$url = array_merge($url, array('action' => 'index'));
+				}
+				return $this->redirect($url);
 			} else {
 				$this->Session->setFlash(__d('croogo', 'The Attachment could not be saved. Please, try again.'), 'default', array('class' => 'error'));
 			}

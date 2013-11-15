@@ -8,7 +8,10 @@
 			<?php
 				echo $this->Croogo->adminAction(
 					__d('croogo', 'New Attachment'),
-					array('action' => 'add', 'editor' => 1)
+					array_merge(
+						array('action' => 'add', 'editor' => 1),
+						array('?' => $this->request->query)
+					)
 				);
 			?>
 			</ul>
