@@ -27,11 +27,13 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 				$path = rtrim(WWW_ROOT, '/') . $storage['path'];
 				$fp = fopen($path, 'r');
 				$stat = fstat($fp);
-				$finfo = new finfo(FILEINFO_MIME_TYPE);
+				$imageInfo = $this->__getImageInfo($path);
 				$storage['filesize'] = $stat[7];
 				$storage['filename'] = basename($path);
 				$storage['hash'] = sha1_file($path);
-				$storage['mime_type'] = $finfo->file($path);
+				$storage['mime_type'] = $imageInfo['mimeType'];
+				$storage['width'] = $imageInfo['width'];
+				$storage['height'] = $imageInfo['height'];
 				$storage['extension'] = substr($path, strrpos($path, '.') + 1);
 			}
 			return true;
@@ -42,12 +44,15 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		try {
 			$raw = file_get_contents($file['tmp_name']);
 			$extension = substr($file['name'], strrpos($file['name'], '.') + 1);
+			$imageInfo = $this->__getImageInfo($file['tmp_name']);
 			$result = $adapter->write($file['name'], $raw);
 			$storage['filename'] = $file['name'];
 			$storage['filesize'] = $file['size'];
 			$storage['hash'] = sha1($raw);
 			$storage['extension'] = $extension;
-			$storage['mime_type'] = $file['type'];
+			$storage['mime_type'] = $imageInfo['mimeType'];
+			$storage['width'] = $imageInfo['width'];
+			$storage['height'] = $imageInfo['height'];
 			if (empty($storage['path'])) {
 				$storage['path'] = '/uploads/' . $file['name'];
 			}

@@ -6,7 +6,6 @@
 
 	"dependencies": {
 		"plugins": [
-			"Imagine"
 		]
 	}
 }

@@ -8,7 +8,10 @@
 			<?php
 				echo $this->Croogo->adminAction(
 					__d('croogo', 'New Attachment'),
-					array('action' => 'add', 'editor' => 1)
+					array_merge(
+						array('action' => 'add', 'editor' => 1),
+						array('?' => $this->request->query)
+					)
 				);
 			?>
 			</ul>
@@ -31,26 +34,26 @@
 		foreach ($attachments as $attachment):
 			$actions = array();
 			$actions[] = $this->Croogo->adminRowAction('',
-				array('controller' => 'attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
+				array('controller' => 'assets_attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
 				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
 			);
 			$actions[] = $this->Croogo->adminRowAction('', array(
-				'controller' => 'attachments',
+				'controller' => 'assets_attachments',
 				'action' => 'delete',
 				$attachment['AssetsAttachment']['id'],
 				'editor' => 1,
 			), array('icon' => 'trash', 'tooltip' => __d('croogo', 'Delete')), __d('croogo', 'Are you sure?'));
 
-			$mimeType = explode('/', $attachment['AssetsAttachment']['mime_type']);
+			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
 			$mimeType = $mimeType['0'];
 			if ($mimeType == 'image') {
-				$thumbnail = $this->Html->link($this->Image->resize($attachment['AssetsAttachment']['path'], 100, 200), $attachment['AssetsAttachment']['path'], array(
+				$thumbnail = $this->Html->link($this->Image->resize($attachment['AssetsAsset']['path'], 100, 200, array(), array('class' => 'img-polaroid')), $attachment['AssetsAsset']['path'], array(
 					'class' => 'thickbox',
 					'escape' => false,
 					'title' => $attachment['AssetsAttachment']['title'],
 				));
 			} else {
-				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAttachment']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['AssetsAttachment']['slug']) . ')';
+				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAsset']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['AssetsAttachment']['slug']) . ')';
 				$thumbnail = $this->Html->link($thumbnail, '#', array(
 					'escape' => false,
 				));
@@ -69,8 +72,8 @@
 				$thumbnail,
 				$attachment['AssetsAttachment']['title'],
 				$insertCode,
-				$this->Html->link(Router::url($attachment['AssetsAttachment']['path']),
-					$attachment['AssetsAttachment']['path'],
+				$this->Html->link(Router::url($attachment['AssetsAsset']['path']),
+					$attachment['AssetsAsset']['path'],
 					array('onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');")
 				),
 				$actions,

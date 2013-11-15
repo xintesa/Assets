@@ -3,7 +3,7 @@
 App::uses('BaseStorageHandler', 'Assets.Event');
 App::uses('CakeEventListener', 'Event');
 App::uses('StorageManager', 'Assets.Lib');
-App::uses('FileStorageUtils', 'FileStorage.Utility');
+App::uses('FileStorageUtils', 'Assets.Utility');
 
 class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEventListener {
 
@@ -25,13 +25,16 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEv
 		if (empty($storage['file'])) {
 			if (isset($storage['path']) && empty($storage['filename'])) {
 				$path = rtrim(WWW_ROOT, '/') . $storage['path'];
+				$imageInfo = $this->__getImageInfo($path);
+
 				$fp = fopen($path, 'r');
 				$stat = fstat($fp);
-				$finfo = new finfo(FILEINFO_MIME_TYPE);
 				$storage['filesize'] = $stat[7];
 				$storage['filename'] = basename($path);
 				$storage['hash'] = sha1_file($path);
-				$storage['mime_type'] = $finfo->file($path);
+				$storage['mime_type'] = $imageInfo['mimeType'];
+				$storage['width'] = $imageInfo['width'];
+				$storage['height'] = $imageInfo['height'];
 				$storage['extension'] = substr($path, strrpos($path, '.') + 1);
 			}
 			return true;
@@ -43,6 +46,7 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEv
 			$raw = file_get_contents($file['tmp_name']);
 			$key = sha1($raw);
 			$extension = strtolower(FileStorageUtils::fileExtension($file['name']));
+			$imageInfo = $this->__getImageInfo($file['tmp_name']);
 
 			if (empty($storage['path'])) {
 				$prefix = FileStorageUtils::trimPath(FileStorageUtils::randomPath($file['name']));
@@ -53,8 +57,10 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEv
 			$storage['filename'] = $file['name'];
 			$storage['filesize'] = $file['size'];
 			$storage['hash'] = sha1($raw);
+			$storage['mime_type'] = $imageInfo['mimeType'];
+			$storage['width'] = $imageInfo['width'];
+			$storage['height'] = $imageInfo['height'];
 			$storage['extension'] = $extension;
-			$storage['mime_type'] = $file['type'];
 			return $result;
 		} catch (Exception $e) {
 			$this->log($e->getMessage());

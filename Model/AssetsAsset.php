@@ -11,6 +11,23 @@ class AssetsAsset extends AssetsAppModel {
 
 	public $useTable = 'assets';
 
+	public $hasMany = array(
+		'AssetsAssetUsage' => array(
+			'className' => 'Assets.AssetsAssetUsage',
+			'dependent' => true,
+		),
+	);
+
+	public $belongsTo = array(
+		'AssetsAttachment' => array(
+			'className' => 'Assets.AssetsAttachment',
+			'foreignKey' => 'foreign_key',
+			'conditions' => array(
+				'AssetsAsset.model' => 'AssetsAttachment',
+			),
+		),
+	);
+
 	public function beforeSave($options = array()) {
 		$Event = Croogo::dispatchEvent('FileStorage.beforeSave', $this, array(
 			'record' => $this->data,

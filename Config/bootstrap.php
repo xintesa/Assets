@@ -36,6 +36,27 @@ StorageManager::config('LegacyLocalAttachment', array(
 	'class' => '\Gaufrette\Filesystem',
 ));
 
+$actions = array(
+	'Nodes/admin_edit',
+	'Blocks/admin_edit',
+	'Types/admin_edit',
+);
+$tabTitle = __d('assets', 'Assets');
+foreach ($actions as $action):
+	Croogo::hookAdminTab($action, $tabTitle, 'Assets.admin/asset_list');
+endforeach;
+
+Croogo::hookModelProperty('Node', 'hasMany', array(
+	'AssetsAssetUsage' => array(
+		'className' => 'Assets.AssetsAssetUsage',
+		'foreignKey' => 'foreign_key',
+		'dependent' => true,
+		'conditions' => array(
+			'model' => 'Node',
+		),
+	),
+));
+
 CroogoNav::add('media.children.attachments', array(
 	'title' => __d('croogo', 'Attachments'),
 	'url' => array(

@@ -20,8 +20,8 @@ class AssetsAttachment extends AssetsAppModel {
 			'foreignKey' => 'foreign_key',
 			'dependent' => true,
 			'conditions' => array(
-				'parent_asset_id' => null,
-				'model' => 'AssetsAttachment',
+				'AssetsAsset.parent_asset_id' => null,
+				'AssetsAsset.model' => 'AssetsAttachment',
 			),
 		),
 	);
