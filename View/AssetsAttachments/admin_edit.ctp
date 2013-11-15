@@ -7,7 +7,13 @@ $this->Html
 	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
 	->addCrumb($this->data['AssetsAttachment']['title'], '/' . $this->request->url);
 
-echo $this->Form->create('AssetsAttachment', array('url' => array('controller' => 'assets_attachments', 'action' => 'edit')));
+$formUrl = array('controller' => 'assets_attachments', 'action' => 'edit');
+if (isset($this->request->query)) {
+	$formUrl = array_merge($formUrl, $this->request->query);
+}
+echo $this->Form->create('AssetsAttachment', array(
+	'url' => $formUrl,
+));
 
 ?>
 <div class="row-fluid">
@@ -74,6 +80,12 @@ echo $this->Form->create('AssetsAttachment', array('url' => array('controller' =
 		$redirect = array('action' => 'index');
 		if ($this->Session->check('Wysiwyg.redirect')) {
 			$redirect = $this->Session->read('Wysiwyg.redirect');
+		}
+		if (isset($this->request->query['model'])) {
+			$redirect = array_merge(
+				array('action' => 'browse', 'controller' => 'assets_assets'),
+				array('?' => $this->request->query)
+			);
 		}
 		echo $this->Html->beginBox(__d('croogo', 'Publishing')) .
 			$this->Form->button(__d('croogo', 'Save')) .

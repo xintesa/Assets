@@ -68,6 +68,12 @@ $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->quer
 		if ($this->Session->check('Wysiwyg.redirect')) {
 			$redirect = $this->Session->read('Wysiwyg.redirect');
 		}
+		if (isset($this->request->query['model'])) {
+			$redirect = array_merge(
+				array('action' => 'browse', 'controller' => 'assets_assets'),
+				array('?' => $this->request->query)
+			);
+		}
 		echo $this->Html->beginBox(__d('croogo', 'Publishing')) .
 			$this->Form->button(__d('croogo', 'Upload'), array('button' => 'default')) .
 			$this->Form->end() .

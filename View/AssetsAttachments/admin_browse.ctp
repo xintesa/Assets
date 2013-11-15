@@ -34,11 +34,11 @@
 		foreach ($attachments as $attachment):
 			$actions = array();
 			$actions[] = $this->Croogo->adminRowAction('',
-				array('controller' => 'attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
+				array('controller' => 'assets_attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
 				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
 			);
 			$actions[] = $this->Croogo->adminRowAction('', array(
-				'controller' => 'attachments',
+				'controller' => 'assets_attachments',
 				'action' => 'delete',
 				$attachment['AssetsAttachment']['id'],
 				'editor' => 1,

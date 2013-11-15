@@ -92,6 +92,7 @@ class AssetsAttachmentsController extends AssetsAppController {
 				if (isset($this->request->data['AssetsAsset']['AssetsAssetUsage'][0])) {
 					$usage = $this->request->data['AssetsAsset']['AssetsAssetUsage'][0];
 					if (!empty($usage['model']) && !empty($usage['foreign_key'])) {
+						$url['controller'] = 'assets_assets';
 						$url['?']['model'] = $usage['model'];
 						$url['?']['foreign_key'] = $usage['foreign_key'];
 					}

@@ -36,6 +36,7 @@ a i[class^=icon]:hover { text-decoration: none; }
 		));
 		echo $tableHeaders;
 
+		$query = array('?' => $this->request->query);
 		$rows = array();
 		foreach ($attachments as $attachment):
 			$actions = array();
@@ -44,16 +45,29 @@ a i[class^=icon]:hover { text-decoration: none; }
 				'icon' => 'paper-clip',
 				'tooltip' => __d('croogo', 'Insert')
 			));
-			$actions[] = $this->Croogo->adminRowAction('',
-				array('controller' => 'assets_attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
+
+			$editUrl = Hash::merge($query, array(
+				'controller' => 'assets_attachments',
+				'action' => 'edit',
+				$attachment['AssetsAttachment']['id'],
+				'editor' => 1,
+			));
+			$actions[] = $this->Croogo->adminRowAction('', $editUrl,
 				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
 			);
-			$actions[] = $this->Croogo->adminRowAction('', array(
+
+			$deleteUrl = Hash::merge($query, array(
 				'controller' => 'assets_attachments',
 				'action' => 'delete',
 				$attachment['AssetsAttachment']['id'],
 				'editor' => 1,
-			), array('icon' => 'trash', 'tooltip' => __d('croogo', 'Delete')), __d('croogo', 'Are you sure?'));
+			));
+			$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
+				'icon' => 'trash',
+				'tooltip' => __d('croogo', 'Delete')
+				),
+				__d('croogo', 'Are you sure?')
+			);
 
 			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
 			$mimeType = $mimeType['0'];
@@ -83,6 +97,7 @@ a i[class^=icon]:hover { text-decoration: none; }
 			$urlPopover = $this->Croogo->adminRowAction('', '#', array(
 				'class' => 'popovers',
 				'icon' => 'link',
+				'iconSize' => 'small',
 				'data-title' => __d('croogo', 'URL'),
 				'data-html' => true,
 				'data-placement' => 'top',
