@@ -11,10 +11,10 @@ class AssetsImageHelper extends ImageHelper {
 			$uploadsDir = '';
 		}
 		$cacheDir = dirname($path);
-		$this->cacheDir = $cacheDir;
 		$options = Hash::merge(array(
 			'aspect' => true,
 			'adapter' => false,
+			'cacheDir' => $cacheDir,
 			'uploadsDir' => $uploadsDir,
 		), $options);
 		$adapter = $options['adapter'];
