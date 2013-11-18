@@ -26,14 +26,25 @@ $rows = array();
 foreach ($attachments as $attachment):
 	$row = $action = array();
 	$path = $attachment['AssetsAsset']['path'];
-	$imgUrl = $this->AssetsImage->resize($path, 100, 200,
-		array('adapter' => $attachment['AssetsAsset']['adapter']),
-		array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
-	);
-	$thumbnail = $this->Html->link($imgUrl, $path,
-		array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
-	);
+	list($mimeType, ) = explode('/', $attachment['AssetsAsset']['mime_type']);
 
+	if ($mimeType === 'image'):
+		$imgUrl = $this->AssetsImage->resize($path, 100, 200,
+			array('adapter' => $attachment['AssetsAsset']['adapter']),
+			array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
+		);
+		$thumbnail = $this->Html->link($imgUrl, $path,
+			array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
+		);
+	else:
+		$imgUrl = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAsset']['filename'];
+		$thumbnail = $this->Html->link($imgUrl,
+			$attachment['AssetsAsset']['path'], array(
+				'escape' => false,
+				'target' => '_blank',
+			)
+		);
+	endif;
 
 	$row[] = $thumbnail;
 	$row[] = $attachment['AssetsAssetUsage']['type'];

@@ -46,7 +46,13 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEv
 			$raw = file_get_contents($file['tmp_name']);
 			$key = sha1($raw);
 			$extension = strtolower(FileStorageUtils::fileExtension($file['name']));
+
 			$imageInfo = $this->__getImageInfo($file['tmp_name']);
+			if (isset($imageInfo['mimeType'])) {
+				$mimeType = $imageInfo['mimeType'];
+			} else {
+				$mimeType = $file['type'];
+			}
 
 			if (empty($storage['path'])) {
 				$prefix = FileStorageUtils::trimPath(FileStorageUtils::randomPath($file['name']));
@@ -57,7 +63,7 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEv
 			$storage['filename'] = $file['name'];
 			$storage['filesize'] = $file['size'];
 			$storage['hash'] = sha1($raw);
-			$storage['mime_type'] = $imageInfo['mimeType'];
+			$storage['mime_type'] = $mimeType;
 			$storage['width'] = $imageInfo['width'];
 			$storage['height'] = $imageInfo['height'];
 			$storage['extension'] = $extension;

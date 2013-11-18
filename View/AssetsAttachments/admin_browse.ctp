@@ -46,38 +46,14 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 		$rows = array();
 		foreach ($attachments as $attachment):
 			$actions = array();
+			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
+			$mimeType = $mimeType['0'];
+
 			if (isset($this->request->query['editor'])):
 				$actions[] = $this->Html->link('', '#', array(
 					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
 					'icon' => 'paper-clip',
 					'tooltip' => __d('croogo', 'Insert')
-				));
-			endif;
-
-			if (isset($this->request->query['asset_id'])):
-				unset($query['?']['asset_id']);
-				$addUrl = Hash::merge(array(
-					'controller' => 'assets_asset_usages',
-					'action' => 'add',
-					'?' => array(
-						'asset_id' => $attachment['AssetsAsset']['id'],
-						'model' => $this->request->query['model'],
-						'foreign_key' => $this->request->query['foreign_key'],
-					)
-				), $query);
-				$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
-					'icon' => 'plus',
-					'method' => 'post',
-				));
-			else:
-				$detailUrl = Hash::merge(array(
-					'action' => 'browse',
-					'?' => array(
-						'asset_id' => $attachment['AssetsAsset']['id'],
-					)
-				), $query);
-				$actions[] = $this->Html->link('', $detailUrl, array(
-					'icon' => 'suitcase',
 				));
 			endif;
 
@@ -104,8 +80,33 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 				__d('croogo', 'Are you sure?')
 			);
 
-			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
-			$mimeType = $mimeType['0'];
+			if (isset($this->request->query['asset_id'])):
+				unset($query['?']['asset_id']);
+				$addUrl = Hash::merge(array(
+					'controller' => 'assets_asset_usages',
+					'action' => 'add',
+					'?' => array(
+						'asset_id' => $attachment['AssetsAsset']['id'],
+						'model' => $this->request->query['model'],
+						'foreign_key' => $this->request->query['foreign_key'],
+					)
+				), $query);
+				$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
+					'icon' => 'plus',
+					'method' => 'post',
+				));
+			elseif ($mimeType === 'image'):
+				$detailUrl = Hash::merge(array(
+					'action' => 'browse',
+					'?' => array(
+						'asset_id' => $attachment['AssetsAsset']['id'],
+					)
+				), $query);
+				$actions[] = $this->Html->link('', $detailUrl, array(
+					'icon' => 'suitcase',
+				));
+			endif;
+
 			if ($mimeType == 'image') {
 				$thumbnail = $this->Html->link($this->AssetsImage->resize($attachment['AssetsAsset']['path'], 100, 200, array(), array('class' => 'img-polaroid')), $attachment['AssetsAsset']['path'], array(
 					'class' => 'thickbox',
@@ -113,7 +114,7 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 					'title' => $attachment['AssetsAttachment']['title'],
 				));
 			} else {
-				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAttachment']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['AssetsAttachment']['slug']) . ')';
+				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAsset']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['AssetsAttachment']['slug']) . ')';
 				$thumbnail = $this->Html->link($thumbnail, '#', array(
 					'escape' => false,
 				));
