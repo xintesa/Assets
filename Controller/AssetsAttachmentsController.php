@@ -55,8 +55,18 @@ class AssetsAttachmentsController extends AssetsAppController {
 	public function admin_index() {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
-		$this->AssetsAttachment->recursive = 0;
-		$this->paginate['AssetsAttachment']['order'] = 'AssetsAttachment.created DESC';
+		if (empty($this->request->query)) {
+			$this->AssetsAttachment->recursive = 0;
+			$this->paginate['AssetsAttachment']['order'] = 'AssetsAttachment.created DESC';
+		} else {
+			$this->paginate = array('modelAttachments');
+			if (isset($this->request->query['model'])) {
+				$this->paginate['model'] = $this->request->query['model'];
+			}
+			if (isset($this->request->query['foreign_key'])) {
+				$this->paginate['foreign_key'] = $this->request->query['foreign_key'];
+			};
+		}
 		$this->set('attachments', $this->paginate());
 	}
 

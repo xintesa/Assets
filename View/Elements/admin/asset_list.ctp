@@ -6,8 +6,8 @@ $model = $this->Form->defaultModel;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
 $id = $this->data[$model][$primaryKey];
 
-$Asset = ClassRegistry::init('Assets.AssetsAssetUsage');
-$assets = $Asset->find('modelAssets', array(
+$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+$attachments = $Attachment->find('modelAttachments', array(
 	'model' => $model,
 	'foreign_key' => $id,
 ));
@@ -23,21 +23,21 @@ if (!$this->Helpers->loaded('AssetsImage')) {
 }
 
 $rows = array();
-foreach ($assets as $asset):
+foreach ($attachments as $attachment):
 	$row = $action = array();
-	$path = $asset['AssetsAsset']['path'];
+	$path = $attachment['AssetsAsset']['path'];
 	$imgUrl = $this->AssetsImage->resize($path, 100, 200,
-		array('adapter' => $asset['AssetsAsset']['adapter']),
-		array('class' => 'img-polaroid', 'alt' => $asset['AssetsAttachment']['title'])
+		array('adapter' => $attachment['AssetsAsset']['adapter']),
+		array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
 	);
 	$thumbnail = $this->Html->link($imgUrl, $path,
-		array('escape' => false, 'class' => 'thickbox', 'title' => $asset['AssetsAttachment']['title'])
+		array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
 	);
 
 
 	$row[] = $thumbnail;
-	$row[] = $asset['AssetsAssetUsage']['type'];
-	$row[] = $this->Number->toReadableSize($asset['AssetsAsset']['filesize']);
+	$row[] = $attachment['AssetsAssetUsage']['type'];
+	$row[] = $this->Number->toReadableSize($attachment['AssetsAsset']['filesize']);
 
 	$action[] = $this->Croogo->adminRowAction('Hello', '#');
 	$row[] = implode(' ', $action);
