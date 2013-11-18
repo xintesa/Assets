@@ -18,6 +18,9 @@ class AssetsImageHelper extends ImageHelper {
 			'uploadsDir' => $uploadsDir,
 		), $options);
 		$adapter = $options['adapter'];
+		if ($adapter === 'LegacyLocalAttachment') {
+			$options['resizedInd'] = 'resized';
+		}
 		$result = parent::resize($path, $width, $height, $options, $htmlAttributes, $return);
 		$data = compact('result', 'path', 'width', 'height', 'aspect', 'htmlAttributes', 'adapter');
 		Croogo::dispatchEvent('Assets.AssetsImageHelper.resize', $this->_View, $data);
