@@ -2,6 +2,10 @@
 .popover-content { word-wrap: break-word; }
 a i[class^=icon]:hover { text-decoration: none; }
 </style>
+<?php
+$this->Html->script('Croogo.jquery/thickbox-compressed', array('inline' => false));
+$this->Html->css('Croogo.thickbox', array('inline' => false));
+?>
 <div class="attachments index">
 
 	<h2><?php echo $title_for_layout; ?></h2>
