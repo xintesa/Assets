@@ -8,7 +8,9 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 ?>
 <div class="attachments index">
 
+	<?php if ($this->layout != 'admin_popup'): ?>
 	<h2><?php echo $title_for_layout; ?></h2>
+	<?php endif; ?>
 
 	<div class="row-fluid">
 		<div class="span12 actions">

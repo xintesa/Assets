@@ -7,6 +7,10 @@ $this->Html
 	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
 	->addCrumb($this->data['AssetsAttachment']['title'], '/' . $this->request->url);
 
+if ($this->layout === 'admin_popup'):
+	$this->append('title', ' ');
+endif;
+
 $formUrl = array('controller' => 'assets_attachments', 'action' => 'edit');
 if (isset($this->request->query)) {
 	$formUrl = array_merge($formUrl, $this->request->query);

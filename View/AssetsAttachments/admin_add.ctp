@@ -7,6 +7,10 @@ $this->Html
 	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
 	->addCrumb(__d('croogo', 'Upload'), '/' . $this->request->url);
 
+if ($this->layout === 'admin_popup'):
+	$this->append('title', ' ');
+endif;
+
 $formUrl = array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'add');
 if (isset($this->params['named']['editor'])) {
 	$formUrl['editor'] = 1;
