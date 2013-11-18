@@ -59,7 +59,12 @@ class AssetsAttachmentsController extends AssetsAppController {
 			$this->AssetsAttachment->recursive = 0;
 			$this->paginate['AssetsAttachment']['order'] = 'AssetsAttachment.created DESC';
 		} else {
-			$this->paginate = array('modelAttachments');
+			if (isset($this->request->query['asset_id'])) {
+				$this->paginate = array('versions');
+				$this->paginate['asset_id'] = $this->request->query['asset_id'];
+			} else {
+				$this->paginate = array('modelAttachments');
+			}
 			if (isset($this->request->query['model'])) {
 				$this->paginate['model'] = $this->request->query['model'];
 			}

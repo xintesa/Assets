@@ -44,11 +44,40 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 		$rows = array();
 		foreach ($attachments as $attachment):
 			$actions = array();
-			$actions[] = $this->Html->link('', '#', array(
-				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
-				'icon' => 'paper-clip',
-				'tooltip' => __d('croogo', 'Insert')
-			));
+			if (isset($this->request->query['editor'])):
+				$actions[] = $this->Html->link('', '#', array(
+					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
+					'icon' => 'paper-clip',
+					'tooltip' => __d('croogo', 'Insert')
+				));
+			endif;
+
+			if (isset($this->request->query['asset_id'])):
+				unset($query['?']['asset_id']);
+				$addUrl = Hash::merge(array(
+					'controller' => 'assets_asset_usages',
+					'action' => 'add',
+					'?' => array(
+						'asset_id' => $attachment['AssetsAsset']['id'],
+						'model' => $this->request->query['model'],
+						'foreign_key' => $this->request->query['foreign_key'],
+					)
+				), $query);
+				$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
+					'icon' => 'plus',
+					'method' => 'post',
+				));
+			else:
+				$detailUrl = Hash::merge(array(
+					'action' => 'browse',
+					'?' => array(
+						'asset_id' => $attachment['AssetsAsset']['id'],
+					)
+				), $query);
+				$actions[] = $this->Html->link('', $detailUrl, array(
+					'icon' => 'suitcase',
+				));
+			endif;
 
 			$editUrl = Hash::merge($query, array(
 				'controller' => 'assets_attachments',
