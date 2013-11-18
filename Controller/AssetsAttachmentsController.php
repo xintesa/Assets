@@ -92,7 +92,6 @@ class AssetsAttachmentsController extends AssetsAppController {
 				if (isset($this->request->data['AssetsAsset']['AssetsAssetUsage'][0])) {
 					$usage = $this->request->data['AssetsAsset']['AssetsAssetUsage'][0];
 					if (!empty($usage['model']) && !empty($usage['foreign_key'])) {
-						$url['controller'] = 'assets_assets';
 						$url['?']['model'] = $usage['model'];
 						$url['?']['foreign_key'] = $usage['foreign_key'];
 					}
@@ -123,14 +122,22 @@ class AssetsAttachmentsController extends AssetsAppController {
 			$this->layout = 'admin_popup';
 		}
 
+		$redirect = array('action' => 'index');
+		if (!empty($this->request->query)) {
+			$redirect = array_merge(
+				$redirect,
+				array('action' => 'browse', '?' => $this->request->query)
+			);
+		}
+
 		if (!$id && empty($this->request->data)) {
 			$this->Session->setFlash(__d('croogo', 'Invalid Attachment'), 'default', array('class' => 'error'));
-			return $this->redirect(array('action' => 'index'));
+			return $this->redirect($redirect);
 		}
 		if (!empty($this->request->data)) {
 			if ($this->AssetsAttachment->save($this->request->data)) {
 				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'default', array('class' => 'success'));
-				return $this->redirect(array('action' => 'index'));
+				return $this->redirect($redirect);
 			} else {
 				$this->Session->setFlash(__d('croogo', 'The Attachment could not be saved. Please, try again.'), 'default', array('class' => 'error'));
 			}
@@ -153,14 +160,22 @@ class AssetsAttachmentsController extends AssetsAppController {
 			return $this->redirect(array('action' => 'index'));
 		}
 
+		$redirect = array('action' => 'index');
+		if (!empty($this->request->query)) {
+			$redirect = array_merge(
+				$redirect,
+				array('action' => 'browse', '?' => $this->request->query)
+			);
+		}
+
 		$this->AssetsAttachment->begin();
 		if ($this->AssetsAttachment->delete($id)) {
 			$this->AssetsAttachment->commit();
 			$this->Session->setFlash(__d('croogo', 'Attachment deleted'), 'default', array('class' => 'success'));
-			return $this->redirect(array('action' => 'index'));
+			return $this->redirect($redirect);
 		} else {
 			$this->Session->setFlash(__d('croogo', 'Invalid id for Attachment'), 'default', array('class' => 'error'));
-			return $this->redirect(array('action' => 'index'));
+			return $this->redirect($redirect);
 		}
 	}
 

@@ -47,7 +47,6 @@ endforeach;
 $browseUrl = array_merge(
 	Configure::read('Wysiwyg.attachmentBrowseUrl'),
 	array(
-		'controller' => 'assets_assets',
 		'?' => array('model' => $model, 'foreign_key' => $id),
 	)
 );

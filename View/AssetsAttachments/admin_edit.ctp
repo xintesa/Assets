@@ -83,7 +83,7 @@ echo $this->Form->create('AssetsAttachment', array(
 		}
 		if (isset($this->request->query['model'])) {
 			$redirect = array_merge(
-				array('action' => 'browse', 'controller' => 'assets_assets'),
+				array('action' => 'browse'),
 				array('?' => $this->request->query)
 			);
 		}
