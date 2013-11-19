@@ -47,8 +47,11 @@ foreach ($attachments as $attachment):
 	endif;
 
 	$preview = $this->Html->div(null, $thumbnail);
-	$preview .= $this->Html->tag('small', sprintf(
-		'Size: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
+	if ($mimeType === 'image'):
+		$preview .= $this->Html->tag('small', sprintf(
+			'Size: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
+		));
+	endif;
 
 	$changeTypeUrl = array(
 		'admin' => true,
@@ -67,20 +70,24 @@ foreach ($attachments as $attachment):
 	$row[] = $typeCell;
 	$row[] = $this->Number->toReadableSize($attachment['AssetsAsset']['filesize']);
 
-	$detailUrl = array(
-		'plugin' => 'assets',
-		'controller' => 'assets_attachments',
-		'action' => 'browse',
-		'?' => array(
-			'asset_id' => $attachment['AssetsAsset']['id'],
-			'model' => $model,
-			'foreign_key' => $id,
-		),
-	);
-	$action[] = $this->Croogo->adminRowAction('', $detailUrl, array(
-		'icon' => 'suitcase',
-		'rel' => 'browse',
-	));
+	if ($mimeType === 'image'):
+		$detailUrl = array(
+			'plugin' => 'assets',
+			'controller' => 'assets_attachments',
+			'action' => 'browse',
+			'?' => array(
+				'asset_id' => $attachment['AssetsAsset']['id'],
+				'model' => $model,
+				'foreign_key' => $id,
+			),
+		);
+		$action[] = $this->Croogo->adminRowAction('', $detailUrl, array(
+			'icon' => 'suitcase',
+			'rel' => 'browse',
+		));
+	else:
+		$action[] = null;
+	endif;
 	$row[] = implode(' ', $action);
 	$rows[] = $row;
 endforeach;
