@@ -21,10 +21,6 @@ class AssetsAssetUsage extends AssetsAppModel {
 		),
 	);
 
-	public $findMethods = array(
-		'modelAssets' => true,
-	);
-
 	public function beforeSave($options = array()) {
 		if (!empty($this->data['AssetsAssetUsage']['featured_image'])) {
 			$this->data['AssetsAssetUsage']['type'] = 'FeaturedImage';
