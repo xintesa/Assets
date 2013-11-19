@@ -36,6 +36,7 @@ StorageManager::config('LegacyLocalAttachment', array(
 	'class' => '\Gaufrette\Filesystem',
 ));
 
+// TODO: make this configurable via backend
 $actions = array(
 	'Nodes/admin_edit',
 	'Blocks/admin_edit',
@@ -48,7 +49,11 @@ foreach ($actions as $action):
 	Croogo::hookHelper($controller, 'Assets.AssetsAdmin');
 endforeach;
 
-Croogo::hookBehavior('Node', 'Assets.LinkedAssets', array('priority' => 9));
+// TODO: make this configurable via backend
+$models = array('Block', 'Node', 'Type');
+foreach ($models as $model) {
+	Croogo::hookBehavior($model, 'Assets.LinkedAssets', array('priority' => 9));
+}
 
 CroogoNav::add('media.children.attachments', array(
 	'title' => __d('croogo', 'Attachments'),
