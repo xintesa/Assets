@@ -136,6 +136,10 @@ class AssetsAttachment extends AssetsAppModel {
 			$foreignKey = $query['foreign_key'];
 			unset($query['foreign_key']);
 		}
+		if (isset($query['all'])) {
+			$all = $query['all'];
+			unset($query['all']);
+		}
 		$this->unbindModel(array('hasOne' => array('AssetsAsset')));
 		$this->bindModel(array(
 			'hasOne' => array(
@@ -156,7 +160,7 @@ class AssetsAttachment extends AssetsAppModel {
 				),
 			)
 		));
-		if ($assetId) {
+		if ($assetId && !isset($all)) {
 			$query['conditions'] = Hash::merge($query['conditions'], array(
 				'OR' => array(
 					'AssetsAsset.id' => $assetId,

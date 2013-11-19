@@ -6,7 +6,7 @@ a i[class^=icon]:hover { text-decoration: none; }
 $this->Html->script('Croogo.jquery/thickbox-compressed', array('inline' => false));
 $this->Html->css('Croogo.thickbox', array('inline' => false));
 
-$model = $foreignKey = $assetId = $filter = $filename = $type = null;
+$model = $foreignKey = $assetId = $filter = $filename = $type = $all = null;
 if (!empty($this->request->query['model'])):
 	$model = $this->request->query['model'];
 endif;
@@ -24,6 +24,9 @@ if (!empty($this->request->query['filter'])):
 endif;
 if (!empty($this->request->query['filename'])):
 	$filename = $this->request->query['filename'];
+endif;
+if (!empty($this->request->query['all'])):
+	$all = $this->request->query['all'];
 endif;
 
 ?>
@@ -45,23 +48,24 @@ endif;
 					)
 				);
 
-				if ($assetId || $filter || $filename || $type):
-					echo $this->Croogo->adminAction(
-					__d('croogo', 'List Attachments'),
-					array_merge(
-						array('controller' => 'assets_attachments', 'action' => 'browse'),
-						array(
-							'?' => array(
-								'model' => $model,
-								'foreign_key' => $foreignKey,
-							),
-						)
+				$listUrl = array(
+					'controller' => 'assets_attachments',
+					'action' => 'browse',
+					'?' => array(
+						'model' => $model,
+						'foreign_key' => $foreignKey,
 					),
-					array(
-						'button' => 'success',
-					)
 				);
+
+				if (!$all):
+					$listUrl['?']['all'] = true;
+					$listTitle = __d('assets', 'List All Attachments');
+				else:
+					$listTitle = __d('assets', 'List Attachments');
 				endif;
+				echo $this->Croogo->adminAction($listTitle, $listUrl, array(
+					'button' => 'success',
+				));
 			?>
 			</ul>
 		</div>
