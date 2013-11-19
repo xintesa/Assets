@@ -32,6 +32,26 @@ class AssetsAttachmentsController extends AssetsAppController {
  */
 	public $helpers = array('FileManager.FileManager', 'Text', 'Assets.AssetsImage');
 
+	public $paginate = array(
+		'paramType' => 'querystring',
+		'limit' => 5,
+	);
+
+	public $components = array(
+		'Search.Prg' => array(
+			'presetForm' => array(
+				'paramType' => 'querystring',
+			),
+			'commonProcess' => array(
+				'paramType' => 'querystring',
+				'filterEmpty' => 'true',
+			),
+		),
+	);
+
+	public $presetVars = true;
+
+
 /**
  * Before executing controller actions
  *
@@ -55,15 +75,17 @@ class AssetsAttachmentsController extends AssetsAppController {
 	public function admin_index() {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
+		$this->Prg->commonProcess();
+
 		if (empty($this->request->query)) {
 			$this->AssetsAttachment->recursive = 0;
 			$this->paginate['AssetsAttachment']['order'] = 'AssetsAttachment.created DESC';
 		} else {
 			if (isset($this->request->query['asset_id'])) {
-				$this->paginate = array('versions');
+				$this->paginate = array_merge(array('versions'), $this->paginate);
 				$this->paginate['asset_id'] = $this->request->query['asset_id'];
 			} else {
-				$this->paginate = array('modelAttachments');
+				$this->paginate = array_merge(array('modelAttachments'), $this->paginate);
 			}
 			if (isset($this->request->query['model'])) {
 				$this->paginate['model'] = $this->request->query['model'];
@@ -71,8 +93,9 @@ class AssetsAttachmentsController extends AssetsAppController {
 			if (isset($this->request->query['foreign_key'])) {
 				$this->paginate['foreign_key'] = $this->request->query['foreign_key'];
 			};
+
 		}
-		$this->set('attachments', $this->paginate());
+		$this->set('attachments', $this->paginate($this->AssetsAttachment->parseCriteria($this->request->query)));
 	}
 
 /**

@@ -12,6 +12,7 @@ class AssetsAttachment extends AssetsAppModel {
 
 	public $actsAs = array(
 		'Croogo.Trackable',
+		'Search.Searchable',
 	);
 
 	public $hasOne = array(
@@ -26,11 +27,32 @@ class AssetsAttachment extends AssetsAppModel {
 		),
 	);
 
+	public $filterArgs = array(
+		'filter' => array('type' => 'query', 'method' => 'filterAttachments'),
+		'filename' => array('type' => 'like', 'field' => 'AssetsAsset.filename'),
+		'type' => array('type' => 'value', 'field' => 'AssetsAssetUsage.type'),
+	);
+
 	public $findMethods = array(
 		'duplicate' => true,
 		'modelAttachments' => true,
 		'versions' => true,
 	);
+
+	public function filterAttachments($data = array()) {
+		$conditions = array();
+		if (!empty($data['filter'])) {
+			$filter = '%' . $data['filter'] . '%s';
+			$conditions = array(
+				'OR' => array(
+					$this->escapeField('title') . ' LIKE' => $filter,
+					$this->escapeField('excerpt') . ' LIKE' => $filter,
+					$this->escapeField('body') . ' LIKE' => $filter,
+				),
+			);
+		}
+		return $conditions;
+	}
 
 /**
  * Find duplicates based on hash

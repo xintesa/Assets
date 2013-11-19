@@ -5,6 +5,27 @@ a i[class^=icon]:hover { text-decoration: none; }
 <?php
 $this->Html->script('Croogo.jquery/thickbox-compressed', array('inline' => false));
 $this->Html->css('Croogo.thickbox', array('inline' => false));
+
+$model = $foreignKey = $assetId = $filter = $filename = $type = null;
+if (!empty($this->request->query['model'])):
+	$model = $this->request->query['model'];
+endif;
+if (!empty($this->request->query['foreign_key'])):
+	$foreignKey = $this->request->query['foreign_key'];
+endif;
+if (!empty($this->request->query['asset_id'])):
+	$assetId = $this->request->query['asset_id'];
+endif;
+if (!empty($this->request->query['type'])):
+	$type = $this->request->query['type'];
+endif;
+if (!empty($this->request->query['filter'])):
+	$filter = $this->request->query['filter'];
+endif;
+if (!empty($this->request->query['filename'])):
+	$filename = $this->request->query['filename'];
+endif;
+
 ?>
 <div class="attachments index">
 
@@ -23,8 +44,51 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 						array('?' => $this->request->query)
 					)
 				);
+
+				if ($assetId || $filter || $filename || $type):
+					echo $this->Croogo->adminAction(
+					__d('croogo', 'List Attachments'),
+					array_merge(
+						array('controller' => 'assets_attachments', 'action' => 'browse'),
+						array(
+							'?' => array(
+								'model' => $model,
+								'foreign_key' => $foreignKey,
+							),
+						)
+					),
+					array(
+						'button' => 'success',
+					)
+				);
+				endif;
 			?>
 			</ul>
+		</div>
+	</div>
+
+<?php
+	$filters = $this->Form->create('AssetsAttachment');
+	$filters .= $this->Form->input('filter', array(
+		'label' => false,
+		'placeholder' => true,
+		'div' => 'input text span4',
+	));
+	$filters .= $this->Form->input('filename', array(
+		'label' => false,
+		'placeholder' => true,
+		'div' => 'input text span4',
+	));
+	$filters .= $this->Form->submit(__d('croogo', 'Filter'), array(
+		'div' => 'input submit span2',
+	));
+	$filters .= $this->Form->end();
+	$filterRow = sprintf('<div class="clearfix filter">%s</div>', $filters);
+
+?>
+	<div class="row-fluid">
+		<div class="span12">
+			<?php echo $filterRow; ?>
 		</div>
 	</div>
 
@@ -115,9 +179,20 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 				));
 				if (!empty($attachment['AssetsAssetUsage']['type'])):
 					$thumbnail .= $this->Html->div(null,
-						$this->Html->tag('span',
-							$attachment['AssetsAssetUsage']['type'],
-							array('class' => 'badge badge-info')
+						$this->Html->link(
+							$this->Html->tag('span',
+								$attachment['AssetsAssetUsage']['type'],
+								array('class' => 'badge badge-info')
+							),
+							array(
+								'action' => 'browse',
+								'?' => array(
+									'type' => $attachment['AssetsAssetUsage']['type']
+								) + $this->request->query,
+							),
+							array(
+								'escape' => false,
+							)
 						)
 					);
 				endif;
