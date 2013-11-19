@@ -26,4 +26,16 @@ class AssetsImageHelper extends ImageHelper {
 		Croogo::dispatchEvent('Assets.AssetsImageHelper.resize', $this->_View, $data);
 		return $result;
 	}
+
+	public function featured($data, $options = array()) {
+		if (empty($data['LinkedAssets']['FeaturedImage'])) {
+			return null;
+		}
+		$options = Hash::merge(array(
+			'class' => 'featured-image',
+		), $options);
+		$image = $data['LinkedAssets']['FeaturedImage'];
+		return $this->Html->image($image['path'], $options);
+	}
+
 }
