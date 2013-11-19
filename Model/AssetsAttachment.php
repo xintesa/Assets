@@ -134,6 +134,14 @@ class AssetsAttachment extends AssetsAppModel {
 				),
 			)
 		));
+		if ($assetId) {
+			$query['conditions'] = Hash::merge($query['conditions'], array(
+				'OR' => array(
+					'AssetsAsset.id' => $assetId,
+					'AssetsAsset.parent_asset_id' => $assetId,
+				),
+			));
+		}
 		return $query;
 	}
 
