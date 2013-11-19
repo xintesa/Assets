@@ -9,6 +9,9 @@ class AssetsAdminHelper extends AppHelper {
 	);
 
 	public function beforeRender($viewFile) {
+		if (empty($this->request->params['admin'])) {
+			return;
+		}
 		$this->Html->css(array(
 			'bootstrap-editable',
 		), array(

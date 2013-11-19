@@ -46,7 +46,16 @@ class AssetsAssetUsagesController extends AssetsAppController {
 					'foreign_key' => $foreignKey,
 					'type' => $type,
 				));
-				$this->AssetsAssetUsage->save($assetUsage);
+				$saved = $this->AssetsAssetUsage->save($assetUsage);
+				if ($saved) {
+					$this->Session->setFlash('Asset added', 'default', array(
+						'class' => 'success',
+					));
+				}
+			} else {
+				$this->Session->setFlash('Asset already exist', 'default', array(
+					'class' => 'alert',
+				));
 			}
 		}
 		$this->redirect($this->referer());
