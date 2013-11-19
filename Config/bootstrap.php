@@ -43,19 +43,12 @@ $actions = array(
 );
 $tabTitle = __d('assets', 'Assets');
 foreach ($actions as $action):
+	list($controller, ) = explode('/', $action);
 	Croogo::hookAdminTab($action, $tabTitle, 'Assets.admin/asset_list');
+	Croogo::hookHelper($controller, 'Assets.AssetsAdmin');
 endforeach;
 
-Croogo::hookModelProperty('Node', 'hasMany', array(
-	'AssetsAssetUsage' => array(
-		'className' => 'Assets.AssetsAssetUsage',
-		'foreignKey' => 'foreign_key',
-		'dependent' => true,
-		'conditions' => array(
-			'model' => 'Node',
-		),
-	),
-));
+Croogo::hookBehavior('Node', 'Assets.LinkedAssets');
 
 CroogoNav::add('media.children.attachments', array(
 	'title' => __d('croogo', 'Attachments'),

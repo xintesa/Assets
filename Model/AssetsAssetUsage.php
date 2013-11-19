@@ -21,49 +21,12 @@ class AssetsAssetUsage extends AssetsAppModel {
 		),
 	);
 
-	public $findMethods = array(
-		'modelAssets' => true,
-	);
-
-	protected function _findModelAssets($state, $query = array(), $results = array()) {
-		if ($state === 'after') {
-			return $results;
+	public function beforeSave($options = array()) {
+		if (!empty($this->data['AssetsAssetUsage']['featured_image'])) {
+			$this->data['AssetsAssetUsage']['type'] = 'FeaturedImage';
+			unset($this->data['AssetsAssetUsage']['featured_image']);
 		}
-		$model = $foreignKey = null;
-		if (isset($query['model'])) {
-			$model = $query['model'];
-			unset($query['model']);
-		}
-		if (isset($query['foreign_key'])) {
-			$foreignKey = $query['foreign_key'];
-			unset($query['foreign_key']);
-		}
-		$this->unbindModel(array('belongsTo' => array('AssetsAsset')));
-		$this->bindModel(array(
-			'hasOne' => array(
-				'AssetsAsset' => array(
-					'foreignKey' => false,
-					'conditions' => array(
-						'AssetsAsset.id = AssetsAssetUsage.asset_id',
-					),
-				),
-				'AssetsAttachment' => array(
-					'className' => 'Assets.AssetsAttachment',
-					'foreignKey' => false,
-					'conditions' => array(
-						'AssetsAsset.model = \'AssetsAttachment\'',
-						'AssetsAsset.foreign_key = AssetsAttachment.id',
-					),
-				),
-			)
-		));
-		$query = Hash::merge($query, array(
-			'conditions' => array(
-				$this->escapeField('model') => $model,
-				$this->escapeField('foreign_key') => $foreignKey,
-			),
-		));
-		return $query;
+		return true;
 	}
 
 }

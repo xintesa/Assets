@@ -7,6 +7,10 @@ $this->Html
 	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
 	->addCrumb(__d('croogo', 'Upload'), '/' . $this->request->url);
 
+if ($this->layout === 'admin_popup'):
+	$this->append('title', ' ');
+endif;
+
 $formUrl = array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'add');
 if (isset($this->params['named']['editor'])) {
 	$formUrl['editor'] = 1;
@@ -39,7 +43,14 @@ $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->quer
 				'type' => 'hidden',
 				'value' => $foreignKey,
 			));
+
 			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
+
+			echo $this->Form->input($assetUsage . 'featured_image', array(
+				'type' => 'checkbox',
+				'label' => 'Featured Image',
+			));
+
 			echo $this->Form->input('AssetsAsset.adapter', array(
 				'type' => 'select',
 				'default' => 'LocalAttachment',
@@ -70,7 +81,7 @@ $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->quer
 		}
 		if (isset($this->request->query['model'])) {
 			$redirect = array_merge(
-				array('action' => 'browse', 'controller' => 'assets_assets'),
+				array('action' => 'browse'),
 				array('?' => $this->request->query)
 			);
 		}

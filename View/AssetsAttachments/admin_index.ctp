@@ -6,11 +6,17 @@ $this->Html
 	->addCrumb('', '/admin', array('icon' => 'home'))
 	->addCrumb(__d('croogo', 'Attachments'), '/' . $this->request->url);
 
+if (!empty($this->request->query)) {
+	$query = $this->request->query;
+} else {
+	$query = array();
+}
+
 $this->start('actions');
 
 echo $this->Croogo->adminAction(
 	__d('croogo', 'New %s', __d('croogo', 'Attachment')),
-	array('action' => 'add'),
+	array_merge(array('?' => $query), array('action' => 'add')),
 	array('button' => 'success')
 );
 
@@ -37,12 +43,16 @@ $this->end();
 	foreach ($attachments as $attachment) {
 		$actions = array();
 		$actions[] = $this->Croogo->adminRowActions($attachment['AssetsAttachment']['id']);
-		$actions[] = $this->Croogo->adminRowAction('',
-			array('controller' => 'assets_attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id']),
+		$editUrl = array_merge(
+			array('action' => 'edit', $attachment['AssetsAttachment']['id']),
+			array('?' => $query)
+		);
+		$actions[] = $this->Croogo->adminRowAction('', $editUrl,
 			array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit this item'))
 		);
-		$actions[] = $this->Croogo->adminRowAction('',
-			array('controller' => 'assets_attachments', 'action' => 'delete', $attachment['AssetsAttachment']['id']),
+		$deleteUrl = array('action' => 'delete', $attachment['AssetsAttachment']['id']);
+		$deleteUrl = array_merge(array('?' => $query), $deleteUrl);
+		$actions[] = $this->Croogo->adminRowAction('', $deleteUrl,
 			array('icon' => 'trash', 'tooltip' => __d('croogo', 'Remove this item')),
 			__d('croogo', 'Are you sure?'));
 

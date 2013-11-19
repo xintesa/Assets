@@ -44,13 +44,20 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		try {
 			$raw = file_get_contents($file['tmp_name']);
 			$extension = substr($file['name'], strrpos($file['name'], '.') + 1);
+
 			$imageInfo = $this->__getImageInfo($file['tmp_name']);
+			if (isset($imageInfo['mimeType'])) {
+				$mimeType = $imageInfo['mimeType'];
+			} else {
+				$mimeType = $file['type'];
+			}
+
 			$result = $adapter->write($file['name'], $raw);
 			$storage['filename'] = $file['name'];
 			$storage['filesize'] = $file['size'];
 			$storage['hash'] = sha1($raw);
 			$storage['extension'] = $extension;
-			$storage['mime_type'] = $imageInfo['mimeType'];
+			$storage['mime_type'] = $mimeType;
 			$storage['width'] = $imageInfo['width'];
 			$storage['height'] = $imageInfo['height'];
 			if (empty($storage['path'])) {
@@ -95,7 +102,11 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
 		$Asset =& $Attachment->AssetsAsset;
 		$Attachment->contain('AssetsAsset');
-		$attachment = $Attachment->createFromFile(rtrim(WWW_ROOT, '/') . $src);
+		try {
+			$attachment = $Attachment->createFromFile(rtrim(WWW_ROOT, '/') . $src);
+		} catch (InvalidArgumentException $e) {
+			$this->log(get_class($this) . ': ' . $e->getMessage());
+		}
 
 		$hash = $attachment['AssetsAttachment']['hash'];
 

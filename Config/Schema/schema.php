@@ -49,7 +49,7 @@ class AssetSchema extends CakeSchema {
 		'filesize' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 16),
 		'width' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 16),
 		'height' => array('type' => 'integer', 'null' => true, 'default' => null, 'length' => 16),
-		'mime_type' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 32),
+		'mime_type' => array('type' => 'string', 'null' => false, 'default' => null, 'length' => 32),
 		'extension' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 5),
 		'hash' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
 		'path' => array('type' => 'string', 'null' => false, 'default' => null),
@@ -59,6 +59,7 @@ class AssetSchema extends CakeSchema {
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'ix_assets_hash' => array('column' => array('hash')),
+			'fk_assets' => array('column' => array('model', 'foreign_key')),
 		),
 	);
 
@@ -70,5 +71,9 @@ class AssetSchema extends CakeSchema {
 		'type' => array('type' => 'string', 'length' => 20, 'null' => true, 'default' => null),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'indexes' => array(
+			'PRIMARY' => array('column' => 'id', 'unique' => 1),
+			'fk_asset_usage' => array('column' => array('model', 'foreign_key')),
+		),
 	);
 }

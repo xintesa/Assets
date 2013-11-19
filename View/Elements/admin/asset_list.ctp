@@ -6,8 +6,8 @@ $model = $this->Form->defaultModel;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
 $id = $this->data[$model][$primaryKey];
 
-$Asset = ClassRegistry::init('Assets.AssetsAssetUsage');
-$assets = $Asset->find('modelAssets', array(
+$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+$attachments = $Attachment->find('modelAttachments', array(
 	'model' => $model,
 	'foreign_key' => $id,
 ));
@@ -23,23 +23,71 @@ if (!$this->Helpers->loaded('AssetsImage')) {
 }
 
 $rows = array();
-foreach ($assets as $asset):
+foreach ($attachments as $attachment):
 	$row = $action = array();
-	$path = $asset['AssetsAsset']['path'];
-	$imgUrl = $this->AssetsImage->resize($path, 100, 200,
-		array('adapter' => $asset['AssetsAsset']['adapter']),
-		array('class' => 'img-polaroid', 'alt' => $asset['AssetsAttachment']['title'])
+	$path = $attachment['AssetsAsset']['path'];
+	list($mimeType, ) = explode('/', $attachment['AssetsAsset']['mime_type']);
+
+	if ($mimeType === 'image'):
+		$imgUrl = $this->AssetsImage->resize($path, 100, 200,
+			array('adapter' => $attachment['AssetsAsset']['adapter']),
+			array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
+		);
+		$thumbnail = $this->Html->link($imgUrl, $path,
+			array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
+		);
+	else:
+		$imgUrl = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAsset']['filename'];
+		$thumbnail = $this->Html->link($imgUrl,
+			$attachment['AssetsAsset']['path'], array(
+				'escape' => false,
+				'target' => '_blank',
+			)
+		);
+	endif;
+
+	$preview = $this->Html->div(null, $thumbnail);
+	if ($mimeType === 'image'):
+		$preview .= $this->Html->tag('small', sprintf(
+			'Size: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
+		));
+	endif;
+
+	$changeTypeUrl = array(
+		'admin' => true,
+		'plugin' => 'assets',
+		'controller' => 'assets_asset_usages',
+		'action' => 'change_type',
 	);
-	$thumbnail = $this->Html->link($imgUrl, $path,
-		array('escape' => false, 'class' => 'thickbox', 'title' => $asset['AssetsAttachment']['title'])
-	);
+	$typeCell = $this->Html->link($attachment['AssetsAssetUsage']['type'], 'javascript:void(0)', array(
+		'class' => 'editable editable-click',
+		'data-pk' => $attachment['AssetsAssetUsage']['id'],
+		'data-url' => $this->Html->url($changeTypeUrl),
+		'data-name' => 'type',
+	));
 
+	$row[] = $preview;
+	$row[] = $typeCell;
+	$row[] = $this->Number->toReadableSize($attachment['AssetsAsset']['filesize']);
 
-	$row[] = $thumbnail;
-	$row[] = $asset['AssetsAssetUsage']['type'];
-	$row[] = $this->Number->toReadableSize($asset['AssetsAsset']['filesize']);
-
-	$action[] = $this->Croogo->adminRowAction('Hello', '#');
+	if ($mimeType === 'image'):
+		$detailUrl = array(
+			'plugin' => 'assets',
+			'controller' => 'assets_attachments',
+			'action' => 'browse',
+			'?' => array(
+				'asset_id' => $attachment['AssetsAsset']['id'],
+				'model' => $model,
+				'foreign_key' => $id,
+			),
+		);
+		$action[] = $this->Croogo->adminRowAction('', $detailUrl, array(
+			'icon' => 'suitcase',
+			'rel' => 'browse',
+		));
+	else:
+		$action[] = null;
+	endif;
 	$row[] = implode(' ', $action);
 	$rows[] = $row;
 endforeach;
@@ -47,7 +95,6 @@ endforeach;
 $browseUrl = array_merge(
 	Configure::read('Wysiwyg.attachmentBrowseUrl'),
 	array(
-		'controller' => 'assets_assets',
 		'?' => array('model' => $model, 'foreign_key' => $id),
 	)
 );
@@ -99,3 +146,6 @@ $uploadUrl = array(
 		</table>
 	</div>
 </div>
+<?php
+
+$this->Js->buffer("$('.editable').editable();");

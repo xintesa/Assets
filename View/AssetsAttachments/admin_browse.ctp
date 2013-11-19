@@ -1,6 +1,16 @@
+<style>
+.popover-content { word-wrap: break-word; }
+a i[class^=icon]:hover { text-decoration: none; }
+</style>
+<?php
+$this->Html->script('Croogo.jquery/thickbox-compressed', array('inline' => false));
+$this->Html->css('Croogo.thickbox', array('inline' => false));
+?>
 <div class="attachments index">
 
+	<?php if ($this->layout != 'admin_popup'): ?>
 	<h2><?php echo $title_for_layout; ?></h2>
+	<?php endif; ?>
 
 	<div class="row-fluid">
 		<div class="span12 actions">
@@ -9,7 +19,7 @@
 				echo $this->Croogo->adminAction(
 					__d('croogo', 'New Attachment'),
 					array_merge(
-						array('action' => 'add', 'editor' => 1),
+						array('controller' => 'assets_attachments', 'action' => 'add', 'editor' => 1),
 						array('?' => $this->request->query)
 					)
 				);
@@ -21,37 +31,96 @@
 	<table class="table table-striped">
 	<?php
 		$tableHeaders = $this->Html->tableHeaders(array(
-			$this->Paginator->sort('id', __d('croogo', 'Id')),
+			$this->Paginator->sort('AssetsAsset.id', __d('croogo', 'Id')),
 			'&nbsp;',
-			$this->Paginator->sort('title', __d('croogo', 'Title')),
-			'&nbsp;',
-			__d('croogo', 'URL'),
+			$this->Paginator->sort('title', __d('croogo', 'Title')) . ' ' .
+			$this->Paginator->sort('filename', __d('croogo', 'Filename')) . ' ' .
+			$this->Paginator->sort('width', __d('assets', 'Width')) . ' ' .
+			$this->Paginator->sort('height', __d('assets', 'Height')) . ' ' .
+			$this->Paginator->sort('filesize', __d('croogo', 'Size')),
 			__d('croogo', 'Actions'),
 		));
 		echo $tableHeaders;
 
+		$query = array('?' => $this->request->query);
 		$rows = array();
 		foreach ($attachments as $attachment):
 			$actions = array();
-			$actions[] = $this->Croogo->adminRowAction('',
-				array('controller' => 'assets_attachments', 'action' => 'edit', $attachment['AssetsAttachment']['id'], 'editor' => 1),
+			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
+			$mimeType = $mimeType['0'];
+
+			if (isset($this->request->query['editor'])):
+				$actions[] = $this->Html->link('', '#', array(
+					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
+					'icon' => 'paper-clip',
+					'tooltip' => __d('croogo', 'Insert')
+				));
+			endif;
+
+			$editUrl = Hash::merge($query, array(
+				'controller' => 'assets_attachments',
+				'action' => 'edit',
+				$attachment['AssetsAttachment']['id'],
+				'editor' => 1,
+			));
+			$actions[] = $this->Croogo->adminRowAction('', $editUrl,
 				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
 			);
-			$actions[] = $this->Croogo->adminRowAction('', array(
+
+			$deleteUrl = Hash::merge($query, array(
 				'controller' => 'assets_attachments',
 				'action' => 'delete',
 				$attachment['AssetsAttachment']['id'],
 				'editor' => 1,
-			), array('icon' => 'trash', 'tooltip' => __d('croogo', 'Delete')), __d('croogo', 'Are you sure?'));
+			));
+			$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
+				'icon' => 'trash',
+				'tooltip' => __d('croogo', 'Delete')
+				),
+				__d('croogo', 'Are you sure?')
+			);
 
-			$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
-			$mimeType = $mimeType['0'];
+			if (isset($this->request->query['asset_id'])):
+				unset($query['?']['asset_id']);
+				$addUrl = Hash::merge(array(
+					'controller' => 'assets_asset_usages',
+					'action' => 'add',
+					'?' => array(
+						'asset_id' => $attachment['AssetsAsset']['id'],
+						'model' => $this->request->query['model'],
+						'foreign_key' => $this->request->query['foreign_key'],
+					)
+				), $query);
+				$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
+					'icon' => 'plus',
+					'method' => 'post',
+				));
+			elseif ($mimeType === 'image'):
+				$detailUrl = Hash::merge(array(
+					'action' => 'browse',
+					'?' => array(
+						'asset_id' => $attachment['AssetsAsset']['id'],
+					)
+				), $query);
+				$actions[] = $this->Html->link('', $detailUrl, array(
+					'icon' => 'suitcase',
+				));
+			endif;
+
 			if ($mimeType == 'image') {
-				$thumbnail = $this->Html->link($this->Image->resize($attachment['AssetsAsset']['path'], 100, 200, array(), array('class' => 'img-polaroid')), $attachment['AssetsAsset']['path'], array(
+				$thumbnail = $this->Html->link($this->AssetsImage->resize($attachment['AssetsAsset']['path'], 100, 200, array(), array('class' => 'img-polaroid')), $attachment['AssetsAsset']['path'], array(
 					'class' => 'thickbox',
 					'escape' => false,
 					'title' => $attachment['AssetsAttachment']['title'],
 				));
+				if (!empty($attachment['AssetsAssetUsage']['type'])):
+					$thumbnail .= $this->Html->div(null,
+						$this->Html->tag('span',
+							$attachment['AssetsAssetUsage']['type'],
+							array('class' => 'badge badge-info')
+						)
+					);
+				endif;
 			} else {
 				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAsset']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['AssetsAttachment']['slug']) . ')';
 				$thumbnail = $this->Html->link($thumbnail, '#', array(
@@ -61,21 +130,45 @@
 
 			$actions = $this->Html->div('item-actions', implode(' ', $actions));
 
-			$insertCode = $this->Html->link('', '#', array(
-				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
-				'icon' => 'paper-clip',
-				'tooltip' => __d('croogo', 'Insert')
+			$url = $this->Html->link(
+				Router::url($attachment['AssetsAsset']['path']),
+				$attachment['AssetsAsset']['path'],
+				array(
+					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
+					'target' => '_blank',
+				)
+			);
+			$urlPopover = $this->Croogo->adminRowAction('', '#', array(
+				'class' => 'popovers',
+				'icon' => 'link',
+				'iconSize' => 'small',
+				'data-title' => __d('croogo', 'URL'),
+				'data-html' => true,
+				'data-placement' => 'top',
+				'data-content' => $url,
 			));
 
+			$title = $this->Html->para(null, $attachment['AssetsAttachment']['title']);
+			$title .= $this->Html->para(null,
+				$this->Text->truncate(
+					$attachment['AssetsAsset']['filename'], 30
+				) . '&nbsp;' . $urlPopover,
+				array('title' => $attachment['AssetsAsset']['filename'])
+			);
+
+			$title .= $this->Html->para(null, 'Dimension: ' .
+				$attachment['AssetsAsset']['width'] . ' x ' .
+				$attachment['AssetsAsset']['height']
+			);
+
+			$title .= $this->Html->para(null,
+				'Size: ' . $this->Number->toReadableSize($attachment['AssetsAsset']['filesize'])
+			);
+
 			$rows[] = array(
-				$attachment['AssetsAttachment']['id'],
+				$attachment['AssetsAsset']['id'],
 				$thumbnail,
-				$attachment['AssetsAttachment']['title'],
-				$insertCode,
-				$this->Html->link(Router::url($attachment['AssetsAsset']['path']),
-					$attachment['AssetsAsset']['path'],
-					array('onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');")
-				),
+				$title,
 				$actions,
 			);
 		endforeach;
@@ -100,3 +193,6 @@
 		<div class="counter"><?php echo $this->Paginator->counter(array('format' => __d('croogo', 'Page %page% of %pages%, showing %current% records out of %count% total, starting on record %start%, ending on %end%'))); ?></div>
 	</div>
 </div>
+<?php
+
+$this->Js->buffer("$('.popovers').popover().on('click', function() { return false; });");

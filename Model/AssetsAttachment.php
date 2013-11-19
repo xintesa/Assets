@@ -28,6 +28,8 @@ class AssetsAttachment extends AssetsAppModel {
 
 	public $findMethods = array(
 		'duplicate' => true,
+		'modelAttachments' => true,
+		'versions' => true,
 	);
 
 /**
@@ -51,6 +53,88 @@ class AssetsAttachment extends AssetsAppModel {
 		} else {
 			return $results;
 		}
+	}
+
+	protected function _findModelAttachments($state, $query = array(), $results = array()) {
+		if ($state === 'after') {
+			return $results;
+		}
+		$model = $foreignKey = null;
+		if (isset($query['model'])) {
+			$model = $query['model'];
+			unset($query['model']);
+		}
+		if (isset($query['foreign_key'])) {
+			$foreignKey = $query['foreign_key'];
+			unset($query['foreign_key']);
+		}
+		$this->unbindModel(array('hasOne' => array('AssetsAsset')));
+		$this->bindModel(array(
+			'hasOne' => array(
+				'AssetsAsset' => array(
+					'className' => 'Assets.AssetsAsset',
+					'foreignKey' => false,
+					'conditions' => array(
+						'AssetsAsset.model = \'AssetsAttachment\'',
+						'AssetsAsset.foreign_key = AssetsAttachment.id',
+					),
+				),
+				'AssetsAssetUsage' => array(
+					'className' => 'Assets.AssetUsage',
+					'foreignKey' => false,
+					'conditions' => array(
+						'AssetsAsset.id = AssetsAssetUsage.asset_id',
+					),
+				),
+			)
+		));
+		$query = Hash::merge($query, array(
+			'conditions' => array(
+				'AssetsAssetUsage.model' => $model,
+				'AssetsAssetUsage.foreign_key' => $foreignKey,
+			),
+		));
+		return $query;
+	}
+
+	protected function _findVersions($state, $query = array(), $results = array()) {
+		if ($state === 'after') {
+			return $results;
+		}
+		$assetId = $model = $foreignKey = null;
+		if (isset($query['asset_id'])) {
+			$assetId = $query['asset_id'];
+			unset($query['asset_id']);
+		}
+		if (isset($query['model'])) {
+			$model = $query['model'];
+			unset($query['model']);
+		}
+		if (isset($query['foreign_key'])) {
+			$foreignKey = $query['foreign_key'];
+			unset($query['foreign_key']);
+		}
+		$this->unbindModel(array('hasOne' => array('AssetsAsset')));
+		$this->bindModel(array(
+			'hasOne' => array(
+				'AssetsAsset' => array(
+					'className' => 'Assets.AssetsAsset',
+					'foreignKey' => false,
+					'conditions' => array(
+						'AssetsAsset.model = \'AssetsAttachment\'',
+						'AssetsAsset.foreign_key = AssetsAttachment.id',
+					),
+				),
+				'AssetsAssetUsage' => array(
+					'className' => 'Assets.AssetUsage',
+					'foreignKey' => false,
+					'conditions' => array(
+						'AssetsAsset.id = AssetsAssetUsage.asset_id',
+					),
+				),
+			)
+		));
+		return $query;
 	}
 
 	public function beforeSave($options = array()) {
