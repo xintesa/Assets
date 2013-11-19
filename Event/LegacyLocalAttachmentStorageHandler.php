@@ -102,7 +102,11 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
 		$Asset =& $Attachment->AssetsAsset;
 		$Attachment->contain('AssetsAsset');
-		$attachment = $Attachment->createFromFile(rtrim(WWW_ROOT, '/') . $src);
+		try {
+			$attachment = $Attachment->createFromFile(rtrim(WWW_ROOT, '/') . $src);
+		} catch (InvalidArgumentException $e) {
+			$this->log(get_class($this) . ': ' . $e->getMessage());
+		}
 
 		$hash = $attachment['AssetsAttachment']['hash'];
 
