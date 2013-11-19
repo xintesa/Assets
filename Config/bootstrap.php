@@ -48,7 +48,7 @@ foreach ($actions as $action):
 	Croogo::hookHelper($controller, 'Assets.AssetsAdmin');
 endforeach;
 
-Croogo::hookBehavior('Node', 'Assets.LinkedAssets');
+Croogo::hookBehavior('Node', 'Assets.LinkedAssets', array('priority' => 9));
 
 CroogoNav::add('media.children.attachments', array(
 	'title' => __d('croogo', 'Attachments'),
