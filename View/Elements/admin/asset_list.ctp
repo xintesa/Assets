@@ -49,10 +49,22 @@ foreach ($attachments as $attachment):
 	$preview = $this->Html->div(null, $thumbnail);
 	$preview .= $this->Html->tag('small', sprintf(
 		'Size: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
+
+	$changeTypeUrl = array(
+		'admin' => true,
+		'plugin' => 'assets',
+		'controller' => 'assets_asset_usages',
+		'action' => 'change_type',
+	);
+	$typeCell = $this->Html->link($attachment['AssetsAssetUsage']['type'], 'javascript:void(0)', array(
+		'class' => 'editable editable-click',
+		'data-pk' => $attachment['AssetsAssetUsage']['id'],
+		'data-url' => $this->Html->url($changeTypeUrl),
+		'data-name' => 'type',
 	));
 
 	$row[] = $preview;
-	$row[] = $attachment['AssetsAssetUsage']['type'];
+	$row[] = $typeCell;
 	$row[] = $this->Number->toReadableSize($attachment['AssetsAsset']['filesize']);
 
 	$detailUrl = array(
@@ -127,3 +139,6 @@ $uploadUrl = array(
 		</table>
 	</div>
 </div>
+<?php
+
+$this->Js->buffer("$('.editable').editable();");

@@ -43,7 +43,9 @@ $actions = array(
 );
 $tabTitle = __d('assets', 'Assets');
 foreach ($actions as $action):
+	list($controller, ) = explode('/', $action);
 	Croogo::hookAdminTab($action, $tabTitle, 'Assets.admin/asset_list');
+	Croogo::hookHelper($controller, 'Assets.AssetsAdmin');
 endforeach;
 
 Croogo::hookBehavior('Node', 'Assets.LinkedAssets');

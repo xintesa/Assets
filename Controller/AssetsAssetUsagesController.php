@@ -8,6 +8,18 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		'Assets.AssetsAssetUsage',
 	);
 
+	public function beforeFilter() {
+		parent::beforeFilter();
+
+		$excludeActions = array(
+			'admin_change_type',
+		);
+		if (in_array($this->request->params['action'], $excludeActions)) {
+			$this->Security->validatePost = false;
+			$this->Security->csrfCheck = false;
+		}
+	}
+
 	public function admin_add() {
 		if (isset($this->request->query)) {
 			$assetId = $model = $foreignKey = $type = null;
@@ -38,6 +50,18 @@ class AssetsAssetUsagesController extends AssetsAppController {
 			}
 		}
 		$this->redirect($this->referer());
+	}
+
+	public function admin_change_type() {
+		$this->viewClass = 'Json';
+		$result = true;
+		if (isset($this->request->data['pk'])) {
+			$data = $this->request->data;
+			$this->AssetsAssetUsage->id = $data['pk'];
+			$result = $this->AssetsAssetUsage->saveField('type', $data['value']);
+		}
+		$this->set(compact('result'));
+		$this->set('_serialize', 'result');
 	}
 
 }

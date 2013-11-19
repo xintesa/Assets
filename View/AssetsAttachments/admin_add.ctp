@@ -43,7 +43,14 @@ $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->quer
 				'type' => 'hidden',
 				'value' => $foreignKey,
 			));
+
 			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
+
+			echo $this->Form->input($assetUsage . 'featured_image', array(
+				'type' => 'checkbox',
+				'label' => 'Featured Image',
+			));
+
 			echo $this->Form->input('AssetsAsset.adapter', array(
 				'type' => 'select',
 				'default' => 'LocalAttachment',

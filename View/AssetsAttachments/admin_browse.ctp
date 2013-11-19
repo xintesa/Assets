@@ -113,6 +113,14 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 					'escape' => false,
 					'title' => $attachment['AssetsAttachment']['title'],
 				));
+				if (!empty($attachment['AssetsAssetUsage']['type'])):
+					$thumbnail .= $this->Html->div(null,
+						$this->Html->tag('span',
+							$attachment['AssetsAssetUsage']['type'],
+							array('class' => 'badge badge-info')
+						)
+					);
+				endif;
 			} else {
 				$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAsset']['mime_type'] . ' (' . $this->Filemanager->filename2ext($attachment['AssetsAttachment']['slug']) . ')';
 				$thumbnail = $this->Html->link($thumbnail, '#', array(
@@ -154,7 +162,7 @@ $this->Html->css('Croogo.thickbox', array('inline' => false));
 			);
 
 			$title .= $this->Html->para(null,
-				'Size: ' .$this->Number->toReadableSize($attachment['AssetsAsset']['filesize'])
+				'Size: ' . $this->Number->toReadableSize($attachment['AssetsAsset']['filesize'])
 			);
 
 			$rows[] = array(
