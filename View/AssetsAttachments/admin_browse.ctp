@@ -148,21 +148,28 @@ endif;
 				__d('croogo', 'Are you sure?')
 			);
 
-			if (isset($this->request->query['asset_id'])):
+			if (isset($this->request->query['asset_id']) ||
+				isset($this->request->query['all'])
+			):
 				unset($query['?']['asset_id']);
-				$addUrl = Hash::merge(array(
-					'controller' => 'assets_asset_usages',
-					'action' => 'add',
-					'?' => array(
-						'asset_id' => $attachment['AssetsAsset']['id'],
-						'model' => $this->request->query['model'],
-						'foreign_key' => $this->request->query['foreign_key'],
-					)
-				), $query);
-				$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
-					'icon' => 'plus',
-					'method' => 'post',
-				));
+
+				if ($attachment['AssetsAssetUsage']['foreign_key'] != $foreignKey ||
+					$attachment['AssetsAssetUsage']['model'] != $model
+				):
+					$addUrl = Hash::merge(array(
+						'controller' => 'assets_asset_usages',
+						'action' => 'add',
+						'?' => array(
+							'asset_id' => $attachment['AssetsAsset']['id'],
+							'model' => $this->request->query['model'],
+							'foreign_key' => $this->request->query['foreign_key'],
+						)
+					), $query);
+					$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
+						'icon' => 'plus',
+						'method' => 'post',
+					));
+				endif;
 			elseif ($mimeType === 'image'):
 				$detailUrl = Hash::merge(array(
 					'action' => 'browse',
@@ -181,7 +188,10 @@ endif;
 					'escape' => false,
 					'title' => $attachment['AssetsAttachment']['title'],
 				));
-				if (!empty($attachment['AssetsAssetUsage']['type'])):
+				if (!empty($attachment['AssetsAssetUsage']['type']) &&
+					$attachment['AssetsAssetUsage']['foreign_key'] === $foreignKey &&
+					$attachment['AssetsAssetUsage']['model'] === $model
+				):
 					$thumbnail .= $this->Html->div(null,
 						$this->Html->link(
 							$this->Html->tag('span',
