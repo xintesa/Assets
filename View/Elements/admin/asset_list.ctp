@@ -46,11 +46,29 @@ foreach ($attachments as $attachment):
 		);
 	endif;
 
-	$row[] = $thumbnail;
+	$preview = $this->Html->div(null, $thumbnail);
+	$preview .= $this->Html->tag('small', sprintf(
+		'Size: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
+	));
+
+	$row[] = $preview;
 	$row[] = $attachment['AssetsAssetUsage']['type'];
 	$row[] = $this->Number->toReadableSize($attachment['AssetsAsset']['filesize']);
 
-	$action[] = $this->Croogo->adminRowAction('Hello', '#');
+	$detailUrl = array(
+		'plugin' => 'assets',
+		'controller' => 'assets_attachments',
+		'action' => 'browse',
+		'?' => array(
+			'asset_id' => $attachment['AssetsAsset']['id'],
+			'model' => $model,
+			'foreign_key' => $id,
+		),
+	);
+	$action[] = $this->Croogo->adminRowAction('', $detailUrl, array(
+		'icon' => 'suitcase',
+		'rel' => 'browse',
+	));
 	$row[] = implode(' ', $action);
 	$rows[] = $row;
 endforeach;
