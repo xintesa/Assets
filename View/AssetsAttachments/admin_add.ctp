@@ -34,22 +34,27 @@ $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->quer
 
 			<div id="attachment-upload" class="tab-pane">
 			<?php
-			$assetUsage = 'AssetsAsset.AssetsAssetUsage.0.';
-			echo $this->Form->input($assetUsage . 'model', array(
-				'type' => 'hidden',
-				'value' => $model,
-			));
-			echo $this->Form->input($assetUsage . 'foreign_key', array(
-				'type' => 'hidden',
-				'value' => $foreignKey,
-			));
+
+			if (isset($model) && isset($foreignKey)):
+				$assetUsage = 'AssetsAsset.AssetsAssetUsage.0.';
+				echo $this->Form->input($assetUsage . 'model', array(
+					'type' => 'hidden',
+					'value' => $model,
+				));
+				echo $this->Form->input($assetUsage . 'foreign_key', array(
+					'type' => 'hidden',
+					'value' => $foreignKey,
+				));
+			endif;
 
 			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
 
-			echo $this->Form->input($assetUsage . 'featured_image', array(
-				'type' => 'checkbox',
-				'label' => 'Featured Image',
-			));
+			if (isset($model) && isset($foreignKey)):
+				echo $this->Form->input($assetUsage . 'featured_image', array(
+					'type' => 'checkbox',
+					'label' => 'Featured Image',
+				));
+			endif;
 
 			echo $this->Form->input('AssetsAsset.adapter', array(
 				'type' => 'select',
