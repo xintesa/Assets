@@ -60,6 +60,10 @@ class AssetSchema extends CakeSchema {
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'ix_assets_hash' => array('column' => array('hash')),
 			'fk_assets' => array('column' => array('model', 'foreign_key')),
+			'un_assets_dimension' => array(
+				'unique' => true,
+				'column' => array('parent_asset_id', 'width', 'height'),
+			),
 		),
 	);
 
@@ -69,8 +73,10 @@ class AssetSchema extends CakeSchema {
 		'model' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
 		'foreign_key' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 36),
 		'type' => array('type' => 'string', 'length' => 20, 'null' => true, 'default' => null),
+		'url' => array('type' => 'string', 'length' => 512, 'null' => true),
 		'created' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
+		'params' => array('type' => 'text', 'null' => true, 'default' => null),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
 			'fk_asset_usage' => array('column' => array('model', 'foreign_key')),
