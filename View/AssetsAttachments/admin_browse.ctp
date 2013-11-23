@@ -183,11 +183,19 @@ endif;
 			endif;
 
 			if ($mimeType == 'image') {
-				$thumbnail = $this->Html->link($this->AssetsImage->resize($attachment['AssetsAsset']['path'], 100, 200, array(), array('class' => 'img-polaroid')), $attachment['AssetsAsset']['path'], array(
-					'class' => 'thickbox',
-					'escape' => false,
-					'title' => $attachment['AssetsAttachment']['title'],
-				));
+				$img = $this->AssetsImage->resize(
+					$attachment['AssetsAsset']['path'], 100, 200,
+					array('adapter' => $attachment['AssetsAsset']['adapter']),
+					array('class' => 'img-polaroid')
+				);
+				$thumbnail = $this->Html->link($img,
+					$attachment['AssetsAsset']['path'],
+					array(
+						'class' => 'thickbox',
+						'escape' => false,
+						'title' => $attachment['AssetsAttachment']['title'],
+					)
+				);
 				if (!empty($attachment['AssetsAssetUsage']['type']) &&
 					$attachment['AssetsAssetUsage']['foreign_key'] === $foreignKey &&
 					$attachment['AssetsAssetUsage']['model'] === $model
