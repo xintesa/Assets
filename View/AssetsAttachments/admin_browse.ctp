@@ -161,8 +161,8 @@ endif;
 						'action' => 'add',
 						'?' => array(
 							'asset_id' => $attachment['AssetsAsset']['id'],
-							'model' => $this->request->query['model'],
-							'foreign_key' => $this->request->query['foreign_key'],
+							'model' => $model,
+							'foreign_key' => $foreignKey,
 						)
 					), $query);
 					$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(

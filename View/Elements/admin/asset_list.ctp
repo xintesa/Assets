@@ -49,7 +49,7 @@ foreach ($attachments as $attachment):
 	$preview = $this->Html->div(null, $thumbnail);
 	if ($mimeType === 'image'):
 		$preview .= $this->Html->tag('small', sprintf(
-			'Size: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
+			'Dimension: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
 		));
 	endif;
 

@@ -26,6 +26,7 @@ echo $this->Form->create('AssetsAttachment', array(
 		<ul class="nav nav-tabs">
 		<?php
 			echo $this->Croogo->adminTab(__d('croogo', 'Attachment'), '#attachment-main');
+			echo $this->Croogo->adminTabs();
 		?>
 		</ul>
 
