@@ -91,55 +91,17 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEv
 		return $model->deleteAll(array('parent_asset_id' => $model->id), true, true);
 	}
 
-	public function onResizeImage($Event) {
-		if (!$this->_check($Event)) {
-			return true;
-		}
-		if (!$Event->data['result']) {
-			return true;
-		}
-		$doc = new DOMDocument();
-		$doc->loadHTML($Event->data['result']);
-		$imgTags = $doc->getElementsByTagName('img');
-		if ($imgTags->length == 0) {
-			return;
-		}
-		$src = $imgTags->item(0)->getAttribute('src');
-		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
-		$Asset =& $Attachment->AssetsAsset;
-		$Attachment->contain('AssetsAsset');
-		try {
-			$attachment = $Attachment->createFromFile(rtrim(WWW_ROOT, '/') . $src);
-		} catch (InvalidArgumentException $e) {
-			$this->log(get_class($this) . ': ' . $e->getMessage());
-			return false;
-		}
-
-		$hash = $attachment['AssetsAttachment']['hash'];
-
-		$existing = $Asset->find('count', array(
-			'conditions' => array($Asset->escapeField('hash') => $hash),
-		));
-		if ($existing > 0) {
-			return true;
-		}
-
+/**
+ * Find parent of the resized image
+ */
+	protected function _parentAsset($attachment) {
 		$path = $attachment['AssetsAttachment']['import_path'];
 		$parts = pathinfo($path);
 		list($filename, ) = explode('.', $parts['filename'], 2);
-		$hash = sha1_file(WWW_ROOT . $parts['dirname'] . '/' . $filename . '.' . $parts['extension']);
-		$parent = $Attachment->findByHash($hash);
-
-		$asset = $Asset->create(array(
-			'parent_asset_id' => $parent['AssetsAsset']['id'],
-			'model' => $parent['AssetsAsset']['model'],
-			'foreign_key' => $parent['AssetsAsset']['foreign_key'],
-			'adapter' => $parent['AssetsAsset']['adapter'],
-			'path' => $path,
-			'hash' => $hash,
-		));
-
-		return $Asset->save($asset);
+		$filename = rtrim(WWW_ROOT, '/') . $parts['dirname'] . '/' . $filename . '.' . $parts['extension'];
+		$hash = sha1_file($filename);
+		$this->Attachment->AssetsAsset->recursive = -1;
+		return $this->Attachment->AssetsAsset->findByHash($hash);
 	}
 
 }
