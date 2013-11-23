@@ -58,7 +58,7 @@ class AssetSchema extends CakeSchema {
 		'modified' => array('type' => 'datetime', 'null' => true, 'default' => null),
 		'indexes' => array(
 			'PRIMARY' => array('column' => 'id', 'unique' => 1),
-			'ix_assets_hash' => array('column' => array('hash')),
+			'ix_assets_hash' => array('column' => array('hash', 'path')),
 			'fk_assets' => array('column' => array('model', 'foreign_key')),
 			'un_assets_dimension' => array(
 				'unique' => true,
