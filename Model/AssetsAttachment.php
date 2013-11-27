@@ -13,6 +13,7 @@ class AssetsAttachment extends AssetsAppModel {
 	public $actsAs = array(
 		'Croogo.Trackable',
 		'Search.Searchable',
+		'Imagine.Imagine',
 	);
 
 	public $hasOne = array(
@@ -307,6 +308,72 @@ class AssetsAttachment extends AssetsAppModel {
 
 			return $this->_createImportTask($files, $options);
 		}
+	}
+
+/**
+ * Copy an existing attachment and resize with width: $w and height: $h
+ *
+ * @param integer $id Attachment Id
+ * @param integer $w New Width
+ * @param integer $h New Height
+ * @param array $options Options array
+ */
+	public function createResized($id, $w, $h, $options = array()) {
+		$options = Hash::merge(array(
+			'uploadsDir' => 'assets',
+		), $options);
+		$imagine = $this->imagineObject();
+		$this->recursive = -1;
+		$this->contain(array('AssetsAsset'));
+		$attachment = $this->findById($id);
+		$asset =& $attachment['AssetsAsset'];
+		$path = rtrim(WWW_ROOT, '/') . $asset['path'];
+
+		$image = $imagine->open($path);
+		$size = $image->getSize();
+		$width = $size->getWidth();
+		$height = $size->getHeight();
+
+		if (empty($h) && !empty($w)) {
+			$scale = $w / $width;
+			$newSize = $size->scale($scale);
+		} elseif (empty($w) && !empty($h)) {
+			$scale = $h / $height;
+			$newSize = $size->scale($scale);
+		} else {
+			$scaleWidth = $w / $width;
+			$scaleHeight = $h / $height;
+			$scale = $scaleWidth > $scaleHeight ? $scaleWidth : $scaleHeight;
+			$newSize = $size->scale($scale);
+		}
+
+		$image->resize($newSize);
+
+		$tmpName = tempnam('/tmp', 'qq');
+		$image->save($tmpName, array('format' => $asset['extension']));
+		$raw = file_get_contents($tmpName);
+		unlink($tmpName);
+
+		$info = pathinfo($asset['path']);
+		$ind = sprintf('.resized-%dx%d.', $newSize->getWidth(), $newSize->getHeight());
+
+		$uploadsDir = str_replace('/' . $options['uploadsDir'] . '/', '', dirname($asset['path'])) . '/';
+		$writePath = $uploadsDir . $info['filename'] . $ind . $info['extension'];
+
+		$filesystem = StorageManager::adapter($asset['adapter']);
+		$filesystem->write($writePath, $raw);
+
+		$data = $this->AssetsAsset->create(array(
+			'path' => dirname($asset['path']) . '/' . $info['filename'] . $ind . $info['extension'],
+			'model' => $asset['model'],
+			'extension' => $asset['extension'],
+			'parent_asset_id' => $asset['id'],
+			'foreign_key' => $asset['foreign_key'],
+			'adapter' => 'Gallery',
+		));
+
+		$asset = $this->AssetsAsset->save($data);
+		return $asset;
 	}
 
 }
