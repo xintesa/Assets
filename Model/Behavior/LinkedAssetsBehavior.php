@@ -20,9 +20,8 @@ class LinkedAssetsBehavior extends ModelBehavior {
 	}
 
 	public function beforeFind(Model $model, $query) {
-		$queryTypes = array('promoted');
-		if (isset($query['type']) && in_array($query['type'], $queryTypes)) {
-			if (empty($query['contain']['AssetsAssetUsage'])) {
+		if (isset($query['contain'])) {
+			if (!isset($query['contain']['AssetsAssetUsage'])) {
 				$query['contain']['AssetsAssetUsage'] = 'AssetsAsset';
 			}
 		}
