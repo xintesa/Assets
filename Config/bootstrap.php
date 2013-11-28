@@ -55,6 +55,8 @@ foreach ($models as $model) {
 	Croogo::hookBehavior($model, 'Assets.LinkedAssets', array('priority' => 9));
 }
 
+Croogo::hookHelper('*', 'Assets.AssetsFilter');
+
 CroogoNav::add('media.children.attachments', array(
 	'title' => __d('croogo', 'Attachments'),
 	'url' => array(
