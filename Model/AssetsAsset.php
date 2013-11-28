@@ -39,7 +39,7 @@ class AssetsAsset extends AssetsAppModel {
 		return true;
 	}
 
-	public function beforeDelete($cascade) {
+	public function beforeDelete($cascade = true) {
 		if (!parent::beforeDelete($cascade)) {
 			return false;
 		}
