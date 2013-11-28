@@ -151,7 +151,7 @@ class StorageManager {
 		return $engineObject;
 	}
 
-	public function configured() {
+	public static function configured() {
 		$_this = StorageManager::getInstance();
 		$config = array();
 		foreach ($_this->_adapterConfig as $k => $v) {
