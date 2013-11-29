@@ -86,7 +86,8 @@ foreach ($attachments as $attachment):
 		);
 		$action[] = $this->Croogo->adminRowAction('', $detailUrl, array(
 			'icon' => 'suitcase',
-			'rel' => 'browse',
+			'data-toggle' => 'browse',
+			'tooltip' => __d('assets', 'View other sizes'),
 		));
 	else:
 		$action[] = null;
@@ -125,7 +126,7 @@ $uploadUrl = array(
 					array(
 						'icon' => 'folder-open',
 						'iconSize' => 'small',
-						'rel' => 'browse',
+						'data-toggle' => 'browse',
 					)
 				);
 				echo $this->Croogo->adminAction(__d('assets', 'Upload'),
@@ -133,7 +134,7 @@ $uploadUrl = array(
 					array(
 						'icon' => 'upload-alt',
 						'iconSize' => 'small',
-						'rel' => 'browse',
+						'data-toggle' => 'browse',
 					)
 				);
 			?>

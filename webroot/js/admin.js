@@ -17,5 +17,5 @@ Assets.popup = function(e) {
 }
 
 $(function() {
-	$('body').on('click', 'a[rel=browse]', Assets.popup);
+	$('body').on('click', 'a[data-toggle=browse]', Assets.popup);
 });
