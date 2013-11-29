@@ -29,6 +29,7 @@ if (!empty($this->request->query['all'])):
 	$all = $this->request->query['all'];
 endif;
 
+$extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$foreignKey]";
 ?>
 <div class="attachments index">
 
@@ -153,9 +154,8 @@ endif;
 			):
 				unset($query['?']['asset_id']);
 
-				if ($attachment['AssetsAssetUsage']['foreign_key'] != $foreignKey ||
-					$attachment['AssetsAssetUsage']['model'] != $model
-				):
+				$usage = Hash::extract($attachment, $extractPath);
+				if (!empty($usage)):
 					$addUrl = Hash::merge(array(
 						'controller' => 'assets_asset_usages',
 						'action' => 'add',

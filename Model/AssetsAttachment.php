@@ -152,14 +152,11 @@ class AssetsAttachment extends AssetsAppModel {
 						'AssetsAsset.foreign_key = AssetsAttachment.id',
 					),
 				),
-				'AssetsAssetUsage' => array(
-					'className' => 'Assets.AssetUsage',
-					'foreignKey' => false,
-					'conditions' => array(
-						'AssetsAsset.id = AssetsAssetUsage.asset_id',
-					),
-				),
 			)
+		));
+		$contain = isset($query['contain']) ? $query['contain'] : array();
+		$query['contain'] = Hash::merge($contain, array(
+			'AssetsAsset' => array('AssetsAssetUsage'),
 		));
 		if ($assetId && !isset($all)) {
 			$query['conditions'] = Hash::merge($query['conditions'], array(
