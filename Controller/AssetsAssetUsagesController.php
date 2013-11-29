@@ -12,7 +12,7 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		parent::beforeFilter();
 
 		$excludeActions = array(
-			'admin_change_type',
+			'admin_change_type', 'admin_unregister',
 		);
 		if (in_array($this->request->params['action'], $excludeActions)) {
 			$this->Security->validatePost = false;
@@ -77,6 +77,16 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		if (isset($id)) {
 			$this->AssetsAssetUsage->id = $id;
 			$result = $this->AssetsAssetUsage->saveField('type', $value);
+		}
+		$this->set(compact('result'));
+		$this->set('_serialize', 'result');
+	}
+
+	public function admin_unregister() {
+		$this->viewClass = 'Json';
+		$result = false;
+		if (isset($this->request->data['id'])) {
+			$result = $this->AssetsAssetUsage->delete($this->request->data['id']);
 		}
 		$this->set(compact('result'));
 		$this->set('_serialize', 'result');

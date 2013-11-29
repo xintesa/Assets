@@ -1,3 +1,11 @@
+<style>
+td .actions a:hover{
+	text-decoration: none;
+}
+td .actions a.unregister-usage {
+	color: #9D261D;
+}
+</style>
 <?php
 
 $this->Html->script('Assets.admin.js', array('inline' => false));
@@ -6,7 +14,24 @@ $model = isset($model) ? $model : $this->Form->defaultModel;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
 $id = isset($foreignKey) ? $foreignKey : $this->data[$model][$primaryKey];
 
-$ajaxUrl = $this->Html->url(array(
+$detailUrl = array(
+	'plugin' => 'assets',
+	'controller' => 'assets_attachments',
+	'action' => 'browse',
+	'?' => array(
+		'model' => $model,
+		'foreign_key' => $id,
+	),
+);
+
+$changeTypeUrl = array(
+	'admin' => true,
+	'plugin' => 'assets',
+	'controller' => 'assets_asset_usages',
+	'action' => 'change_type',
+);
+
+$assetListUrl = $this->Html->url(array(
 	'admin' => true,
 	'plugin' => 'assets',
 	'controller' => 'assets_attachments',
@@ -16,6 +41,13 @@ $ajaxUrl = $this->Html->url(array(
 		'foreign_key' => $id,
 	),
 ));
+
+$unregisterUsageUrl = array(
+	'admin' => true,
+	'plugin' => 'assets',
+	'controller' => 'assets_asset_usages',
+	'action' => 'unregister',
+);
 
 if (!isset($attachments)):
 	$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
@@ -69,12 +101,8 @@ foreach ($attachments as $attachment):
 		));
 	endif;
 
-	$changeTypeUrl = array(
-		'admin' => true,
-		'plugin' => 'assets',
-		'controller' => 'assets_asset_usages',
-		'action' => 'change_type',
-	);
+	$detailUrl['?']['asset_id'] = $attachment['AssetsAsset']['id'];
+
 	$typeCell = $this->Html->link($attachment['AssetsAssetUsage']['type'], 'javascript:void(0)', array(
 		'class' => 'editable editable-click usage-type',
 		'data-pk' => $attachment['AssetsAssetUsage']['id'],
@@ -87,16 +115,6 @@ foreach ($attachments as $attachment):
 	$row[] = $this->Number->toReadableSize($attachment['AssetsAsset']['filesize']);
 
 	if ($mimeType === 'image'):
-		$detailUrl = array(
-			'plugin' => 'assets',
-			'controller' => 'assets_attachments',
-			'action' => 'browse',
-			'?' => array(
-				'asset_id' => $attachment['AssetsAsset']['id'],
-				'model' => $model,
-				'foreign_key' => $id,
-			),
-		);
 		$action[] = $this->Croogo->adminRowAction('', $detailUrl, array(
 			'icon' => 'suitcase',
 			'data-toggle' => 'browse',
@@ -110,10 +128,17 @@ foreach ($attachments as $attachment):
 			'data-value' => 'FeaturedImage',
 			'tooltip' => __d('assets', 'Set as FeaturedImage'),
 		));
+
+		$action[] = $this->Croogo->adminRowAction('', $unregisterUsageUrl, array(
+			'icon' => 'trash',
+			'class' => 'unregister-usage',
+			'data-id' => $attachment['AssetsAssetUsage']['id'],
+			'tooltip' => __d('assets', 'Unregister asset from this resource'),
+		));
 	else:
 		$action[] = null;
 	endif;
-	$row[] = implode('&nbsp;', $action);
+	$row[] = '<span class="actions">' . implode('&nbsp;', $action) . '</span>';
 	$rows[] = $row;
 endforeach;
 
@@ -173,7 +198,7 @@ $uploadUrl = array(
 </div>
 <div class="row-fluid">
 	<div class="span12">
-		<table class="table asset-list" data-url="<?php echo $ajaxUrl; ?>">
+		<table class="table asset-list" data-url="<?php echo $assetListUrl; ?>">
 			<thead><?php echo $this->Html->tableHeaders($headers); ?></thead>
 			<tbody><?php echo $this->Html->tableCells($rows); ?></tbody>
 		</table>
