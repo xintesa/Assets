@@ -2,15 +2,28 @@
 
 $this->Html->script('Assets.admin.js', array('inline' => false));
 
-$model = $this->Form->defaultModel;
+$model = isset($model) ? $model : $this->Form->defaultModel;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
-$id = $this->data[$model][$primaryKey];
+$id = isset($foreignKey) ? $foreignKey : $this->data[$model][$primaryKey];
 
-$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
-$attachments = $Attachment->find('modelAttachments', array(
-	'model' => $model,
-	'foreign_key' => $id,
+$ajaxUrl = $this->Html->url(array(
+	'admin' => true,
+	'plugin' => 'assets',
+	'controller' => 'assets_attachments',
+	'action' => 'list',
+	'?' => array(
+		'model' => $model,
+		'foreign_key' => $id,
+	),
 ));
+
+if (!isset($attachments)):
+	$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+	$attachments = $Attachment->find('modelAttachments', array(
+		'model' => $model,
+		'foreign_key' => $id,
+	));
+endif;
 
 $headers = array(
 	__d('croogo', 'Preview'),
@@ -129,6 +142,14 @@ $uploadUrl = array(
 		<div class="actions pull-right">
 			<ul class="nav-buttons">
 			<?php
+				echo $this->Croogo->adminAction(__d('assets', 'Reload'),
+					$browseUrl,
+					array(
+						'icon' => 'refresh',
+						'iconSize' => 'small',
+						'data-toggle' => 'refresh',
+					)
+				);
 				echo $this->Croogo->adminAction(__d('assets', 'Browse'),
 					$browseUrl,
 					array(
@@ -152,7 +173,7 @@ $uploadUrl = array(
 </div>
 <div class="row-fluid">
 	<div class="span12">
-		<table class="table">
+		<table class="table asset-list" data-url="<?php echo $ajaxUrl; ?>">
 			<thead><?php echo $this->Html->tableHeaders($headers); ?></thead>
 			<tbody><?php echo $this->Html->tableCells($rows); ?></tbody>
 		</table>
@@ -160,4 +181,12 @@ $uploadUrl = array(
 </div>
 <?php
 
-$this->Js->buffer("$('.editable').editable();");
+$script =<<<EOF
+	$('.editable').editable();
+	tb_init('a.thickbox');
+EOF;
+if ($this->request->is('ajax')):
+	echo $this->Html->scriptBlock($script);
+else:
+	$this->Js->buffer($script);
+endif;

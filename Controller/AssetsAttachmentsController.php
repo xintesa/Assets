@@ -235,4 +235,18 @@ class AssetsAttachmentsController extends AssetsAppController {
 		$this->admin_index();
 	}
 
+	public function admin_list() {
+		$this->paginate = array(
+			'modelAttachments',
+			'model' => $this->request->query['model'],
+			'foreign_key' => $this->request->query['foreign_key'],
+		);
+		if ($this->request->is('ajax')) {
+			$this->layout = 'ajax';
+			$this->paginate['limit'] = 100;
+		}
+		$attachments = $this->paginate();
+		$this->set(compact('attachments'));
+	}
+
 }
