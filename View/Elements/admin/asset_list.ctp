@@ -63,7 +63,7 @@ foreach ($attachments as $attachment):
 		'action' => 'change_type',
 	);
 	$typeCell = $this->Html->link($attachment['AssetsAssetUsage']['type'], 'javascript:void(0)', array(
-		'class' => 'editable editable-click',
+		'class' => 'editable editable-click usage-type',
 		'data-pk' => $attachment['AssetsAssetUsage']['id'],
 		'data-url' => $this->Html->url($changeTypeUrl),
 		'data-name' => 'type',
@@ -89,10 +89,18 @@ foreach ($attachments as $attachment):
 			'data-toggle' => 'browse',
 			'tooltip' => __d('assets', 'View other sizes'),
 		));
+
+		$action[] = $this->Croogo->adminRowAction('', $changeTypeUrl, array(
+			'icon' => 'star',
+			'class' => 'change-usage-type',
+			'data-pk' => $attachment['AssetsAssetUsage']['id'],
+			'data-value' => 'FeaturedImage',
+			'tooltip' => __d('assets', 'Set as FeaturedImage'),
+		));
 	else:
 		$action[] = null;
 	endif;
-	$row[] = implode(' ', $action);
+	$row[] = implode('&nbsp;', $action);
 	$rows[] = $row;
 endforeach;
 

@@ -16,6 +16,26 @@ Assets.popup = function(e) {
 	return false;
 }
 
+Assets.changeUsageType = function(e) {
+	var $target = $(e.currentTarget);
+	var $editable = $target.parents('tr').find('.usage-type.editable');
+	var type = 'FeaturedImage';
+	e.preventDefault();
+	var curValue = $editable.editable('getValue');
+	if (curValue.type !== '') {
+		return alert('Type already set');
+	}
+	var postData = {
+		pk: $target.data('pk'),
+		value: $target.data('value')
+	};
+	$.post($target.attr('href'), postData, function(data, textStatus) {
+		$target.parents('tr').find('.usage-type.editable').editable('setValue', type, type);
+	});
+	return false;
+}
+
 $(function() {
 	$('body').on('click', 'a[data-toggle=browse]', Assets.popup);
+	$('body').on('click', 'a.change-usage-type', Assets.changeUsageType);
 });

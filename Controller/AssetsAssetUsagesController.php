@@ -64,10 +64,19 @@ class AssetsAssetUsagesController extends AssetsAppController {
 	public function admin_change_type() {
 		$this->viewClass = 'Json';
 		$result = true;
+		$data = array('pk' => null, 'value' => null);
 		if (isset($this->request->data['pk'])) {
 			$data = $this->request->data;
-			$this->AssetsAssetUsage->id = $data['pk'];
-			$result = $this->AssetsAssetUsage->saveField('type', $data['value']);
+		} elseif (isset($this->request->query['pk'])) {
+			$data = $this->request->query;
+		}
+
+		$id = $data['pk'];
+		$value = $data['value'];
+
+		if (isset($id)) {
+			$this->AssetsAssetUsage->id = $id;
+			$result = $this->AssetsAssetUsage->saveField('type', $value);
 		}
 		$this->set(compact('result'));
 		$this->set('_serialize', 'result');
