@@ -19,6 +19,7 @@ class AssetSchema extends CakeSchema {
 		'sticky' => array('type' => 'boolean', 'null' => false, 'default' => '0'),
 		'visibility_roles' => array('type' => 'text', 'null' => true, 'default' => null, 'collate' => 'utf8_unicode_ci', 'charset' => 'utf8'),
 		'hash' => array('type' => 'string', 'null' => true, 'default' => null, 'length' => 64),
+		'plugin' => array('type' => 'string', 'null' => true, 'default' => null),
 		'import_path' => array('type' => 'string', 'length' => 512),
 		'created' => array('type' => 'datetime', 'null' => true),
 		'created_by' => array('type' => 'integer', 'null' => true),
