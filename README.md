@@ -2,7 +2,6 @@
 
 	git clone http://github.com/rchavik/Assets Plugin/Assets
 	( cd Assets && git submodule update --init )
-	Console/cake schema create -p Assets
 	Console/cake ext activate plugin Assets
 
 # Dependencies

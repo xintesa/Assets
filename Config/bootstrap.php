@@ -1,5 +1,9 @@
 <?php
 
+if (!Configure::read('Assets.installed')) {
+	return;
+}
+
 spl_autoload_register(function($class) {
 	$defaultPath = CakePlugin::path('Assets') . 'Vendor' . DS . 'Gaufrette' . DS . 'src' . DS;
 	$base = Configure::read('Assets.GaufretteLib');

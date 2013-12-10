@@ -1,8 +1,13 @@
 <?php
 
-$config = array(
-	'EventHandlers' => array(
+$handlers = array();
+if (Configure::read('Assets.installed')) {
+	$handlers = array(
 		'Assets.LegacyLocalAttachmentStorageHandler',
 		'Assets.LocalAttachmentStorageHandler',
-	),
+	);
+}
+
+$config = array(
+	'EventHandlers' => $handlers,
 );
