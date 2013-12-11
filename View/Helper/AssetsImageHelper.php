@@ -29,15 +29,60 @@ class AssetsImageHelper extends ImageHelper {
 		return $result;
 	}
 
+/**
+ * Looks upon $data and extract FeaturedImage tag or value
+ *
+ * By default, this method will return the generated <img> tag.  Pass
+ * array('tag' => false) in the $options array to get the value.
+ *
+ * If you have multiple versions of image, you can retrieve a specific image
+ * by passing an integer value in the `maxWidth` key.
+ *
+ * Example:
+ *
+ *	echo $this->AssetsImage->featured($node, array(
+ *		'class' => 'gallery featured-image',
+ *		'tag' => true,
+ *		'maxWidth' => 500,
+ *	));
+ *
+ * @param array $data Array of record containing `LinkedAssets` key
+ * @param array $options Array of options
+ */
 	public function featured($data, $options = array()) {
 		if (empty($data['LinkedAssets']['FeaturedImage'])) {
 			return null;
 		}
 		$options = Hash::merge(array(
 			'class' => 'featured-image',
+			'tag' => true,
 		), $options);
+		$tag = $options['tag'];
 		$image = $data['LinkedAssets']['FeaturedImage'];
-		return $this->Html->image($image['path'], $options);
+		$path = $image['path'];
+		if (isset($options['maxWidth'])) {
+			$maxWidth = $options['maxWidth'];
+			unset($options['maxWidth']);
+			if ($image['width'] > $maxWidth && !empty($image['Versions'])) {
+				$found = false;
+				foreach ($image['Versions'] as $version) {
+					$smallest = $version['path'];
+					if ($version['width'] <= $maxWidth) {
+						$path = $version['path'];
+						$found = true;
+						break;
+					}
+				}
+				if (!$found && isset($smallest)) {
+					$path = $smallest;
+				}
+			}
+		}
+		if ($tag) {
+			return $this->Html->image($path, $options);
+		} else {
+			return $path;
+		}
 	}
 
 }

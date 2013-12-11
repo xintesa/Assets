@@ -33,6 +33,12 @@ class LinkedAssetsBehavior extends ModelBehavior {
 			return $results;
 		}
 		$key = 'LinkedAssets';
+
+		if (isset($model->AssetsAsset)) {
+			$Asset = $model->AssetsAsset;
+		} else {
+			$Asset = ClassRegistry::init('Assets.AssetsAsset');
+		}
 		foreach ($results as &$result) {
 			$result[$key] = array();
 			if (empty($result['AssetsAssetUsage'])) {
@@ -47,6 +53,21 @@ class LinkedAssetsBehavior extends ModelBehavior {
 					$result[$key]['DefaultAsset'][] = $asset['AssetsAsset'];
 				} elseif ($asset['type'] === 'FeaturedImage') {
 					$result[$key][$asset['type']] = $asset['AssetsAsset'];
+
+					$seedId = isset($asset['AssetsAsset']['parent_asset_id']) ?
+						$asset['AssetsAsset']['parent_asset_id'] :
+						$asset['AssetsAsset']['id'];
+					$relatedAssets = $Asset->find('all', array(
+						'recursive' => -1,
+						'order' => 'width DESC',
+						'conditions' => array(
+							'AssetsAsset.parent_asset_id' => $seedId,
+						),
+					));
+					foreach ($relatedAssets as $related) {
+						$result[$key]['FeaturedImage']['Versions'][] = $related['AssetsAsset'];
+					}
+
 				} else {
 					$result[$key][$asset['type']][] = $asset['AssetsAsset'];
 				}
