@@ -142,12 +142,17 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				$attachment['AssetsAttachment']['id'],
 				'editor' => 1,
 			));
-			$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
-				'icon' => 'trash',
-				'tooltip' => __d('croogo', 'Delete')
-				),
-				__d('croogo', 'Are you sure?')
-			);
+
+			if (!isset($this->request->query['all']) &&
+				!isset($this->request->query['asset_id'])
+			) {
+				$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
+					'icon' => 'trash',
+					'tooltip' => __d('croogo', 'Delete')
+					),
+					__d('croogo', 'Are you sure?')
+				);
+			}
 
 			if (isset($this->request->query['asset_id']) ||
 				isset($this->request->query['all'])
