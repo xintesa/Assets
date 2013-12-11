@@ -344,29 +344,44 @@ class AssetsAttachment extends AssetsAppModel {
 			$newSize = $size->scale($scale);
 		}
 
+		$newWidth = $newSize->getWidth();
+		$newHeight = $newSize->getHeight();
+
 		$image->resize($newSize);
 
 		$tmpName = tempnam('/tmp', 'qq');
 		$image->save($tmpName, array('format' => $asset['extension']));
+
+		$fp = fopen($tmpName, 'r');
+		$stat = fstat($fp);
+		fclose($fp);
+
 		$raw = file_get_contents($tmpName);
 		unlink($tmpName);
 
 		$info = pathinfo($asset['path']);
-		$ind = sprintf('.resized-%dx%d.', $newSize->getWidth(), $newSize->getHeight());
+		$ind = sprintf('.resized-%dx%d.', $newWidth, $newHeight);
 
 		$uploadsDir = str_replace('/' . $options['uploadsDir'] . '/', '', dirname($asset['path'])) . '/';
-		$writePath = $uploadsDir . $info['filename'] . $ind . $info['extension'];
+		$filename = $info['filename'] . $ind . $info['extension'];
+		$writePath = $uploadsDir . $filename;
 
-		$filesystem = StorageManager::adapter($asset['adapter']);
+		$adapter = $asset['adapter'];
+		$filesystem = StorageManager::adapter($adapter);
 		$filesystem->write($writePath, $raw);
 
 		$data = $this->AssetsAsset->create(array(
-			'path' => dirname($asset['path']) . '/' . $info['filename'] . $ind . $info['extension'],
+			'filename' => $filename,
+			'path' => dirname($asset['path']) . '/' . $filename,
 			'model' => $asset['model'],
 			'extension' => $asset['extension'],
 			'parent_asset_id' => $asset['id'],
 			'foreign_key' => $asset['foreign_key'],
-			'adapter' => 'Gallery',
+			'adapter' => $adapter,
+			'mime_type' => $asset['mime_type'],
+			'width' => $newWidth,
+			'height' => $newHeight,
+			'filesize' => $stat[7],
 		));
 
 		$asset = $this->AssetsAsset->save($data);
