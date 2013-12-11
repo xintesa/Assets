@@ -262,6 +262,12 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				'Size: ' . $this->Number->toReadableSize($attachment['AssetsAsset']['filesize'])
 			);
 
+			if (empty($this->request->query['all']) && empty($this->request->query['asset_id'])) {
+				$title .= $this->Html->para(null,
+					'Number of versions: ' . $attachment['AssetsAttachment']['asset_count']
+				);
+			}
+
 			$rows[] = array(
 				$attachment['AssetsAsset']['id'],
 				$thumbnail,

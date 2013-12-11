@@ -23,6 +23,17 @@ echo $this->Croogo->adminAction(
 );
 
 $this->end();
+
+$detailUrl = array(
+	'plugin' => 'assets',
+	'controller' => 'assets_attachments',
+	'action' => 'browse',
+	'?' => array(
+		'model' => 'AssetsAttachment',
+		'foreign_key' => null,
+		'asset_id' => null,
+	),
+);
 ?>
 <table class="table table-striped">
 <?php
@@ -31,7 +42,7 @@ $this->end();
 		$this->Paginator->sort('id', __d('croogo', 'Id')),
 		'&nbsp;',
 		$this->Paginator->sort('title', __d('croogo', 'Title')),
-		__d('croogo', 'URL'),
+		__d('croogo', 'Versions'),
 		__d('croogo', 'Actions'),
 	));
 
@@ -44,11 +55,27 @@ $this->end();
 	$rows = array();
 	foreach ($attachments as $attachment) {
 		$actions = array();
-		$actions[] = $this->Croogo->adminRowActions($attachment['AssetsAttachment']['id']);
-		$resizeUrl = array_merge(
-			array('action' => 'resize', $attachment['AssetsAttachment']['id'], 'ext' => 'json'),
-			array('?' => $query)
-		);
+
+		$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
+		$mimeType = $mimeType['0'];
+		if ($mimeType == 'image') {
+			$detailUrl['?']['foreign_key'] = $attachment['AssetsAttachment']['id'];
+			$detailUrl['?']['asset_id'] = $attachment['AssetsAsset']['id'];
+			$assetCount = $attachment['AssetsAttachment']['asset_count'] . '&nbsp;';
+			$actions[] = $this->Croogo->adminRowAction('', $detailUrl, array(
+				'icon' => 'suitcase',
+				'iconSize' => 'small',
+				'data-toggle' => 'browse',
+				'tooltip' => __d('assets', 'View other sizes'),
+			));
+
+			$actions[] = $this->Croogo->adminRowActions($attachment['AssetsAttachment']['id']);
+			$resizeUrl = array_merge(
+				array('action' => 'resize', $attachment['AssetsAttachment']['id'], 'ext' => 'json'),
+				array('?' => $query)
+			);
+		}
+
 		$actions[] = $this->Croogo->adminRowAction('', $resizeUrl,
 			array('icon' => 'resize-small', 'tooltip' => __d('croogo', 'Resize this item'), 'data-toggle' => 'resize-asset')
 		);
@@ -65,10 +92,9 @@ $this->end();
 			array('icon' => 'trash', 'tooltip' => __d('croogo', 'Remove this item')),
 			__d('croogo', 'Are you sure?'));
 
-		$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
-		$mimeType = $mimeType['0'];
 		$path = $attachment['AssetsAsset']['path'];
 		if ($mimeType == 'image') {
+
 			$imgUrl = $this->AssetsImage->resize($path, 100, 200,
 				array('adapter' => $attachment['AssetsAsset']['adapter']),
 				array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
@@ -85,7 +111,7 @@ $this->end();
 		$rows[] = array(
 			$attachment['AssetsAttachment']['id'],
 			$thumbnail,
-			$attachment['AssetsAttachment']['title'],
+			$this->Html->div(null, $attachment['AssetsAttachment']['title']) . '&nbsp;' .
 			$this->Html->link(
 				$this->Html->url($path, true),
 				$path,
@@ -93,6 +119,7 @@ $this->end();
 					'target' => '_blank',
 				)
 			),
+			$assetCount,
 			$actions,
 		);
 	}

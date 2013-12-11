@@ -29,13 +29,20 @@ class AssetsAsset extends AssetsAppModel {
 			'conditions' => array(
 				'AssetsAsset.model' => 'AssetsAttachment',
 			),
+			'counterCache' => 'asset_count',
+			'counterScope' => array(
+				'AssetsAsset.model' => 'AssetsAttachment',
+			),
 		),
 	);
 
 	public function beforeSave($options = array()) {
+		$adapter = isset($this->data[$this->alias]['adapter']) ?
+			$this->data[$this->alias]['adapter'] :
+			null;
 		$Event = Croogo::dispatchEvent('FileStorage.beforeSave', $this, array(
 			'record' => $this->data,
-			'adapter' => $this->data[$this->alias]['adapter'],
+			'adapter' => $adapter,
 		));
 		if ($Event->isStopped()) {
 			return false;
