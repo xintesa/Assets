@@ -59,9 +59,33 @@ Assets.unregisterAssetUsage = function(e) {
 	return false;
 };
 
+Assets.resizeAsset = function(e) {
+	e && e.preventDefault();
+
+	var width = parseInt(prompt('Resize to width: '));
+	if (isNaN(width)) {
+		return alert('Invalid number');
+	}
+
+	var $target = $(e.currentTarget);
+	var postData = {
+		width: width
+	};
+	$.post($target.attr('href'), postData, function(data, textStatus) {
+		if (textStatus === 'success') {
+			if (typeof data === 'string') {
+				return alert(data);
+			}
+			return prompt("Asset id: "+ data.AssetsAsset.id + " created", data.AssetsAsset.path);
+		}
+	});
+	return false;
+}
+
 $(function() {
 	$('body').on('click', 'a[data-toggle=browse]', Assets.popup);
 	$('body').on('click', 'a[data-toggle=refresh]', Assets.reloadAssetsTab);
+	$('body').on('click', 'a[data-toggle=resize-asset]', Assets.resizeAsset);
 	$('body').on('click', 'a.change-usage-type', Assets.changeUsageType);
 	$('body').on('click', 'a.unregister-usage', Assets.unregisterAssetUsage);
 });

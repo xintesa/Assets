@@ -61,8 +61,12 @@ class AssetsAttachmentsController extends AssetsAppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 
-		if ($this->action == 'admin_add') {
+		$noCsrfCheck = array('admin_add', 'admin_resize');
+		if (in_array($this->action, $noCsrfCheck)) {
 			$this->Security->csrfCheck = false;
+		}
+		if ($this->action == 'admin_resize') {
+			$this->Security->validatePost = false;
 		}
 	}
 
@@ -247,6 +251,25 @@ class AssetsAttachmentsController extends AssetsAppController {
 		}
 		$attachments = $this->paginate();
 		$this->set(compact('attachments'));
+	}
+
+	public function admin_resize($id = null) {
+		if (empty($id)) {
+			throw new NotFoundException('Missing Asset Id to resize');
+		}
+
+		$result = false;
+		if (!empty($this->request->data)) {
+			$width = $this->request->data['width'];
+			try {
+				$result = $this->AssetsAttachment->createResized($id, $width, null);
+			} catch (Exception $e) {
+				$result = $e->getMessage();
+			}
+		}
+
+		$this->set(compact('result'));
+		$this->set('_serialize', 'result');
 	}
 
 }

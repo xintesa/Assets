@@ -1,5 +1,7 @@
 <?php
 
+$this->Html->script('Assets.admin', array('inline' => false));
+
 $this->extend('/Common/admin_index');
 
 $this->Html
@@ -43,6 +45,13 @@ $this->end();
 	foreach ($attachments as $attachment) {
 		$actions = array();
 		$actions[] = $this->Croogo->adminRowActions($attachment['AssetsAttachment']['id']);
+		$resizeUrl = array_merge(
+			array('action' => 'resize', $attachment['AssetsAttachment']['id'], 'ext' => 'json'),
+			array('?' => $query)
+		);
+		$actions[] = $this->Croogo->adminRowAction('', $resizeUrl,
+			array('icon' => 'resize-small', 'tooltip' => __d('croogo', 'Resize this item'), 'data-toggle' => 'resize-asset')
+		);
 		$editUrl = array_merge(
 			array('action' => 'edit', $attachment['AssetsAttachment']['id']),
 			array('?' => $query)
