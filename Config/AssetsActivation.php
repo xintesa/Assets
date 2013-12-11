@@ -53,6 +53,8 @@ class AssetsActivation {
  * @return void
  */
 	public function onDeactivation(&$controller) {
+		$Setting = ClassRegistry::init('Settings.Setting');
+		$Setting->deleteKey('Assets.installed');
 	}
 
 }
