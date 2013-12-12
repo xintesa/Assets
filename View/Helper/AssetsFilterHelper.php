@@ -28,11 +28,13 @@ class AssetsFilterHelper extends AppHelper {
 
 	public function filter(&$content, $options = array()) {
 		$conditions = array();
+		$identifier = '';
 		if (isset($options['model']) && isset($options['id'])) {
 			$conditions = array(
 				'AssetsAssetUsage.model' => $options['model'],
 				'AssetsAssetUsage.foreign_key' => $options['id'],
 			);
+			$identifier = $options['model'] . '.' . $options['id'];
 		}
 
 		preg_match_all('/\[(image):[ ]*([A-Za-z0-9_\-]*)(.*?)\]/i', $content, $tagMatches);
@@ -48,6 +50,11 @@ class AssetsFilterHelper extends AppHelper {
 				'conditions' => $conditions,
 			));
 			if (empty($asset['AssetsAsset'])) {
+				$this->log(sprintf('%s - Asset not found for %s',
+					$identifier, $tagMatches[0][$i]
+				));
+				$regex = '/' . preg_quote($tagMatches[0][$i]) . '/';
+				$content = preg_replace($regex, '', $content);
 				continue;
 			}
 
