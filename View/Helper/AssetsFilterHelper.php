@@ -27,11 +27,11 @@ class AssetsFilterHelper extends AppHelper {
 	}
 
 	public function filter(&$content) {
-		preg_match_all('/\[(image):([A-Za-z0-9_\-]*)(.*?)\]/i', $content, $tagMatches);
-		$assets = $this->parseString('image|i', $content);
+		preg_match_all('/\[(image):[ ]*([A-Za-z0-9_\-]*)(.*?)\]/i', $content, $tagMatches);
 		$Asset = ClassRegistry::init('Assets.AssetsAssetUsage');
 
 		for ($i = 0, $ii = count($tagMatches[1]); $i < $ii; $i++) {
+			$assets = $this->parseString('image|i', $tagMatches[0][$i]);
 			$assetId = $tagMatches[2][$i];
 			$asset = $Asset->find('first', array(
 				'recursive' => -1,
