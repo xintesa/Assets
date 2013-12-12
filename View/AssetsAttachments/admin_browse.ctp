@@ -143,12 +143,27 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				'editor' => 1,
 			));
 
+			$deleteAssetUrl = Hash::merge($query, array(
+				'controller' => 'assets_assets',
+				'action' => 'delete',
+				$attachment['AssetsAsset']['id'],
+			));
+
 			if (!isset($this->request->query['all']) &&
 				!isset($this->request->query['asset_id'])
 			) {
 				$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
 					'icon' => 'trash',
-					'tooltip' => __d('croogo', 'Delete')
+					'tooltip' => __d('croogo', 'Delete Attachment')
+					),
+					__d('croogo', 'Are you sure?')
+				);
+			} elseif (isset($this->request->query['manage']) &&
+				isset($this->request->query['asset_id'])
+			) {
+				$actions[] = $this->Croogo->adminRowAction('', $deleteAssetUrl, array(
+					'icon' => 'trash',
+					'tooltip' => __d('croogo', 'Delete Attachment version')
 					),
 					__d('croogo', 'Are you sure?')
 				);

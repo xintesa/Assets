@@ -29,6 +29,7 @@ $detailUrl = array(
 	'controller' => 'assets_attachments',
 	'action' => 'browse',
 	'?' => array(
+		'manage' => true,
 		'model' => 'AssetsAttachment',
 		'foreign_key' => null,
 		'asset_id' => null,
