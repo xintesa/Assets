@@ -160,7 +160,7 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				unset($query['?']['asset_id']);
 
 				$usage = Hash::extract($attachment, $extractPath);
-				if (empty($usage)):
+				if (empty($usage) && $model !== 'AssetsAttachment'):
 					$addUrl = Hash::merge(array(
 						'controller' => 'assets_asset_usages',
 						'action' => 'add',
