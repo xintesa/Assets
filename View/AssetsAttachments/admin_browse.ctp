@@ -3,6 +3,7 @@
 a i[class^=icon]:hover { text-decoration: none; }
 </style>
 <?php
+$this->Html->script('Assets.admin', array('inline' => false));
 $this->Html->script('Croogo.jquery/thickbox-compressed', array('inline' => false));
 $this->Html->css('Croogo.thickbox', array('inline' => false));
 
@@ -139,6 +140,11 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				$attachment['AssetsAsset']['id'],
 			));
 
+			$resizeUrl = array_merge(
+				array('action' => 'resize', $attachment['AssetsAttachment']['id'], 'ext' => 'json'),
+				array('?' => $query)
+			);
+
 			if (!isset($this->request->query['all']) &&
 				!isset($this->request->query['asset_id'])
 			) {
@@ -156,6 +162,18 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 					'tooltip' => __d('croogo', 'Delete Attachment version')
 					),
 					__d('croogo', 'Are you sure?')
+				);
+			}
+
+			if ($mimeType === 'image' &&
+				$attachment['AssetsAttachment']['hash'] == $attachment['AssetsAsset']['hash']
+			) {
+				$resizeUrl = array_merge(
+					array('action' => 'resize', $attachment['AssetsAttachment']['id'], 'ext' => 'json'),
+					array('?' => $query)
+				);
+				$actions[] = $this->Croogo->adminRowAction('', $resizeUrl,
+					array('icon' => 'resize-small', 'tooltip' => __d('croogo', 'Resize this item'), 'data-toggle' => 'resize-asset')
 				);
 			}
 
