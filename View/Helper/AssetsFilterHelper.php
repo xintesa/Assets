@@ -17,7 +17,7 @@ class AssetsFilterHelper extends AppHelper {
 	protected function _setupEvents() {
 		$events = array(
 			'Helper.Layout.beforeFilter' => array(
-			'callable' => 'filter', 'passParams' => true,
+				'callable' => 'filter', 'passParams' => true,
 			),
 		);
 		$eventManager = $this->_View->getEventManager();
@@ -26,21 +26,35 @@ class AssetsFilterHelper extends AppHelper {
 		}
 	}
 
-	public function filter(&$content) {
+	public function filter(&$content, $options = array()) {
+		$conditions = array();
+		$identifier = '';
+		if (isset($options['model']) && isset($options['id'])) {
+			$conditions = array(
+				'AssetsAssetUsage.model' => $options['model'],
+				'AssetsAssetUsage.foreign_key' => $options['id'],
+			);
+			$identifier = $options['model'] . '.' . $options['id'];
+		}
+
 		preg_match_all('/\[(image):[ ]*([A-Za-z0-9_\-]*)(.*?)\]/i', $content, $tagMatches);
 		$Asset = ClassRegistry::init('Assets.AssetsAssetUsage');
 
 		for ($i = 0, $ii = count($tagMatches[1]); $i < $ii; $i++) {
 			$assets = $this->parseString('image|i', $tagMatches[0][$i]);
 			$assetId = $tagMatches[2][$i];
+			$conditions['AssetsAssetUsage.id'] = $assetId;
 			$asset = $Asset->find('first', array(
 				'recursive' => -1,
 				'contain' => array('AssetsAsset'),
-				'conditions' => array(
-					'AssetsAssetUsage.id' => $assetId,
-				),
+				'conditions' => $conditions,
 			));
 			if (empty($asset['AssetsAsset'])) {
+				$this->log(sprintf('%s - Asset not found for %s',
+					$identifier, $tagMatches[0][$i]
+				));
+				$regex = '/' . preg_quote($tagMatches[0][$i]) . '/';
+				$content = preg_replace($regex, '', $content);
 				continue;
 			}
 
@@ -55,7 +69,9 @@ class AssetsFilterHelper extends AppHelper {
 
 	public function afterSetNode() {
 		$body = $this->Nodes->field('body');
-		$body = $this->filter($body);
+		$body = $this->filter($body, array(
+			'model' => 'Node', 'id' => $this->Nodes->field('id')
+		));
 		$this->Nodes->field('body', $body);
 	}
 
