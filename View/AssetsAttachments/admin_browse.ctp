@@ -126,16 +126,6 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				));
 			endif;
 
-			$editUrl = Hash::merge($query, array(
-				'controller' => 'assets_attachments',
-				'action' => 'edit',
-				$attachment['AssetsAttachment']['id'],
-				'editor' => 1,
-			));
-			$actions[] = $this->Croogo->adminRowAction('', $editUrl,
-				array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit'))
-			);
-
 			$deleteUrl = Hash::merge($query, array(
 				'controller' => 'assets_attachments',
 				'action' => 'delete',
