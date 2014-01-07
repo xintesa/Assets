@@ -4,9 +4,23 @@ abstract class BaseStorageHandler extends Object {
 
 	protected $_storage = null;
 
-	public function __construct() {
+/**
+ * Instance config
+ */
+	protected $_config = array();
+
+/**
+ * Constructor
+ */
+	public function __construct($config = array()) {
+		$name = get_class($this);
+		$config = Hash::merge(array(
+			'alias' => $name,
+			'className' => $name,
+		), $config);
+		$this->_config = $config;
 		parent::__construct();
-		$this->_storage = str_replace('StorageHandler', '', get_class($this));
+		$this->_storage = str_replace('StorageHandler', '', $config['alias']);
 		$this->Attachment = ClassRegistry::init('Assets.AssetsAttachment');
 	}
 
