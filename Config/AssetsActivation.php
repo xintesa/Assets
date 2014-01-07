@@ -17,6 +17,15 @@ class AssetsActivation {
  * @return boolean
  */
 	public function beforeActivation(&$controller) {
+		if (!CakePlugin::loaded('Imagine')) {
+			$plugins = App::objects('plugins');
+			if (in_array('Imagine', $plugins)) {
+				$plugin = new CroogoPlugin();
+				$plugin->addBootstrap('Imagine');
+				CakePlugin::load('Imagine');
+				CakeLog::info('Imagine plugin added to bootstrap');
+			}
+		}
 		return true;
 	}
 
