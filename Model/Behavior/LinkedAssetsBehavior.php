@@ -5,6 +5,11 @@ App::uses('ModelBehavior', 'Model');
 class LinkedAssetsBehavior extends ModelBehavior {
 
 	public function setup(Model $model, $config = array()) {
+		$config = Hash::merge(array(
+			'key' => 'LinkedAsset',
+		), $config);
+		$this->settings[$model->alias] = $config;
+
 		$model->bindModel(array(
 			'hasMany' => array(
 				'AssetsAssetUsage' => array(
