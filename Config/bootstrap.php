@@ -60,13 +60,3 @@ foreach ($models as $model) {
 }
 
 Croogo::hookHelper('*', 'Assets.AssetsFilter');
-
-CroogoNav::add('media.children.attachments', array(
-	'title' => __d('croogo', 'Attachments'),
-	'url' => array(
-		'admin' => true,
-		'plugin' => 'assets',
-		'controller' => 'assets_attachments',
-		'action' => 'index',
-	),
-));
