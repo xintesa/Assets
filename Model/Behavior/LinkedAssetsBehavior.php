@@ -99,7 +99,10 @@ class LinkedAssetsBehavior extends ModelBehavior {
  * @param string $path Path to file, relative from WWW_ROOT
  * @return bool
  */
-	public function importAsset(Model $model, $adapter, $path) {
+	public function importAsset(Model $model, $adapter, $path, $options = array()) {
+		$options = Hash::merge(array(
+			'usage' => array(),
+		), $options);
 		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
 		$attachment = $Attachment->createFromFile(WWW_ROOT . $path);
 
@@ -135,11 +138,13 @@ class LinkedAssetsBehavior extends ModelBehavior {
 		));
 
 		$Usage = $Attachment->AssetsAsset->AssetsAssetUsage;
-		$usage = $Usage->create(array(
+
+		$usage = Hash::merge($options['usage'], array(
 			'asset_id' => $asset['AssetsAsset']['id'],
 			'model' => $model->alias,
 			'foreign_key' => $model->id,
 		));
+		$usage = $Usage->create($usage);
 
 		$usage = $Usage->save($usage);
 		if ($usage) {
