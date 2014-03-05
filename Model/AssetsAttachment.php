@@ -219,8 +219,8 @@ class AssetsAttachment extends AssetsAppModel {
 			'mime_type' => $finfo->file($file),
 			'hash' => $hash,
 			'status' => true,
-			'created' => date('Y-m-d H:i:s', $stat[10]),
-			'updated' => date('Y-m-d H:i:s', $stat[9]),
+			'created' => date('Y-m-d H:i:s', $stat[9]),
+			'updated' => date('Y-m-d H:i:s', time()),
 		));
 		return $asset;
 	}
