@@ -82,4 +82,71 @@ class LinkedAssetsBehavior extends ModelBehavior {
 		return $results;
 	}
 
+/**
+ * Import $path as $model's asset and automatically registers its usage record
+ *
+ * This method is intended for importing an existing file in the local
+ * filesystem into Assets plugin with automatic usage record with the calling
+ * model.
+ *
+ * Eg:
+ *
+ *   $Book = ClassRegistry::init('Book');
+ *   $Book->Behaviors->load('Assets.LinkedAssets');
+ *   $Book->importAsset('LocalAttachment', '/path/to/file');
+ *
+ * @param string $adapter Adapter name
+ * @param string $path Path to file, relative from WWW_ROOT
+ * @return bool
+ */
+	public function importAsset(Model $model, $adapter, $path) {
+		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+		$attachment = $Attachment->createFromFile(WWW_ROOT . $path);
+
+		if (!is_array($attachment)) {
+			$this->log($attachment);
+			return false;
+		}
+
+		$originalPath = WWW_ROOT . $path;
+		$fp = fopen($originalPath, 'r');
+		$stat = fstat($fp);
+		$finfo = new finfo(FILEINFO_MIME_TYPE);
+
+		$attachment['AssetsAsset'] = array(
+			'model' => $Attachment->alias,
+			'adapter' => $adapter,
+			'file' => array(
+				'name' => basename($originalPath),
+				'tmp_name' => $originalPath,
+				'type' => $finfo->file($originalPath),
+				'size' => $stat['size'],
+				'error' => UPLOAD_ERR_OK,
+			),
+		);
+		$attachment = $Attachment->saveAll($attachment);
+
+		$Attachment->AssetsAsset->recursive = -1;
+		$asset = $Attachment->AssetsAsset->find('first', array(
+			'conditions' => array(
+				'model' => $Attachment->alias,
+				'foreign_key' => $Attachment->id,
+			),
+		));
+
+		$Usage = $Attachment->AssetsAsset->AssetsAssetUsage;
+		$usage = $Usage->create(array(
+			'asset_id' => $asset['AssetsAsset']['id'],
+			'model' => $model->alias,
+			'foreign_key' => $model->id,
+		));
+
+		$usage = $Usage->save($usage);
+		if ($usage) {
+			return true;
+		}
+
+		return false;
+	}
+
 }
