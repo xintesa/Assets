@@ -1,19 +1,19 @@
 {
 	"name": "xintesa/assets",
-	"type": "cakephp-plugin",
-	"description": "Croogo Plugin to help manage Assets",
-	"homepage": "http://github.com/xintesa/assets",
+	"type": "croogo-plugin",
+	"description": "Croogo Assets Management Plugin",
+	"homepage": "http://github.com/xintesa/Assets",
 	"license": "MIT",
 	"authors": [
 		{
 			"name": "Rachman Chavik",
-			"email": "contact@xintesa.com",
+			"email": "oss@xintesa.com",
 			"homepage": "http://xintesa.com"
 		}
 	],
 	"require": {
 		"php": ">=5.3.0",
-		"composer/installers": "*",
-		"croogo/croogo": "~2.0"
+		"composer/installers": "~1.0",
+		"croogo/croogo": "~2.0",
 	}
 }
