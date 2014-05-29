@@ -207,6 +207,7 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				), $query);
 				$actions[] = $this->Html->link('', $detailUrl, array(
 					'icon' => 'suitcase',
+					'tooltip' => __d('assets', 'View other sizes'),
 				));
 			endif;
 
