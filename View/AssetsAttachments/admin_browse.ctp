@@ -259,7 +259,7 @@ $extractPath = "AssetsAsset.AssetsAssetUsage.{n}[model=$model][foreign_key=$fore
 				Router::url($attachment['AssetsAsset']['path']),
 				$attachment['AssetsAsset']['path'],
 				array(
-					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
+					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAsset']['path'] . "'); return false;",
 					'target' => '_blank',
 				)
 			);

@@ -22,6 +22,8 @@ Configure::write('Wysiwyg.attachmentBrowseUrl', array(
 	'action' => 'browse',
 ));
 
+Configure::write('Wysiwyg.uploadsPath', '');
+
 Croogo::mergeConfig('Wysiwyg.actions', array(
 	'AssetsAttachments/admin_browse',
 ));
