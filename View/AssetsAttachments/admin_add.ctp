@@ -15,89 +15,83 @@ $formUrl = array('plugin' => 'assets', 'controller' => 'assets_attachments', 'ac
 if (isset($this->params['named']['editor'])) {
 	$formUrl['editor'] = 1;
 }
-echo $this->Form->create('AssetsAttachment', array('url' => $formUrl, 'type' => 'file'));
+$this->append('form-start', $this->Form->create('AssetsAttachment', array(
+	'url' => $formUrl, 'type' => 'file',
+)));
 
 $model = isset($this->request->query['model']) ? $this->request->query['model'] : null;
 $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->query['foreign_key'] : null;
 
-?>
-<div class="row-fluid">
-	<div class="span8">
+$this->append('tab-heading');
+	echo $this->Croogo->adminTab(__d('croogo', 'Upload'), '#attachment-upload');
+	echo $this->Croogo->adminTabs();
+$this->end();
 
-		<ul class="nav nav-tabs">
-		<?php
-			echo $this->Croogo->adminTab(__d('croogo', 'Upload'), '#attachment-upload');
-		?>
-		</ul>
+$this->append('tab-content');
 
-		<div class="tab-content">
+	echo $this->Html->tabStart('attachment-upload');
 
-			<div id="attachment-upload" class="tab-pane">
-			<?php
-
-			if (isset($model) && isset($foreignKey)):
-				$assetUsage = 'AssetsAsset.AssetsAssetUsage.0.';
-				echo $this->Form->input($assetUsage . 'model', array(
-					'type' => 'hidden',
-					'value' => $model,
-				));
-				echo $this->Form->input($assetUsage . 'foreign_key', array(
-					'type' => 'hidden',
-					'value' => $foreignKey,
-				));
-			endif;
-
-			echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
-
-			if (isset($model) && isset($foreignKey)):
-				echo $this->Form->input($assetUsage . 'featured_image', array(
-					'type' => 'checkbox',
-					'label' => 'Featured Image',
-				));
-			endif;
-
-			echo $this->Form->input('AssetsAsset.adapter', array(
-				'type' => 'select',
-				'default' => 'LocalAttachment',
-				'options' => StorageManager::configured(),
-			));
-			$this->Form->inputDefaults(array(
-				'class' => 'span8',
-			));
-			echo $this->Form->input('excerpt', array('label' => __d('croogo', 'Caption')));
-			echo $this->Form->input('title');
-			echo $this->Form->input('status', array('type' => 'hidden', 'value' => true));
-			echo $this->Form->input('AssetsAsset.model', array(
+		if (isset($model) && isset($foreignKey)):
+			$assetUsage = 'AssetsAsset.AssetsAssetUsage.0.';
+			echo $this->Form->input($assetUsage . 'model', array(
 				'type' => 'hidden',
-				'value' => 'AssetsAttachment',
+				'value' => $model,
 			));
-			?>
-			</div>
+			echo $this->Form->input($assetUsage . 'foreign_key', array(
+				'type' => 'hidden',
+				'value' => $foreignKey,
+			));
+		endif;
 
-			<?php echo $this->Croogo->adminTabs(); ?>
-		</div>
-	</div>
+		echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
 
-	<div class="span4">
-	<?php
-		$redirect = array('action' => 'index');
-		if ($this->Session->check('Wysiwyg.redirect')) {
-			$redirect = $this->Session->read('Wysiwyg.redirect');
-		}
-		if (isset($this->request->query['model'])) {
-			$redirect = array_merge(
-				array('action' => 'browse'),
-				array('?' => $this->request->query)
-			);
-		}
-		echo $this->Html->beginBox(__d('croogo', 'Publishing')) .
-			$this->Form->button(__d('croogo', 'Upload'), array('button' => 'default')) .
-			$this->Form->end() .
-			$this->Html->link(__d('croogo', 'Cancel'), $redirect, array('button' => 'danger')) .
-			$this->Html->endBox();
-		echo $this->Croogo->adminBoxes();
-	?>
-	</div>
+		if (isset($model) && isset($foreignKey)):
+			echo $this->Form->input($assetUsage . 'featured_image', array(
+				'type' => 'checkbox',
+				'label' => 'Featured Image',
+			));
+		endif;
 
-</div>
-<?php echo $this->Form->end(); ?>
+		echo $this->Form->input('AssetsAsset.adapter', array(
+			'type' => 'select',
+			'default' => 'LocalAttachment',
+			'options' => StorageManager::configured(),
+		));
+		echo $this->Form->input('excerpt', array(
+			'label' => __d('croogo', 'Caption'),
+		));
+		echo $this->Form->input('title');
+		echo $this->Form->input('status', array(
+			'type' => 'hidden', 'value' => true,
+		));
+		echo $this->Form->input('AssetsAsset.model', array(
+			'type' => 'hidden',
+			'value' => 'AssetsAttachment',
+		));
+
+	echo $this->Html->tabEnd();
+	echo $this->Croogo->adminTabs();
+$this->end();
+
+$this->append('panels');
+	$redirect = array('action' => 'index');
+	if ($this->Session->check('Wysiwyg.redirect')) {
+		$redirect = $this->Session->read('Wysiwyg.redirect');
+	}
+	if (isset($this->request->query['model'])) {
+		$redirect = array_merge(
+			array('action' => 'browse'),
+			array('?' => $this->request->query)
+		);
+	}
+	echo $this->Html->beginBox(__d('croogo', 'Publishing')) .
+		$this->Form->button(__d('croogo', 'Upload')) .
+		$this->Form->end() .
+		$this->Html->link(__d('croogo', 'Cancel'), $redirect, array(
+			'button' => 'danger',
+		));
+	echo $this->Html->endBox();
+	echo $this->Croogo->adminBoxes();
+$this->end();
+
+$this->append('form-end', $this->Form->end());
