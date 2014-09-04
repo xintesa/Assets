@@ -95,3 +95,6 @@ $this->append('panels');
 $this->end();
 
 $this->append('form-end', $this->Form->end());
+
+$script = "\$('[data-toggle=tab]:first').tab('show');";
+$this->Js->buffer($script);
