@@ -8,7 +8,7 @@ td .actions a.unregister-usage {
 </style>
 <?php
 
-$this->Html->script('Assets.admin.js', array('inline' => false));
+$this->Html->script('Assets.admin.js', array('block' => 'scriptBottom'));
 
 $model = isset($model) ? $model : $this->Form->defaultModel;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
@@ -61,6 +61,7 @@ $headers = array(
 	__d('croogo', 'Preview'),
 	__d('croogo', 'Type'),
 	__d('croogo', 'Size'),
+	__d('croogo', 'Actions'),
 );
 
 if (!$this->Helpers->loaded('AssetsImage')) {
@@ -161,44 +162,37 @@ $uploadUrl = array(
 	),
 );
 
+$this->append('actions');
+	echo $this->Croogo->adminAction(__d('assets', 'Reload'),
+		$browseUrl,
+		array(
+			'icon' => 'refresh',
+			'iconSize' => 'small',
+			'data-toggle' => 'refresh',
+		)
+	);
+	echo $this->Croogo->adminAction(__d('assets', 'Browse'),
+		$browseUrl,
+		array(
+			'icon' => 'folder-open',
+			'iconSize' => 'small',
+			'data-toggle' => 'browse',
+		)
+	);
+	echo $this->Croogo->adminAction(__d('assets', 'Upload'),
+		$uploadUrl,
+		array(
+			'icon' => 'upload-alt',
+			'iconSize' => 'small',
+			'data-toggle' => 'browse',
+		)
+	);
+$this->end();
+
 ?>
-<div class="row-fluid">
-	<div class="span12">
-		<div class="actions pull-right">
-			<ul class="nav-buttons">
-			<?php
-				echo $this->Croogo->adminAction(__d('assets', 'Reload'),
-					$browseUrl,
-					array(
-						'icon' => 'refresh',
-						'iconSize' => 'small',
-						'data-toggle' => 'refresh',
-					)
-				);
-				echo $this->Croogo->adminAction(__d('assets', 'Browse'),
-					$browseUrl,
-					array(
-						'icon' => 'folder-open',
-						'iconSize' => 'small',
-						'data-toggle' => 'browse',
-					)
-				);
-				echo $this->Croogo->adminAction(__d('assets', 'Upload'),
-					$uploadUrl,
-					array(
-						'icon' => 'upload-alt',
-						'iconSize' => 'small',
-						'data-toggle' => 'browse',
-					)
-				);
-			?>
-			</ul>
-		</div>
-	</div>
-</div>
-<div class="row-fluid">
-	<div class="span12">
-		<table class="table asset-list" data-url="<?php echo $assetListUrl; ?>">
+<div class="<?php echo $this->Layout->cssClass('row'); ?>">
+	<div class="<?php echo $this->Layout->cssClass('fullColumn'); ?>">
+		<table class="<?php echo $this->Layout->cssClass('tableClass'); ?> asset-list" data-url="<?php echo $assetListUrl; ?>">
 			<thead><?php echo $this->Html->tableHeaders($headers); ?></thead>
 			<tbody><?php echo $this->Html->tableCells($rows); ?></tbody>
 		</table>
