@@ -14,7 +14,7 @@ if (!empty($this->request->query)) {
 	$query = array();
 }
 
-$this->start('actions');
+$this->append('actions');
 
 echo $this->Croogo->adminAction(
 	__d('croogo', 'New %s', __d('croogo', 'Attachment')),
@@ -35,10 +35,8 @@ $detailUrl = array(
 		'asset_id' => null,
 	),
 );
-?>
-<table class="table table-striped">
-<?php
 
+$this->append('table-heading');
 	$tableHeaders = $this->Html->tableHeaders(array(
 		$this->Paginator->sort('id', __d('croogo', 'Id')),
 		'&nbsp;',
@@ -47,12 +45,10 @@ $detailUrl = array(
 		__d('croogo', 'Actions'),
 	));
 
-?>
-	<thead>
-	<?php echo $tableHeaders; ?>
-	</thead>
-<?php
+	echo $this->Html->tag('thead', $tableHeaders);
+$this->end();
 
+$this->append('table-body');
 	$rows = array();
 	foreach ($attachments as $attachment) {
 		$actions = array();
@@ -65,21 +61,26 @@ $detailUrl = array(
 			$assetCount = $attachment['AssetsAttachment']['asset_count'] . '&nbsp;';
 			$actions[] = $this->Croogo->adminRowAction('', $detailUrl, array(
 				'icon' => 'suitcase',
-				'iconSize' => 'small',
 				'data-toggle' => 'browse',
 				'tooltip' => __d('assets', 'View other sizes'),
 			));
 
 			$actions[] = $this->Croogo->adminRowActions($attachment['AssetsAttachment']['id']);
 			$resizeUrl = array_merge(
-				array('action' => 'resize', $attachment['AssetsAttachment']['id'], 'ext' => 'json'),
+				array(
+					'action' => 'resize',
+					$attachment['AssetsAttachment']['id'],
+					'ext' => 'json'
+				),
 				array('?' => $query)
 			);
 		}
 
-		$actions[] = $this->Croogo->adminRowAction('', $resizeUrl,
-			array('icon' => 'resize-small', 'tooltip' => __d('croogo', 'Resize this item'), 'data-toggle' => 'resize-asset')
-		);
+		$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
+			'icon' => 'resize-small',
+			'tooltip' => __d('croogo', 'Resize this item'),
+			'data-toggle' => 'resize-asset'
+		));
 		$editUrl = array_merge(
 			array('action' => 'edit', $attachment['AssetsAttachment']['id']),
 			array('?' => $query)
@@ -98,7 +99,7 @@ $detailUrl = array(
 
 			$imgUrl = $this->AssetsImage->resize($path, 100, 200,
 				array('adapter' => $attachment['AssetsAsset']['adapter']),
-				array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
+				array('alt' => $attachment['AssetsAttachment']['title'])
 			);
 			$thumbnail = $this->Html->link($imgUrl, $path,
 				array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
@@ -126,6 +127,4 @@ $detailUrl = array(
 	}
 
 	echo $this->Html->tableCells($rows);
-
-?>
-</table>
+$this->end();

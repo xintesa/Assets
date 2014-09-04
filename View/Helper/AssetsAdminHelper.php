@@ -12,16 +12,19 @@ class AssetsAdminHelper extends AppHelper {
 		if (empty($this->request->params['admin'])) {
 			return;
 		}
-		$this->Html->css(array(
-			'bootstrap-editable',
-		), array(
-			'inline' => false,
-		));
-		$this->Html->script(array(
-			'bootstrap-editable.min',
-		), array(
-			'inline' => false,
-		));
+
+		if ($this->_View->theme === 'AdminExtras') {
+			$this->Html->css(array(
+				'bootstrap-editable',
+			), array(
+				'inline' => false,
+			));
+			$this->Html->script(array(
+				'bootstrap-editable.min',
+			), array(
+				'block' => 'scriptBottom',
+			));
+		}
 	}
 
 }
