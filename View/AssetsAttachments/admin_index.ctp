@@ -99,7 +99,7 @@ $this->append('table-body');
 
 			$imgUrl = $this->AssetsImage->resize($path, 100, 200,
 				array('adapter' => $attachment['AssetsAsset']['adapter']),
-				array('class' => 'img-polaroid', 'alt' => $attachment['AssetsAttachment']['title'])
+				array('alt' => $attachment['AssetsAttachment']['title'])
 			);
 			$thumbnail = $this->Html->link($imgUrl, $path,
 				array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])

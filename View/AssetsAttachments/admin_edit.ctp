@@ -77,8 +77,7 @@ $this->append('panels');
 	$path = $this->data['AssetsAsset']['path'];
 	if ($fileType == 'image'):
 		$imgUrl = $this->AssetsImage->resize($path, 200, 300,
-			array('adapter' => $this->data['AssetsAsset']['adapter']),
-			array('class' => 'img-polaroid')
+			array('adapter' => $this->data['AssetsAsset']['adapter'])
 		);
 	else:
 		$imgUrl = $this->Html->image('/croogo/img/icons/' . $this->Filemanager->mimeTypeToImage($this->data['AssetsAttachment']['mime_type'])) . ' ' . $this->data['AssetsAttachment']['mime_type'];

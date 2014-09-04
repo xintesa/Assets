@@ -212,8 +212,7 @@ $this->append('table-body');
 		if ($mimeType == 'image') {
 			$img = $this->AssetsImage->resize(
 				$attachment['AssetsAsset']['path'], 100, 200,
-				array('adapter' => $attachment['AssetsAsset']['adapter']),
-				array('class' => 'img-polaroid')
+				array('adapter' => $attachment['AssetsAsset']['adapter'])
 			);
 			$thumbnail = $this->Html->link($img,
 				$attachment['AssetsAsset']['path'],
