@@ -308,6 +308,59 @@ class AssetsAttachment extends AssetsAppModel {
 	}
 
 /**
+ * Create a video thumbnail
+ *
+ * @param integer $id Attachment Id
+ * @param integer $w New Width
+ * @param integer $h New Height
+ * @param array $options Options array
+ */
+	public function createVideoThumbnail($id, $w, $h, $options = array()) {
+		if (!class_exists('FFmpegMovie')) {
+			throw new RunTimeException('FFmpegMovie class not found');
+		}
+		$this->recursive = -1;
+		$this->contain(array('AssetsAsset'));
+		$attachment = $this->findById($id);
+		$asset =& $attachment['AssetsAsset'];
+		$path = rtrim(WWW_ROOT, '/') . $asset['path'];
+
+		$info = pathinfo($asset['path']);
+		$ind = sprintf('.resized-%dx%d.', $w, $h);
+
+		$uploadsDir = str_replace('/' . $options['uploadsDir'] . '/', '', dirname($asset['path'])) . '/';
+		$filename = $info['filename'] . $ind . 'jpg';
+		$writePath = WWW_ROOT . 'galleries' . DS . $uploadsDir . $filename;
+
+		$ffmpeg = new FFmpegMovie($path, null, 'avconv');
+		$frame = $ffmpeg->getFrame(null, 200, 150);
+		imagejpeg($frame->toGDImage(), $writePath, 100);
+
+		$fp = fopen($writePath, 'r');
+		$stat = fstat($fp);
+		fclose($fp);
+
+		$adapter = $asset['adapter'];
+
+		$data = $this->AssetsAsset->create(array(
+			'filename' => $filename,
+			'path' => dirname($asset['path']) . '/' . $filename,
+			'model' => $asset['model'],
+			'extension' => $asset['extension'],
+			'parent_asset_id' => $asset['id'],
+			'foreign_key' => $asset['foreign_key'],
+			'adapter' => $adapter,
+			'mime_type' => $asset['mime_type'],
+			'width' => $newWidth,
+			'height' => $newHeight,
+			'filesize' => $stat[7],
+		));
+
+		$asset = $this->AssetsAsset->save($data);
+		return $asset;
+	}
+
+/**
  * Copy an existing attachment and resize with width: $w and height: $h
  *
  * @param integer $id Attachment Id
