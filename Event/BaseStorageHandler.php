@@ -57,9 +57,23 @@ abstract class BaseStorageHandler extends Object {
 		if (!file_exists($path)) {
 			return array();
 		}
-		$size = getimagesize($path);
-		list($width, $height) = $size;
-		$mimeType = $size['mime'];
+
+		$fp = finfo_open(FILEINFO_MIME_TYPE);
+		$mimeType = finfo_file($fp, $path);
+
+		switch ($mimeType) {
+			case 'image/jpeg':
+			case 'image/jpg':
+			case 'image/png':
+			case 'image/gif':
+				$size = getimagesize($path);
+				list($width, $height) = $size;
+			break;
+			default:
+				$width = $height = null;
+			break;
+		}
+
 		return compact('width', 'height', 'mimeType');
 	}
 
