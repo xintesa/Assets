@@ -86,12 +86,12 @@ $this->append('table-body');
 			array('?' => $query)
 		);
 		$actions[] = $this->Croogo->adminRowAction('', $editUrl,
-			array('icon' => 'pencil', 'tooltip' => __d('croogo', 'Edit this item'))
+			array('icon' => $_icons['update'], 'tooltip' => __d('croogo', 'Edit this item'))
 		);
 		$deleteUrl = array('action' => 'delete', $attachment['AssetsAttachment']['id']);
 		$deleteUrl = array_merge(array('?' => $query), $deleteUrl);
 		$actions[] = $this->Croogo->adminRowAction('', $deleteUrl,
-			array('icon' => 'trash', 'tooltip' => __d('croogo', 'Remove this item')),
+			array('icon' => $_icons['delete'], 'tooltip' => __d('croogo', 'Remove this item')),
 			__d('croogo', 'Are you sure?'));
 
 		$path = $attachment['AssetsAsset']['path'];

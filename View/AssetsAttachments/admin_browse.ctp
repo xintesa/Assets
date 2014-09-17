@@ -120,7 +120,7 @@ $this->append('table-body');
 		if (isset($this->request->query['editor'])):
 			$actions[] = $this->Html->link('', '#', array(
 				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
-				'icon' => 'paper-clip',
+				'icon' => $_icons['attach'],
 				'tooltip' => __d('croogo', 'Insert')
 			));
 		endif;
@@ -147,7 +147,7 @@ $this->append('table-body');
 			!isset($this->request->query['asset_id'])
 		) {
 			$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
-				'icon' => 'trash',
+				'icon' => $_icons['delete'],
 				'tooltip' => __d('croogo', 'Delete Attachment')
 				),
 				__d('croogo', 'Are you sure?')
@@ -156,7 +156,7 @@ $this->append('table-body');
 			isset($this->request->query['asset_id'])
 		) {
 			$actions[] = $this->Croogo->adminRowAction('', $deleteAssetUrl, array(
-				'icon' => 'trash',
+				'icon' => $_icons['delete'],
 				'tooltip' => __d('croogo', 'Delete Attachment version')
 				),
 				__d('croogo', 'Are you sure?')
