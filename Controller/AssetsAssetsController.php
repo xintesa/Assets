@@ -15,9 +15,9 @@ class AssetsAssetsController extends AssetsAppController {
 			throw new NotFoundException('Invalid Id');
 		}
 		if ($result) {
-			$this->Session->setFlash('Asset has been deleted', 'default', array('class' => 'success'));
+			$this->Session->setFlash('Asset has been deleted', 'flash', array('class' => 'success'));
 		} else {
-			$this->Session->setFlash('Unable to delete Asset');
+			$this->Session->setFlash('Unable to delete Asset', 'flash', array('class' => 'error'));
 			$this->log($this->AssetsAsset->validationErrors);
 		}
 		return $this->redirect($this->referer());

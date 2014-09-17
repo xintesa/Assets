@@ -48,13 +48,13 @@ class AssetsAssetUsagesController extends AssetsAppController {
 				));
 				$saved = $this->AssetsAssetUsage->save($assetUsage);
 				if ($saved) {
-					$this->Session->setFlash('Asset added', 'default', array(
+					$this->Session->setFlash('Asset added', 'flash', array(
 						'class' => 'success',
 					));
 				}
 			} else {
-				$this->Session->setFlash('Asset already exist', 'default', array(
-					'class' => 'alert',
+				$this->Session->setFlash('Asset already exist', 'flash', array(
+					'class' => 'warning',
 				));
 			}
 		}
