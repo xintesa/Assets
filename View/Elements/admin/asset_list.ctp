@@ -203,7 +203,11 @@ $this->end();
 <?php
 
 $script =<<<EOF
-	$('.editable').editable();
+	if (typeof $.fn.editable == 'function') {
+		$('.editable').editable();
+	} else {
+		console.log('Note: bootstrap-xeditable plugin not found. Ensure your admin theme provides this plugin or use http://github.com/rchavik/AdminExtras as an alternative.');
+	}
 	tb_init('a.thickbox');
 EOF;
 if ($this->request->is('ajax')):
