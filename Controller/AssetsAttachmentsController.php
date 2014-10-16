@@ -154,6 +154,25 @@ class AssetsAttachmentsController extends AssetsAppController {
 				array('deep' => true)
 			);
 
+			if ($this->request->is('ajax')) {
+				$files = array();
+				$error = false;
+				if ($saved) {
+					$attachment = $this->AssetsAttachment->findById($this->AssetsAttachment->id);
+					$this->viewClass = 'Json';
+					$files = array(array(
+						'url' => $attachment['AssetsAsset']['path'],
+						'thumbnail_url' => $attachment['AssetsAsset']['path'],
+						'name' => $attachment['AssetsAttachment']['title'],
+						'type' => $attachment['AssetsAsset']['mime_type'],
+						'size' => $attachment['AssetsAsset']['filesize'],
+					));
+				}
+				$this->set(compact('files', 'error'));
+				$this->set('_serialize', array('files', 'error'));
+				return true;
+			}
+
 			if ($saved) {
 				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'flash', array('class' => 'success'));
 				$url = array();

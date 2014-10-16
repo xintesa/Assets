@@ -2,6 +2,26 @@
 
 $this->extend('/Common/admin_edit');
 
+$this->Html->css(array(
+	'Assets.jquery.fileupload',
+), array(
+	'inline' => false,
+));
+$this->Croogo->adminScript(array(
+	'Assets.fileupload/vendor/jquery.ui.widget',
+	'Assets.fileupload/tmpl.min.js',
+	'Assets.fileupload/load-image.all.min',
+	'Assets.fileupload/canvas-to-blob.min',
+	'Assets.fileupload/jquery.iframe-transport',
+	'Assets.fileupload/jquery.fileupload',
+	'Assets.fileupload/jquery.fileupload-process',
+	'Assets.fileupload/jquery.fileupload-image',
+	'Assets.fileupload/jquery.fileupload-audio',
+	'Assets.fileupload/jquery.fileupload-video',
+	'Assets.fileupload/jquery.fileupload-validate',
+	'Assets.fileupload/jquery.fileupload-ui',
+));
+
 $this->Html
 	->addCrumb('', '/admin', array('icon' => 'home'))
 	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
@@ -43,7 +63,7 @@ $this->append('tab-content');
 			));
 		endif;
 
-		echo $this->Form->input('AssetsAsset.file', array('label' => __d('croogo', 'Upload'), 'type' => 'file'));
+		echo $this->element('Assets.admin/fileupload');
 
 		if (isset($model) && isset($foreignKey)):
 			echo $this->Form->input($assetUsage . 'featured_image', array(
@@ -85,7 +105,13 @@ $this->append('panels');
 		);
 	}
 	echo $this->Html->beginBox(__d('croogo', 'Publishing')) .
-		$this->Form->button(__d('croogo', 'Upload')) .
+		$this->Form->button(__d('croogo', 'Upload'), array(
+			'icon' => 'upload',
+			'button' => 'primary',
+			'class' => 'start',
+			'type' => 'submit',
+			'id' => 'start_upload',
+		)) .
 		$this->Form->end() .
 		$this->Html->link(__d('croogo', 'Cancel'), $redirect, array(
 			'button' => 'danger',
@@ -96,5 +122,26 @@ $this->end();
 
 $this->append('form-end', $this->Form->end());
 
-$script = "\$('[data-toggle=tab]:first').tab('show');";
+$xhrUploadUrl = $this->Html->url($formUrl);
+$script =<<<EOF
+
+	\$('[data-toggle=tab]:first').tab('show');
+	var filesToUpload = [];
+	var \$form = \$('#AssetsAttachmentAdminAddForm');
+	\$form.fileupload({
+		url: '$xhrUploadUrl',
+		add: function(e, data) {
+			var that = this;
+			filesToUpload.push(data.files[0]);
+			$.blueimp.fileupload.prototype.options.add.call(that, e, data)
+		}
+	});
+	\$('#start_upload').on('click', function(e) {
+		for (var i in filesToUpload) {
+			\$form.fileupload('send', { files: [filesToUpload[i]] });
+		}
+		e.preventDefault();
+	});
+EOF;
+
 $this->Js->buffer($script);
