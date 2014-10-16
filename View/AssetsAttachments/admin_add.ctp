@@ -127,18 +127,23 @@ $script =<<<EOF
 
 	\$('[data-toggle=tab]:first').tab('show');
 	var filesToUpload = [];
+	var uploadContext = [];
 	var \$form = \$('#AssetsAttachmentAdminAddForm');
 	\$form.fileupload({
 		url: '$xhrUploadUrl',
 		add: function(e, data) {
 			var that = this;
-			filesToUpload.push(data.files[0]);
 			$.blueimp.fileupload.prototype.options.add.call(that, e, data)
+			filesToUpload.push(data.files[0]);
+			uploadContext.push(data.context);
 		}
 	});
 	\$('#start_upload').on('click', function(e) {
 		for (var i in filesToUpload) {
-			\$form.fileupload('send', { files: [filesToUpload[i]] });
+			\$form.fileupload('send', {
+				files: [filesToUpload[i]],
+				context: uploadContext[i]
+			});
 		}
 		e.preventDefault();
 	});
