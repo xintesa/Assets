@@ -118,11 +118,20 @@ $this->append('table-body');
 		$mimeType = $mimeType['0'];
 
 		if (isset($this->request->query['editor'])):
-			$actions[] = $this->Html->link('', '#', array(
-				'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
-				'icon' => $_icons['attach'],
-				'tooltip' => __d('croogo', 'Insert')
-			));
+			if ($this->request->query['func']) {
+				$jActions = $this->request->query['func'];
+				$actions[] = $this->Html->link('', '#', array(
+					'onclick' => $jActions . "('" . $attachment['AssetsAsset']['path'] . "');",
+					'icon' => $_icons['attach'],
+					'tooltip' => __d('croogo', 'Insert')
+				));
+			} else {
+				$actions[] = $this->Html->link('', '#', array(
+					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
+					'icon' => $_icons['attach'],
+					'tooltip' => __d('croogo', 'Insert')
+				));
+			}
 		endif;
 
 		$deleteUrl = Hash::merge($query, array(
