@@ -17,8 +17,52 @@ class AssetsEventHandler implements CakeEventListener {
 			'Croogo.setupAdminData' => array(
 				'callable' => 'onSetupAdminData',
 			),
+			'Controller.Links.setupLinkChooser' => array(
+				'callable' => 'onSetupLinkChooser',
+			)
 		);
 	}
+
+	public function onSetupLinkChooser($event) {
+		$linkChoosers = array();
+		$linkChoosers['Images'] = array(
+			'title' => 'Asset Image Attachments',
+			'description' => 'Assets Attachments with image mime type',
+			'url' => array(
+				'plugin' => 'assets',
+				'controller' => 'assets_attachments',
+				'acion' => 'index',
+				'?' => array(
+					'chooser_type' => 'image',
+					'chooser' => 1,
+					'keepThis' => true,
+					'TB_iframe' => true,
+					'height' => '400',
+					'width' => '600',
+				)
+			)
+		);
+		$linkChoosers['Files'] = array(
+			'title' => 'Asset Files Attachments',
+			'description' => 'Assets Attachments with other mime types, ie. pdf, xls, doc, etc.',
+			'url' => array(
+				'plugin' => 'assets',
+				'controller' => 'assets_attachments',
+				'acion' => 'index',
+				'?' => array(
+					'chooser_type' => 'file',
+					'chooser' => 1,
+					'keepThis' => true,
+					'TB_iframe' => true,
+					'height' => '400',
+					'width' => '600',
+				)
+			)
+		);
+
+		Croogo::mergeConfig('Menus.linkChoosers', $linkChoosers);
+	}
+
 
 /**
  * Setup admin data

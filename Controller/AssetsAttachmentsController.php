@@ -80,6 +80,13 @@ class AssetsAttachmentsController extends AssetsAppController {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
 		$this->Prg->commonProcess();
+		$isChooser = false;
+
+		if (isset($this->request->params['named']['links']) || isset($this->request->query['chooser'])) {
+			$isChooser = true;
+		}
+
+		$criteria = $this->AssetsAttachment->parseCriteria($this->Prg->parsedParams());
 
 		if (empty($this->request->query)) {
 			$this->AssetsAttachment->recursive = 0;
@@ -106,7 +113,19 @@ class AssetsAttachmentsController extends AssetsAppController {
 			};
 
 		}
-		$this->set('attachments', $this->paginate($this->AssetsAttachment->parseCriteria($this->request->query)));
+		if ($isChooser) {
+			if ($this->request->query['chooser_type'] == 'image') {
+				$this->paginate['AssetsAttachment']['conditions']['AssetsAsset.mime_type LIKE'] = 'image/%';
+			} else {
+				$this->paginate['AssetsAttachment']['conditions']['AssetsAsset.mime_type NOT LIKE'] = 'image/%';
+			}
+		}
+		$this->set('attachments', $this->paginate($criteria));
+
+		if (isset($this->request->params['named']['links']) || isset($this->request->query['chooser'])) {
+			$this->layout = 'admin_popup';
+			$this->render('admin_chooser');
+		}
 	}
 
 /**
