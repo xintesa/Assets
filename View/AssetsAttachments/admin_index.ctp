@@ -105,7 +105,7 @@ $this->append('table-body');
 				array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
 			);
 		} else {
-			$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png', array('alt' => $mimeType)) . ' ' . $mimeType . ' (' . $this->Assets->filename2ext($attachment['AssetsAttachment']['path']) . ')';
+			$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png', array('alt' => $mimeType)) . ' ' . $mimeType . ' (' . $this->Assets->filename2ext($attachment['AssetsAsset']['path']) . ')';
 		}
 
 		$actions = $this->Html->div('item-actions', implode(' ', $actions));
