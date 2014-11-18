@@ -122,13 +122,13 @@ $this->append('table-body');
 				$jActions = $this->request->query['func'];
 				$actions[] = $this->Html->link('', '#', array(
 					'onclick' => $jActions . "('" . $attachment['AssetsAsset']['path'] . "');",
-					'icon' => $_icons['attach'],
+					'icon' => $this->Theme->getIcon('paperclip'),
 					'tooltip' => __d('croogo', 'Insert')
 				));
 			} else {
 				$actions[] = $this->Html->link('', '#', array(
 					'onclick' => "Croogo.Wysiwyg.choose('" . $attachment['AssetsAttachment']['slug'] . "');",
-					'icon' => $_icons['attach'],
+					'icon' => $this->Theme->getIcon('paperclip'),
 					'tooltip' => __d('croogo', 'Insert')
 				));
 			}
@@ -156,7 +156,7 @@ $this->append('table-body');
 			!isset($this->request->query['asset_id'])
 		) {
 			$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
-				'icon' => $_icons['delete'],
+				'icon' => $this->Theme->getIcon('delete'),
 				'tooltip' => __d('croogo', 'Delete Attachment')
 				),
 				__d('croogo', 'Are you sure?')
@@ -165,7 +165,7 @@ $this->append('table-body');
 			isset($this->request->query['asset_id'])
 		) {
 			$actions[] = $this->Croogo->adminRowAction('', $deleteAssetUrl, array(
-				'icon' => $_icons['delete'],
+				'icon' => $this->Theme->getIcon('delete'),
 				'tooltip' => __d('croogo', 'Delete Attachment version')
 				),
 				__d('croogo', 'Are you sure?')
