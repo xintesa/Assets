@@ -1,14 +1,4 @@
-<?php $this->append('page-heading'); ?>
-<style>
-td .actions a:hover{
-	text-decoration: none;
-}
-td .actions a.unregister-usage {
-	color: #9D261D;
-}
-</style>
 <?php
-$this->end();
 
 $this->Html->script('Assets.admin.js', array('block' => 'scriptBottom'));
 
