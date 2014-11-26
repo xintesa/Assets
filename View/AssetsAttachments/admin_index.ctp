@@ -55,10 +55,10 @@ $this->append('table-body');
 
 		$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
 		$mimeType = $mimeType['0'];
+		$assetCount = $attachment['AssetsAttachment']['asset_count'] . '&nbsp;';
 		if ($mimeType == 'image') {
 			$detailUrl['?']['foreign_key'] = $attachment['AssetsAttachment']['id'];
 			$detailUrl['?']['asset_id'] = $attachment['AssetsAsset']['id'];
-			$assetCount = $attachment['AssetsAttachment']['asset_count'] . '&nbsp;';
 			$actions[] = $this->Croogo->adminRowAction('', $detailUrl, array(
 				'icon' => 'suitcase',
 				'data-toggle' => 'browse',
@@ -76,23 +76,29 @@ $this->append('table-body');
 			);
 		}
 
-		$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
-			'icon' => 'resize-small',
-			'tooltip' => __d('croogo', 'Resize this item'),
-			'data-toggle' => 'resize-asset'
-		));
+		if (isset($resizeUrl)) {
+			$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
+				'icon' => 'arrows-alt',
+				'tooltip' => __d('croogo', 'Resize this item'),
+				'data-toggle' => 'resize-asset'
+			));
+		}
+
 		$editUrl = array_merge(
 			array('action' => 'edit', $attachment['AssetsAttachment']['id']),
 			array('?' => $query)
 		);
-		$actions[] = $this->Croogo->adminRowAction('', $editUrl,
-			array('icon' => $this->Theme->getIcon('update'), 'tooltip' => __d('croogo', 'Edit this item'))
-		);
+		$actions[] = $this->Croogo->adminRowAction('', $editUrl, array(
+			'icon' => 'update',
+			'tooltip' => __d('croogo', 'Edit this item'),
+		));
 		$deleteUrl = array('action' => 'delete', $attachment['AssetsAttachment']['id']);
 		$deleteUrl = array_merge(array('?' => $query), $deleteUrl);
-		$actions[] = $this->Croogo->adminRowAction('', $deleteUrl,
-			array('icon' => $this->Theme->getIcon('delete'), 'tooltip' => __d('croogo', 'Remove this item')),
-			__d('croogo', 'Are you sure?'));
+		$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
+			'icon' => 'delete',
+			'tooltip' => __d('croogo', 'Remove this item'),
+			'escapeTitle' => false,
+		), __d('croogo', 'Are you sure?'));
 
 		$path = $attachment['AssetsAsset']['path'];
 		if ($mimeType == 'image') {
