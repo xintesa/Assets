@@ -167,6 +167,15 @@ class AssetsAttachmentsController extends AssetsAppController {
 						'type' => $attachment['AssetsAsset']['mime_type'],
 						'size' => $attachment['AssetsAsset']['filesize'],
 					));
+				} else {
+					if (!empty($this->AssetsAttachment->validationErrors)) {
+						$errors = Hash::extract(
+							$this->AssetsAttachment->validationErrors,
+							'{s}.{s}.{n}'
+						);
+						$files = array(array('error' => $errors));
+						$error = implode("\n", $errors);
+					}
 				}
 				$this->set(compact('files', 'error'));
 				$this->set('_serialize', array('files', 'error'));
