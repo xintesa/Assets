@@ -155,30 +155,41 @@ $uploadUrl = array(
 );
 
 $this->append('actions');
-	echo $this->Croogo->adminAction(__d('assets', 'Reload'),
+	echo '<div class="btn-group">';
+	echo $this->Html->link(__d('assets', 'Reload'),
 		$browseUrl,
 		array(
+			'div' => false,
 			'icon' => 'refresh',
 			'iconSize' => 'small',
 			'data-toggle' => 'refresh',
+			'button' => 'default',
+			'tooltip' => __d('assets', 'Reload asset list for this content'),
 		)
 	);
-	echo $this->Croogo->adminAction(__d('assets', 'Browse'),
+	echo $this->Html->link(__d('assets', 'Browse'),
 		$browseUrl,
 		array(
+			'div' => false,
 			'icon' => 'folder-open',
 			'iconSize' => 'small',
 			'data-toggle' => 'browse',
+			'button' => 'default',
+			'tooltip' => __d('assets', 'Browse available assets'),
 		)
 	);
-	echo $this->Croogo->adminAction(__d('assets', 'Upload'),
+	echo $this->Html->link(__d('assets', 'Upload'),
 		$uploadUrl,
 		array(
+			'div' => false,
 			'icon' => 'upload',
 			'iconSize' => 'small',
 			'data-toggle' => 'browse',
+			'button' => 'default',
+			'tooltip' => __d('assets', 'Upload new asset for this content'),
 		)
 	);
+	echo "</div>";
 $this->end();
 
 ?>
