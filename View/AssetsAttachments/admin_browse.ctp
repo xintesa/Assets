@@ -180,7 +180,7 @@ $this->append('table-body');
 				array('?' => $query)
 			);
 			$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
-				'icon' => 'arrows-alt',
+				'icon' => 'resize',
 				'tooltip' => __d('croogo', 'Resize this item'),
 				'data-toggle' => 'resize-asset'
 			));

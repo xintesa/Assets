@@ -174,7 +174,7 @@ $this->append('actions');
 	echo $this->Croogo->adminAction(__d('assets', 'Upload'),
 		$uploadUrl,
 		array(
-			'icon' => 'upload-alt',
+			'icon' => 'upload',
 			'iconSize' => 'small',
 			'data-toggle' => 'browse',
 		)

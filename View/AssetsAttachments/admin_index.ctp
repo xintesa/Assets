@@ -78,7 +78,7 @@ $this->append('table-body');
 
 		if (isset($resizeUrl)) {
 			$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
-				'icon' => 'arrows-alt',
+				'icon' => 'resize',
 				'tooltip' => __d('croogo', 'Resize this item'),
 				'data-toggle' => 'resize-asset'
 			));
