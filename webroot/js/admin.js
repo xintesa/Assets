@@ -11,7 +11,7 @@ Assets.reloadAssetsTab = function(e) {
 
 Assets.popup = function(e) {
 	e && e.preventDefault();
-	var width = 800;
+	var width = window.screen.width > 1024 ? 1024 : 800;
 	var height = 600;
 	var screenLeft = window.screenLeft != undefined ? window.screenLeft : screen.left;
 	var screenTop = window.screenTop != undefined ? window.screenTop : screen.top;
