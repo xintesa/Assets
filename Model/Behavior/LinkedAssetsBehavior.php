@@ -25,6 +25,18 @@ class LinkedAssetsBehavior extends ModelBehavior {
 	}
 
 	public function beforeFind(Model $model, $query) {
+		if (!isset($query['contain'])) {
+			$contain = array();
+			$relationCheck = array('belongsTo', 'hasMany', 'hasOne', 'hasAndBelongsToMany');
+			foreach ($relationCheck as $relation) {
+				if ($model->{$relation}) {
+					$contain = Hash::merge($contain, array_keys($model->{$relation}));
+				}
+			}
+			if ($model->recursive >= 0 || $query['recursive'] >= 0 ) {
+				$query = Hash::merge(array('contain' => $contain), $query);
+			}
+		}
 		if (isset($query['contain'])) {
 			if (!isset($query['contain']['AssetsAssetUsage'])) {
 				$query['contain']['AssetsAssetUsage'] = 'AssetsAsset';
