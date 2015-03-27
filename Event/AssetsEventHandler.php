@@ -14,6 +14,9 @@ class AssetsEventHandler implements CakeEventListener {
  */
 	public function implementedEvents() {
 		return array(
+			'Controller.AssetsAttachment.newAttachment' => array(
+				'callable' => 'onNewAttachment',
+			),
 			'Croogo.setupAdminData' => array(
 				'callable' => 'onSetupAdminData',
 			),
@@ -21,6 +24,35 @@ class AssetsEventHandler implements CakeEventListener {
 				'callable' => 'onSetupLinkChooser',
 			)
 		);
+	}
+
+/**
+ * Registers usage when new attachment is created and attached to a resource
+ */
+	public function onNewAttachment($event) {
+		$controller = $event->subject;
+		$request = $controller->request;
+		$attachment = $event->data['attachment'];
+
+		if (empty($request->data['AssetsAsset']['AssetsAssetUsage'])) {
+			$this->log('No asset usage record to register');
+			return;
+		}
+
+		$usage = $request->data['AssetsAsset']['AssetsAssetUsage'][0];
+		$Usage = ClassRegistry::init('Assets.AssetsAssetUsage');
+		$data = $Usage->create(array(
+			'asset_id' => $attachment['AssetsAsset']['id'],
+			'model' => $usage['model'],
+			'foreign_key' => $usage['foreign_key'],
+			'featured_image' => $usage['featured_image'],
+		));
+		$result = $Usage->save($data);
+		if (!$result) {
+			$this->log('Asset Usage registration failed');
+			$this->log($Usage->validationErrors);
+		}
+		$event->result = $result;
 	}
 
 	public function onSetupLinkChooser($event) {

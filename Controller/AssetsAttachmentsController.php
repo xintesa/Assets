@@ -149,16 +149,19 @@ class AssetsAttachmentsController extends AssetsAppController {
 			}
 
 			$this->AssetsAttachment->create();
-			$saved = $this->AssetsAttachment->saveAll(
-				$this->request->data,
-				array('deep' => true)
-			);
+			$saved = $this->AssetsAttachment->saveAll($this->request->data);
+
+			if ($saved) {
+				$attachmentId = $this->AssetsAttachment->id;
+				$attachment = $this->AssetsAttachment->findById($attachmentId);
+				$eventKey = 'Controller.AssetsAttachment.newAttachment';
+				Croogo::dispatchEvent($eventKey, $this, compact('attachment'));
+			}
 
 			if ($this->request->is('ajax')) {
 				$files = array();
 				$error = false;
 				if ($saved) {
-					$attachment = $this->AssetsAttachment->findById($this->AssetsAttachment->id);
 					$this->viewClass = 'Json';
 					$files = array(array(
 						'url' => $attachment['AssetsAsset']['path'],
