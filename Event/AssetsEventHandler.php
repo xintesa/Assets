@@ -1,6 +1,7 @@
 <?php
 
 App::uses('CakeEventListener', 'Event');
+App::uses('CakeLog', 'Log');
 
 /**
  * AssetsEventHandler
@@ -35,7 +36,7 @@ class AssetsEventHandler implements CakeEventListener {
 		$attachment = $event->data['attachment'];
 
 		if (empty($request->data['AssetsAsset']['AssetsAssetUsage'])) {
-			$this->log('No asset usage record to register');
+			CakeLog::error('No asset usage record to register');
 			return;
 		}
 
@@ -49,8 +50,8 @@ class AssetsEventHandler implements CakeEventListener {
 		));
 		$result = $Usage->save($data);
 		if (!$result) {
-			$this->log('Asset Usage registration failed');
-			$this->log($Usage->validationErrors);
+			CakeLog::error('Asset Usage registration failed');
+			CakeLog::error(print_r($Usage->validationErrors, true));
 		}
 		$event->result = $result;
 	}
