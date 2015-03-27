@@ -122,6 +122,7 @@ $this->end();
 
 $this->append('form-end', $this->Form->end());
 
+$editorMode = isset($formUrl['editor']) ? $formUrl['editor'] : 0;
 $xhrUploadUrl = $this->Html->url($formUrl);
 $script =<<<EOF
 
@@ -146,7 +147,7 @@ $script =<<<EOF
 			});
 		}
 		e.preventDefault();
-		if (filesToUpload.length > 0) {
+		if (filesToUpload.length > 0 && $editorMode == 1) {
 			$(this).text('Close').one('click', function(e) {
 				window.close();
 			});
