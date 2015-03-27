@@ -4,7 +4,7 @@
 
 $uploadIcon = $this->Html->icon('upload');
 $addIcon = $this->Html->icon('create');
-$cancelIcon = $this->Html->icon('cancel');
+$cancelIcon = $this->Html->icon('delete');
 
 ?>
 <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
@@ -64,7 +64,7 @@ $cancelIcon = $this->Html->icon('cancel');
         </td>
         <td>
             {% if (!i && !o.options.autoUpload) { %}
-                <button class="btn btn-primary start" disabled
+                <button class="btn btn-small btn-primary start" disabled
                     title="<?php echo __d('assets', 'Start'); ?>"
                 >
                     <?php echo $uploadIcon; ?>
@@ -72,7 +72,7 @@ $cancelIcon = $this->Html->icon('cancel');
             {% } %}
             {% if (!i) { %}
                 <button
-                    class="btn btn-warning cancel"
+                    class="btn btn-small btn-warning cancel"
                     title="<?php echo __d('assets', 'Cancel'); ?>"
                 >
                     <?php echo $cancelIcon; ?>
