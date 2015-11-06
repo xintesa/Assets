@@ -25,6 +25,9 @@ class LinkedAssetsBehavior extends ModelBehavior {
 	}
 
 	public function beforeFind(Model $model, $query) {
+		if ($model->findQueryType == 'list') {
+			return $query;
+		}
 		if (!isset($query['contain'])) {
 			$contain = array();
 			$relationCheck = array('belongsTo', 'hasMany', 'hasOne', 'hasAndBelongsToMany');
