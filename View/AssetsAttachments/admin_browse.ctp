@@ -66,6 +66,7 @@ $this->append('actions');
 
 	if (!$all):
 		$listUrl['?']['all'] = true;
+		$listUrl['?'] = array_merge($listUrl['?'], $this->request->query);
 		$listTitle = __d('assets', 'List All Attachments');
 	else:
 		$listTitle = __d('assets', 'List Attachments');
