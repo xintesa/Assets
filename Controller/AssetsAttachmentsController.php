@@ -96,6 +96,12 @@ class AssetsAttachmentsController extends AssetsAppController {
 				isset($this->request->query['all'])
 			) {
 				$this->paginate = array_merge(array('versions'), $this->paginate);
+				if (!$this->request->query('sort') && empty($this->request->params['named']['sort'])) {
+					$this->paginate['AssetsAttachment']['order'] = array(
+						'id' => 'desc',
+					);
+				}
+
 				if (isset($this->request->query['asset_id'])) {
 					$this->paginate['asset_id'] = $this->request->query['asset_id'];
 				}
