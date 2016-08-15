@@ -1,7 +1,7 @@
 <?php
 
-App::uses('AppModel', 'Model');
+App::uses('CroogoAppModel', 'Croogo.Model');
 
-class AssetsAppModel extends AppModel {
+class AssetsAppModel extends CroogoAppModel {
 
 }

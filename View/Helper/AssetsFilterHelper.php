@@ -48,6 +48,10 @@ class AssetsFilterHelper extends AppHelper {
 				'recursive' => -1,
 				'contain' => array('AssetsAsset'),
 				'conditions' => $conditions,
+				'cache' => array(
+					'name' => 'asset_filtered_' . $assetId,
+					'config' => 'nodes',
+				),
 			));
 			if (empty($asset['AssetsAsset'])) {
 				$this->log(sprintf('%s - Asset not found for %s',

@@ -83,6 +83,10 @@ class LinkedAssetsBehavior extends ModelBehavior {
 						'conditions' => array(
 							'AssetsAsset.parent_asset_id' => $seedId,
 						),
+						'cache' => array(
+							'name' => 'linked_assets_' . $asset['AssetsAsset']['id'],
+							'config' => 'nodes',
+						),
 					));
 					foreach ($relatedAssets as $related) {
 						$result[$key]['FeaturedImage']['Versions'][] = $related['AssetsAsset'];
