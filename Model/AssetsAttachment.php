@@ -11,6 +11,7 @@ class AssetsAttachment extends AssetsAppModel {
 	public $useTable = 'attachments';
 
 	public $actsAs = array(
+		'Containable',
 		'Croogo.Trackable',
 		'Search.Searchable',
 		'Imagine.Imagine',
