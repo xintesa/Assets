@@ -45,7 +45,6 @@ class AssetsFilterHelper extends AppHelper {
 			$assetId = $tagMatches[2][$i];
 			$conditions['AssetsAssetUsage.id'] = $assetId;
 			$asset = $Asset->find('first', array(
-				'recursive' => -1,
 				'contain' => array('AssetsAsset'),
 				'conditions' => $conditions,
 				'cache' => array(
