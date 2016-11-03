@@ -1,5 +1,7 @@
 <?php
 
+namespace Xintesa\Assets\Event;
+
 abstract class BaseStorageHandler extends Object {
 
 	protected $_storage = null;

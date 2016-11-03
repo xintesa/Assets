@@ -1,10 +1,9 @@
 <?php
 
-App::uses('BaseStorageHandler', 'Assets.Event');
-App::uses('CakeEventListener', 'Event');
-App::uses('StorageManager', 'Assets.Lib');
 
-class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements CakeEventListener {
+namespace Xintesa\Assets\Event;
+
+class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements EventListener {
 
 	public function implementedEvents() {
 		return array(

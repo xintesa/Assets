@@ -1,14 +1,14 @@
 <?php
 
-App::uses('CakeEventListener', 'Event');
-App::uses('CakeLog', 'Log');
 
 /**
  * AssetsEventHandler
  *
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class AssetsEventHandler implements CakeEventListener {
+namespace Xintesa\Assets\Event;
+
+class AssetsEventHandler implements EventListener {
 
 /**
  * implementedEvents
@@ -36,7 +36,7 @@ class AssetsEventHandler implements CakeEventListener {
 		$attachment = $event->data['attachment'];
 
 		if (empty($request->data['AssetsAsset']['AssetsAssetUsage'])) {
-			CakeLog::error('No asset usage record to register');
+			Log::error('No asset usage record to register');
 			return;
 		}
 
@@ -50,8 +50,8 @@ class AssetsEventHandler implements CakeEventListener {
 		));
 		$result = $Usage->save($data);
 		if (!$result) {
-			CakeLog::error('Asset Usage registration failed');
-			CakeLog::error(print_r($Usage->validationErrors, true));
+			Log::error('Asset Usage registration failed');
+			Log::error(print_r($Usage->validationErrors, true));
 		}
 		$event->result = $result;
 	}
