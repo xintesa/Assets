@@ -1,5 +1,6 @@
 <?php
 
+namespace Xintesa\Assets\Controller\Admin;
 
 /**
  * Attachments Controller
@@ -13,7 +14,7 @@
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link     http://www.croogo.org
  */
-class AssetsAttachmentsController extends AssetsAppController {
+class AttachmentsController extends AssetsAppController {
 
 /**
  * Models used by the Controller
@@ -60,11 +61,11 @@ class AssetsAttachmentsController extends AssetsAppController {
 	public function beforeFilter() {
 		parent::beforeFilter();
 
-		$noCsrfCheck = array('admin_add', 'admin_resize');
+		$noCsrfCheck = array('add', 'resize');
 		if (in_array($this->action, $noCsrfCheck)) {
 			$this->Security->csrfCheck = false;
 		}
-		if ($this->action == 'admin_resize') {
+		if ($this->action == 'resize') {
 			$this->Security->validatePost = false;
 		}
 	}
@@ -75,7 +76,7 @@ class AssetsAttachmentsController extends AssetsAppController {
  * @return void
  * @access public
  */
-	public function admin_index() {
+	public function index() {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
 		$this->Prg->commonProcess();
@@ -139,7 +140,7 @@ class AssetsAttachmentsController extends AssetsAppController {
  * @return void
  * @access public
  */
-	public function admin_add() {
+	public function add() {
 		$this->set('title_for_layout', __d('croogo', 'Add Attachment'));
 
 		if (isset($this->request->params['named']['editor'])) {
@@ -219,7 +220,7 @@ class AssetsAttachmentsController extends AssetsAppController {
  * @return void
  * @access public
  */
-	public function admin_edit($id = null) {
+	public function edit($id = null) {
 		$this->set('title_for_layout', __d('croogo', 'Edit Attachment'));
 
 		if (isset($this->request->params['named']['editor'])) {
@@ -258,7 +259,7 @@ class AssetsAttachmentsController extends AssetsAppController {
  * @return void
  * @access public
  */
-	public function admin_delete($id = null) {
+	public function delete($id = null) {
 		if (!$id) {
 			$this->Session->setFlash(__d('croogo', 'Invalid id for Attachment'), 'flash', array('class' => 'error'));
 			return $this->redirect(array('action' => 'index'));
@@ -289,12 +290,12 @@ class AssetsAttachmentsController extends AssetsAppController {
  * @return void
  * @access public
  */
-	public function admin_browse() {
+	public function browse() {
 		$this->layout = 'admin_popup';
-		$this->admin_index();
+		$this->index();
 	}
 
-	public function admin_list() {
+	public function list() {
 		$this->paginate = array(
 			'modelAttachments',
 			'model' => $this->request->query['model'],
@@ -308,7 +309,7 @@ class AssetsAttachmentsController extends AssetsAppController {
 		$this->set(compact('attachments'));
 	}
 
-	public function admin_resize($id = null) {
+	public function resize($id = null) {
 		if (empty($id)) {
 			throw new NotFoundException('Missing Asset Id to resize');
 		}

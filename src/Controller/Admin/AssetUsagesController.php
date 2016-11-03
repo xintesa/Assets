@@ -1,5 +1,6 @@
 <?php
 
+namespace Xintesa\Assets\Controller\Admin;
 
 class AssetsAssetUsagesController extends AssetsAppController {
 
@@ -11,7 +12,7 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		parent::beforeFilter();
 
 		$excludeActions = array(
-			'admin_change_type', 'admin_unregister',
+			'change_type', 'unregister',
 		);
 		if (in_array($this->request->params['action'], $excludeActions)) {
 			$this->Security->validatePost = false;
@@ -19,7 +20,7 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		}
 	}
 
-	public function admin_add() {
+	public function add() {
 		if (isset($this->request->query)) {
 			$assetId = $model = $foreignKey = $type = null;
 			$assetId = $this->request->query('asset_id');
@@ -58,7 +59,7 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		$this->redirect($this->referer());
 	}
 
-	public function admin_change_type() {
+	public function change_type() {
 		$this->viewClass = 'Json';
 		$result = true;
 		$data = array('pk' => null, 'value' => null);
@@ -79,7 +80,7 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		$this->set('_serialize', 'result');
 	}
 
-	public function admin_unregister() {
+	public function unregister() {
 		$this->viewClass = 'Json';
 		$result = false;
 		if (isset($this->request->data['id'])) {
