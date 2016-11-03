@@ -1,11 +1,12 @@
 <?php
 
+namespace Xintesa\Assets\Model\Table;
 
 /**
- * AssetsAssetUsage Model
+ * AssetUsages Table
  *
  */
-class AssetsAssetUsage extends AssetsAppModel {
+class AssetUsagesTable extends AssetsAppTable {
 
 	public $useTable = 'asset_usages';
 

@@ -1,7 +1,8 @@
 <?php
 
+namespace Xintesa\Assets\Model\Table;
 
-class AssetsAsset extends AssetsAppModel {
+class AssetsTable extends AssetsAppTable {
 
 	public $actsAs = array(
 		'Croogo.Trackable',

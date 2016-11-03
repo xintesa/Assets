@@ -1,11 +1,12 @@
 <?php
 
+namespace Xintesa\Assets\Model\Table;
 
 /**
  * AssetsAttachment Model
  *
  */
-class AssetsAttachment extends AssetsAppModel {
+class AttachmentsTable extends AssetsAppTable {
 
 	public $useTable = 'attachments';
 
