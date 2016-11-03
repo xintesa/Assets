@@ -2,7 +2,9 @@
 
 namespace Xintesa\Assets\Model\Behavior;
 
-class LinkedAssetsBehavior extends ModelBehavior {
+use Cake\ORM\Behavior;
+
+class LinkedAssetsBehavior extends Behavior {
 
 	public function setup(Model $model, $config = array()) {
 		$config = Hash::merge(array(

@@ -123,7 +123,7 @@ $this->end();
 $this->append('form-end', $this->Form->end());
 
 $editorMode = isset($formUrl['editor']) ? $formUrl['editor'] : 0;
-$xhrUploadUrl = $this->Html->url($formUrl);
+$xhrUploadUrl = $this->Url->build($formUrl);
 $script =<<<EOF
 
 	\$('[data-toggle=tab]:first').tab('show');

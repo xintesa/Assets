@@ -8,8 +8,8 @@ class AssetsAssetUsagesController extends AssetsAppController {
 		'Assets.AssetsAssetUsage',
 	);
 
-	public function beforeFilter() {
-		parent::beforeFilter();
+	public function beforeFilter(Event $event) {
+		parent::beforeFilter($event);
 
 		$excludeActions = array(
 			'change_type', 'unregister',

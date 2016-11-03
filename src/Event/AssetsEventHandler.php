@@ -8,6 +8,8 @@
  */
 namespace Xintesa\Assets\Event;
 
+use Cake\Log\Log;
+
 class AssetsEventHandler implements EventListener {
 
 /**

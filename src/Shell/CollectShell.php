@@ -1,5 +1,6 @@
 <?php
 
+namespace Xintesa\Assets\Shell;
 
 class CollectShell extends AppShell {
 

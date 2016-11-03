@@ -121,7 +121,7 @@ $this->append('table-body');
 			$thumbnail,
 			$this->Html->div(null, $attachment['AssetsAttachment']['title']) . '&nbsp;' .
 			$this->Html->link(
-				$this->Html->url($path, true),
+				$this->Url->build($path, true),
 				$path,
 				array(
 					'target' => '_blank',

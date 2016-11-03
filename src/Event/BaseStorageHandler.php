@@ -2,7 +2,11 @@
 
 namespace Xintesa\Assets\Event;
 
-abstract class BaseStorageHandler extends Object {
+use Cake\Log\LogTrait;
+
+abstract class BaseStorageHandler {
+
+	use LogTrait;
 
 	protected $_storage = null;
 

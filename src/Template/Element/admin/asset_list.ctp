@@ -23,7 +23,7 @@ $changeTypeUrl = array(
 	'action' => 'change_type',
 );
 
-$assetListUrl = $this->Html->url(array(
+$assetListUrl = $this->Url->build(array(
 	'admin' => true,
 	'plugin' => 'assets',
 	'controller' => 'assets_attachments',
@@ -99,7 +99,7 @@ foreach ($attachments as $attachment):
 	$typeCell = $this->Html->link($attachment['AssetsAssetUsage']['type'], 'javascript:void(0)', array(
 		'class' => 'editable editable-click usage-type',
 		'data-pk' => $attachment['AssetsAssetUsage']['id'],
-		'data-url' => $this->Html->url($changeTypeUrl),
+		'data-url' => $this->Url->build($changeTypeUrl),
 		'data-name' => 'type',
 	));
 

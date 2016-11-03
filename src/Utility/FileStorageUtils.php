@@ -1,4 +1,7 @@
 <?php
+
+namespace Xintesa\Assets\Utility;
+
 /**
  * Utility methods for which I could not find a better place
  *
@@ -6,6 +9,7 @@
  * @copyright 2012 Florian Kr�mer
  * @license MIT
  */
+
 class FileStorageUtils {
 /**
  * Gaufrette Vendor Classloader

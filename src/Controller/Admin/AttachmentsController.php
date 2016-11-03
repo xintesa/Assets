@@ -58,8 +58,8 @@ class AttachmentsController extends AssetsAppController {
  * @return void
  * @access public
  */
-	public function beforeFilter() {
-		parent::beforeFilter();
+	public function beforeFilter(Event $event) {
+		parent::beforeFilter($event);
 
 		$noCsrfCheck = array('add', 'resize');
 		if (in_array($this->action, $noCsrfCheck)) {
