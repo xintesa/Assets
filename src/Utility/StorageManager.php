@@ -1,4 +1,7 @@
 <?php
+
+namespace Xintesa\Assets\Utility;
+
 /**
  * StorageManager - manages and instantiates gaufrette storage engine instances
  *
