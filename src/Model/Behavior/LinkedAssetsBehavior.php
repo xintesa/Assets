@@ -1,5 +1,6 @@
 <?php
 
+namespace Xintesa\Assets\Model\Behavior;
 
 class LinkedAssetsBehavior extends ModelBehavior {
 
