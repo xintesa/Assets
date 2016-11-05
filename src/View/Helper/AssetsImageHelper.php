@@ -2,6 +2,8 @@
 
 namespace Xintesa\Assets\View\Helper;
 
+use Croogo\Core\View\Helper\ImageHelper;
+
 class AssetsImageHelper extends ImageHelper {
 
 	public function resize($path, $width, $height, $options = array(), $htmlAttributes = array(), $return = false) {

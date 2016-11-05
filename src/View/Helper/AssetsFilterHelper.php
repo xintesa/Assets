@@ -2,7 +2,10 @@
 
 namespace Xintesa\Assets\View\Helper;
 
-class AssetsFilterHelper extends AppHelper {
+use Cake\View\View;
+use Cake\View\Helper;
+
+class AssetsFilterHelper extends Helper {
 
 	public $helpers = array(
 		'Html',
@@ -20,7 +23,7 @@ class AssetsFilterHelper extends AppHelper {
 				'callable' => 'filter', 'passParams' => true,
 			),
 		);
-		$eventManager = $this->_View->getEventManager();
+		$eventManager = $this->_View->eventManager();
 		foreach ($events as $name => $config) {
 			$eventManager->attach(array($this, 'filter'), $name, $config);
 		}

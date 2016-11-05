@@ -1,9 +1,9 @@
 <?php
 
-namespace Xintesa\Assets\Model\Table\AssetsAppTable;
+namespace Xintesa\Assets\Model\Table;
 
 use Croogo\Core\Model\Table\CroogoTable;
 
-class AssetsAppModel extends CroogoTable {
+class AssetsAppTable extends CroogoTable {
 
 }

@@ -1,11 +1,16 @@
 <?php
 
+use Cake\Core\Configure;
+use Cake\Core\Plugin;
+use Croogo\Core\Croogo;
+use Xintesa\Assets\Utility\StorageManager;
+
 if (!Configure::read('Assets.installed')) {
 	return;
 }
 
 spl_autoload_register(function($class) {
-	$defaultPath = Plugin::path('Assets') . 'Vendor' . DS . 'Gaufrette' . DS . 'src' . DS;
+	$defaultPath = Plugin::path('Xintesa/Assets') . 'Vendor' . DS . 'Gaufrette' . DS . 'src' . DS;
 	$base = Configure::read('Assets.GaufretteLib');
 	if (empty($base)) {
 		$base = $defaultPath;
@@ -17,15 +22,16 @@ spl_autoload_register(function($class) {
 });
 
 Configure::write('Wysiwyg.attachmentBrowseUrl', array(
-	'plugin' => 'assets',
-	'controller' => 'assets_attachments',
+	'prefix' => 'admin',
+	'plugin' => 'Xintesa/Assets',
+	'controller' => 'Attachments',
 	'action' => 'browse',
 ));
 
 Configure::write('Wysiwyg.uploadsPath', '');
 
 Croogo::mergeConfig('Wysiwyg.actions', array(
-	'AssetsAttachments/admin_browse',
+	'Admin/Attachments/browse',
 ));
 
 StorageManager::config('LocalAttachment', array(
@@ -43,21 +49,21 @@ StorageManager::config('LegacyLocalAttachment', array(
 
 // TODO: make this configurable via backend
 $actions = array(
-	'Nodes/admin_edit',
-	'Blocks/admin_edit',
-	'Types/admin_edit',
+	'Admin/Nodes/edit',
+	'Admin/Blocks/edit',
+	'Admin/Types/edit',
 );
 $tabTitle = __d('assets', 'Assets');
 foreach ($actions as $action):
 	list($controller, ) = explode('/', $action);
-	Croogo::hookAdminTab($action, $tabTitle, 'Assets.admin/asset_list');
-	Croogo::hookHelper($controller, 'Assets.AssetsAdmin');
+	Croogo::hookAdminTab($action, $tabTitle, 'Xintesa/Assets.admin/asset_list');
+	Croogo::hookHelper($controller, 'Xintesa/Assets.AssetsAdmin');
 endforeach;
 
 // TODO: make this configurable via backend
-$models = array('Block', 'Node', 'Type');
+$models = ['Croogo/Blocks.Blocks', 'Croogo/Nodes.Nodes', 'Croogo/Taxonomy.Types'];
 foreach ($models as $model) {
-	Croogo::hookBehavior($model, 'Assets.LinkedAssets', array('priority' => 9));
+	Croogo::hookBehavior($model, 'Xintesa/Assets.LinkedAssets', array('priority' => 9));
 }
 
-Croogo::hookHelper('*', 'Assets.AssetsFilter');
+Croogo::hookHelper('*', 'Xintesa/Assets.AssetsFilter');

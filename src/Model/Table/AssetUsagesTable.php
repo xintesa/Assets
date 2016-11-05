@@ -8,18 +8,17 @@ namespace Xintesa\Assets\Model\Table;
  */
 class AssetUsagesTable extends AssetsAppTable {
 
-	public $useTable = 'asset_usages';
+	public function initialize(array $config) {
+		parent::initialize($config);
+		$this->table('asset_usages');
 
-	public $actsAs = array(
-		'Croogo.Trackable',
-	);
-
-	public $belongsTo = array(
-		'AssetsAsset' => array(
-			'className' => 'Assets.AssetsAsset',
+		$this->belongsTo('Assets', [
+			'className' => 'Xintesa/Assets.Assets',
 			'foreignKey' => 'asset_id',
-		),
-	);
+		]);
+
+		$this->addBehavior('Croogo/Core.Trackable');
+	}
 
 	public function beforeSave($options = array()) {
 		if (!empty($this->data['AssetsAssetUsage']['featured_image'])) {

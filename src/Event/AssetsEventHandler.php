@@ -1,16 +1,17 @@
 <?php
 
+namespace Xintesa\Assets\Event;
+
+use Cake\Log\Log;
+use Cake\Event\EventListenerInterface;
+use Croogo\Core\Nav;
 
 /**
  * AssetsEventHandler
  *
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-namespace Xintesa\Assets\Event;
-
-use Cake\Log\Log;
-
-class AssetsEventHandler implements EventListener {
+class AssetsEventHandler implements EventListenerInterface {
 
 /**
  * implementedEvents
@@ -103,12 +104,12 @@ class AssetsEventHandler implements EventListener {
  * Setup admin data
  */
 	public function onSetupAdminData($event) {
-		CroogoNav::add('media.children.attachments', array(
+		Nav::add('media.children.attachments', array(
 			'title' => __d('croogo', 'Attachments'),
 			'url' => array(
-				'admin' => true,
-				'plugin' => 'assets',
-				'controller' => 'assets_attachments',
+				'prefix' => 'admin',
+				'plugin' => 'Xintesa/Assets',
+				'controller' => 'Attachments',
 				'action' => 'index',
 			),
 		));

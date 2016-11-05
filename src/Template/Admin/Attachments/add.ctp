@@ -1,6 +1,8 @@
 <?php
 
-$this->extend('/Common/admin_edit');
+use Xintesa\Assets\Utility\StorageManager;
+
+$this->extend('Croogo/Core./Common/admin_edit');
 
 $this->Html->css(array(
 	'Assets.jquery.fileupload',
@@ -8,34 +10,37 @@ $this->Html->css(array(
 	'inline' => false,
 ));
 $this->Croogo->adminScript(array(
-	'Assets.fileupload/vendor/jquery.ui.widget',
-	'Assets.fileupload/tmpl.min.js',
-	'Assets.fileupload/load-image.all.min',
-	'Assets.fileupload/canvas-to-blob.min',
-	'Assets.fileupload/jquery.iframe-transport',
-	'Assets.fileupload/jquery.fileupload',
-	'Assets.fileupload/jquery.fileupload-process',
-	'Assets.fileupload/jquery.fileupload-image',
-	'Assets.fileupload/jquery.fileupload-audio',
-	'Assets.fileupload/jquery.fileupload-video',
-	'Assets.fileupload/jquery.fileupload-validate',
-	'Assets.fileupload/jquery.fileupload-ui',
+	'Xintesa/Assets.fileupload/vendor/jquery.ui.widget',
+	'Xintesa/Assets.fileupload/tmpl.min.js',
+	'Xintesa/Assets.fileupload/load-image.all.min',
+	'Xintesa/Assets.fileupload/canvas-to-blob.min',
+	'Xintesa/Assets.fileupload/jquery.iframe-transport',
+	'Xintesa/Assets.fileupload/jquery.fileupload',
+	'Xintesa/Assets.fileupload/jquery.fileupload-process',
+	'Xintesa/Assets.fileupload/jquery.fileupload-image',
+	'Xintesa/Assets.fileupload/jquery.fileupload-audio',
+	'Xintesa/Assets.fileupload/jquery.fileupload-video',
+	'Xintesa/Assets.fileupload/jquery.fileupload-validate',
+	'Xintesa/Assets.fileupload/jquery.fileupload-ui',
 ));
 
 $this->Html
-	->addCrumb('', '/admin', array('icon' => 'home'))
-	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
+	->addCrumb(__d('croogo', 'Attachments'), [
+		'plugin' => 'Xintesa/Assets',
+		'controller' => 'Attachments',
+		'action' => 'index'
+	])
 	->addCrumb(__d('croogo', 'Upload'), '/' . $this->request->url);
 
 if ($this->layout === 'admin_popup'):
 	$this->append('title', ' ');
 endif;
 
-$formUrl = array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'add');
-if (isset($this->params['named']['editor'])) {
+$formUrl = ['plugin' => 'Xintesa/Assets', 'controller' => 'Attachments', 'action' => 'add'];
+if ($this->request->query('editor')) {
 	$formUrl['editor'] = 1;
 }
-$this->append('form-start', $this->Form->create('AssetsAttachment', array(
+$this->append('form-start', $this->Form->create('Attachments', array(
 	'url' => $formUrl, 'type' => 'file',
 )));
 
@@ -63,7 +68,7 @@ $this->append('tab-content');
 			));
 		endif;
 
-		echo $this->element('Assets.admin/fileupload');
+		echo $this->element('Xintesa/Assets.admin/fileupload');
 
 		if (isset($model) && isset($foreignKey)):
 			echo $this->Form->input($assetUsage . 'featured_image', array(
@@ -95,8 +100,8 @@ $this->end();
 
 $this->append('panels');
 	$redirect = array('action' => 'index');
-	if ($this->Session->check('Wysiwyg.redirect')) {
-		$redirect = $this->Session->read('Wysiwyg.redirect');
+	if ($this->request->session()->check('Wysiwyg.redirect')) {
+		$redirect = $this->request->session()->read('Wysiwyg.redirect');
 	}
 	if (isset($this->request->query['model'])) {
 		$redirect = array_merge(

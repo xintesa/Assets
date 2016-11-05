@@ -4,36 +4,35 @@ namespace Xintesa\Assets\Model\Table;
 
 class AssetsTable extends AssetsAppTable {
 
-	public $actsAs = array(
-		'Croogo.Trackable',
-	);
-
-	public $useTable = 'assets';
-
-	public $hasMany = array(
-		'AssetsAssetUsage' => array(
-			'className' => 'Assets.AssetsAssetUsage',
-			'dependent' => true,
-		),
-	);
-
 	public $validate = array(
 		'file' => 'checkFileUpload'
 	);
 
-	public $belongsTo = array(
-		'AssetsAttachment' => array(
-			'className' => 'Assets.AssetsAttachment',
+	public function initialize(array $config) {
+		parent::initialize($config);
+
+		$this->table('assets');
+
+		$this->hasMany('AssetUsages', [
+			'className' => 'Xintesa/Assets.AssetUsages',
+			'dependent' => true,
+		]);
+
+		$this->belongsTo('Attachments', [
+			'className' => 'Assets.Attachments',
 			'foreignKey' => 'foreign_key',
-			'conditions' => array(
-				'AssetsAsset.model' => 'AssetsAttachment',
-			),
+			'conditions' => [
+				'AssetsAsset.model' => 'Attachments',
+			],
 			'counterCache' => 'asset_count',
-			'counterScope' => array(
-				'AssetsAsset.model' => 'AssetsAttachment',
-			),
-		),
-	);
+			'counterScope' => [
+				'AssetsAsset.model' => 'Attachments',
+			],
+		]);
+
+		$this->addBehavior('Croogo/Core.Trackable');
+
+	}
 
 	public function beforeSave($options = array()) {
 		$adapter = isset($this->data[$this->alias]['adapter']) ?

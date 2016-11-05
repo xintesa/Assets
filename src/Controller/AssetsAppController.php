@@ -2,6 +2,8 @@
 
 namespace Xintesa\Assets\Controller;
 
-class AssetsAppController extends AppController {
+use Croogo\Core\Controller\Admin\AppController as CroogoController;
+
+class AssetsAppController extends CroogoController {
 
 }

@@ -2,6 +2,9 @@
 
 namespace Xintesa\Assets\Controller\Admin;
 
+use Cake\Event\Event;
+use Xintesa\Assets\Controller\AssetsAppController;
+
 /**
  * Attachments Controller
  *
@@ -17,20 +20,16 @@ namespace Xintesa\Assets\Controller\Admin;
 class AttachmentsController extends AssetsAppController {
 
 /**
- * Models used by the Controller
- *
- * @var array
- * @access public
- */
-	public $uses = array('Assets.AssetsAttachment');
-
-/**
  * Helpers used by the Controller
  *
  * @var array
  * @access public
  */
-	public $helpers = array('FileManager.FileManager', 'Text', 'Assets.AssetsImage');
+	public $helpers = [
+		'Croogo/FileManager.FileManager',
+		'Text',
+		'Xintesa/Assets.AssetsImage'
+	];
 
 	public $paginate = array(
 		'paramType' => 'querystring',
@@ -51,6 +50,10 @@ class AttachmentsController extends AssetsAppController {
 
 	public $presetVars = true;
 
+	public function initialize() {
+		parent::initialize();
+		$this->loadModel('Xintesa/Assets.Attachments');
+	}
 
 /**
  * Before executing controller actions
@@ -79,25 +82,33 @@ class AttachmentsController extends AssetsAppController {
 	public function index() {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
+		$query = $this->Attachments->find('search', [
+			'search' => $this->request->query
+		]);
+
+		$this->set('attachments', $this->paginate($query));
+
+/*
 		$this->Prg->commonProcess();
 		$isChooser = false;
+
 
 		if (isset($this->request->params['named']['links']) || isset($this->request->query['chooser'])) {
 			$isChooser = true;
 		}
 
-		$criteria = $this->AssetsAttachment->parseCriteria($this->Prg->parsedParams());
+		$criteria = $this->Attachments->parseCriteria($this->Prg->parsedParams());
 
 		if (empty($this->request->query)) {
-			$this->AssetsAttachment->recursive = 0;
-			$this->paginate['AssetsAttachment']['order'] = 'AssetsAttachment.created DESC';
+			$this->Attachments->recursive = 0;
+			$this->paginate['Attachments']['order'] = 'Attachments.created DESC';
 		} else {
 			if (isset($this->request->query['asset_id']) ||
 				isset($this->request->query['all'])
 			) {
 				$this->paginate = array_merge(array('versions'), $this->paginate);
 				if (!$this->request->query('sort') && empty($this->request->params['named']['sort'])) {
-					$this->paginate['AssetsAttachment']['order'] = array(
+					$this->paginate['Attachments']['order'] = array(
 						'id' => 'desc',
 					);
 				}
@@ -121,12 +132,13 @@ class AttachmentsController extends AssetsAppController {
 		}
 		if ($isChooser) {
 			if ($this->request->query['chooser_type'] == 'image') {
-				$this->paginate['AssetsAttachment']['conditions']['AssetsAsset.mime_type LIKE'] = 'image/%';
+				$this->paginate['Attachments']['conditions']['AssetsAsset.mime_type LIKE'] = 'image/%';
 			} else {
-				$this->paginate['AssetsAttachment']['conditions']['AssetsAsset.mime_type NOT LIKE'] = 'image/%';
+				$this->paginate['Attachments']['conditions']['AssetsAsset.mime_type NOT LIKE'] = 'image/%';
 			}
 		}
-		$this->set('attachments', $this->paginate($criteria));
+		$this->set('attachments', $criteria));
+*/
 
 		if (isset($this->request->params['named']['links']) || isset($this->request->query['chooser'])) {
 			$this->layout = 'admin_popup';
@@ -149,17 +161,17 @@ class AttachmentsController extends AssetsAppController {
 
 		if ($this->request->is('post') || !empty($this->request->data)) {
 
-			if (empty($this->data['AssetsAttachment'])) {
-				$this->AssetsAttachment->invalidate('file', __d('croogo', 'Upload failed. Please ensure size does not exceed the server limit.'));
+			if (empty($this->data['Attachments'])) {
+				$this->Attachments->invalidate('file', __d('croogo', 'Upload failed. Please ensure size does not exceed the server limit.'));
 				return;
 			}
 
-			$this->AssetsAttachment->create();
-			$saved = $this->AssetsAttachment->saveAll($this->request->data);
+			$this->Attachments->create();
+			$saved = $this->Attachments->saveAll($this->request->data);
 
 			if ($saved) {
-				$attachmentId = $this->AssetsAttachment->id;
-				$attachment = $this->AssetsAttachment->findById($attachmentId);
+				$attachmentId = $this->Attachments->id;
+				$attachment = $this->Attachments->findById($attachmentId);
 				$eventKey = 'Controller.AssetsAttachment.newAttachment';
 				Croogo::dispatchEvent($eventKey, $this, compact('attachment'));
 			}
@@ -172,14 +184,14 @@ class AttachmentsController extends AssetsAppController {
 					$files = array(array(
 						'url' => $attachment['AssetsAsset']['path'],
 						'thumbnail_url' => $attachment['AssetsAsset']['path'],
-						'name' => $attachment['AssetsAttachment']['title'],
+						'name' => $attachment['Attachments']['title'],
 						'type' => $attachment['AssetsAsset']['mime_type'],
 						'size' => $attachment['AssetsAsset']['filesize'],
 					));
 				} else {
-					if (!empty($this->AssetsAttachment->validationErrors)) {
+					if (!empty($this->Attachments->validationErrors)) {
 						$errors = Hash::extract(
-							$this->AssetsAttachment->validationErrors,
+							$this->Attachments->validationErrors,
 							'{s}.{s}.{n}'
 						);
 						$files = array(array('error' => $errors));
@@ -240,7 +252,7 @@ class AttachmentsController extends AssetsAppController {
 			return $this->redirect($redirect);
 		}
 		if (!empty($this->request->data)) {
-			if ($this->AssetsAttachment->save($this->request->data)) {
+			if ($this->Attachments->save($this->request->data)) {
 				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'flash', array('class' => 'success'));
 				return $this->redirect($redirect);
 			} else {
@@ -248,7 +260,7 @@ class AttachmentsController extends AssetsAppController {
 			}
 		}
 		if (empty($this->request->data)) {
-			$this->request->data = $this->AssetsAttachment->read(null, $id);
+			$this->request->data = $this->Attachments->read(null, $id);
 		}
 	}
 
@@ -273,9 +285,9 @@ class AttachmentsController extends AssetsAppController {
 			);
 		}
 
-		$this->AssetsAttachment->begin();
-		if ($this->AssetsAttachment->delete($id)) {
-			$this->AssetsAttachment->commit();
+		$this->Attachments->begin();
+		if ($this->Attachments->delete($id)) {
+			$this->Attachments->commit();
 			$this->Session->setFlash(__d('croogo', 'Attachment deleted'), 'flash', array('class' => 'success'));
 			return $this->redirect($redirect);
 		} else {
@@ -318,7 +330,7 @@ class AttachmentsController extends AssetsAppController {
 		if (!empty($this->request->data)) {
 			$width = $this->request->data['width'];
 			try {
-				$result = $this->AssetsAttachment->createResized($id, $width, null);
+				$result = $this->Attachments->createResized($id, $width, null);
 			} catch (Exception $e) {
 				$result = $e->getMessage();
 			}

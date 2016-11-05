@@ -2,32 +2,14 @@
 
 namespace Xintesa\Assets\Model\Table;
 
+use Cake\ORM\Query;
+use Xintesa\Assets\Model\Table\AssetsAppTable;
+
 /**
- * AssetsAttachment Model
+ * Attachments Model
  *
  */
 class AttachmentsTable extends AssetsAppTable {
-
-	public $useTable = 'attachments';
-
-	public $actsAs = array(
-		'Containable',
-		'Croogo.Trackable',
-		'Search.Searchable',
-		'Imagine.Imagine',
-	);
-
-	public $hasOne = array(
-		'AssetsAsset' => array(
-			'className' => 'Assets.AssetsAsset',
-			'foreignKey' => 'foreign_key',
-			'dependent' => true,
-			'conditions' => array(
-				'AssetsAsset.parent_asset_id' => null,
-				'AssetsAsset.model' => 'AssetsAttachment',
-			),
-		),
-	);
 
 	public $filterArgs = array(
 		'filter' => array('type' => 'query', 'method' => 'filterAttachments'),
@@ -40,6 +22,31 @@ class AttachmentsTable extends AssetsAppTable {
 		'modelAttachments' => true,
 		'versions' => true,
 	);
+
+	public function initialize(array $config) {
+		parent::initialize($config);
+
+		$this->table('attachments');
+
+		$this->hasOne('Assets', [
+			'className' => 'Xintesa/Assets.Assets',
+			'foreignKey' => 'foreign_key',
+			'dependent' => true,
+			'conditions' => [
+				'Assets.parent_asset_id' => null,
+				'Assets.model' => 'Attachments',
+			],
+		]);
+
+		$this->addBehavior('Croogo/Core.Trackable');
+		$this->addBehavior('Search.Search');
+		//$this->addBehavior('Burzum/Imagine.Imagine');
+
+		$this->searchManager()
+			->value('type', [
+				'field' => 'AssetUsages.type',
+			]);
+	}
 
 	public function filterAttachments($data = array()) {
 		$conditions = array();
@@ -79,45 +86,42 @@ class AttachmentsTable extends AssetsAppTable {
 		}
 	}
 
-	protected function _findModelAttachments($state, $query = array(), $results = array()) {
-		if ($state === 'after') {
-			return $results;
-		}
+	public function findModelAttachments(Query $query, array $options) {
 		$model = $foreignKey = null;
-		if (isset($query['model'])) {
-			$model = $query['model'];
-			unset($query['model']);
+		if (isset($options['model'])) {
+			$model = $options['model'];
+			unset($options['model']);
 		}
-		if (isset($query['foreign_key'])) {
-			$foreignKey = $query['foreign_key'];
-			unset($query['foreign_key']);
+		if (isset($options['foreign_key'])) {
+			$foreignKey = $options['foreign_key'];
+			unset($options['foreign_key']);
 		}
-		$this->unbindModel(array('hasOne' => array('AssetsAsset')));
-		$this->bindModel(array(
-			'hasOne' => array(
-				'AssetsAsset' => array(
-					'className' => 'Assets.AssetsAsset',
+		$this->associations()->remove('Assets');
+		$this->addAssociations([
+			'hasOne' => [
+				'Assets' => [
+					'className' => 'Xintesa/Assets.Assets',
 					'foreignKey' => false,
-					'conditions' => array(
-						'AssetsAsset.model = \'AssetsAttachment\'',
-						'AssetsAsset.foreign_key = AssetsAttachment.id',
-					),
-				),
-				'AssetsAssetUsage' => array(
-					'className' => 'Assets.AssetUsage',
+					'conditions' => [
+						'Assets.model = \'Attachments\'',
+						'Assets.foreign_key = Attachments.id',
+					],
+				],
+				'AssetUsages' => [
+					'className' => 'Xintesa/Assets.AssetUsages',
 					'foreignKey' => false,
-					'conditions' => array(
-						'AssetsAsset.id = AssetsAssetUsage.asset_id',
-					),
-				),
-			)
-		));
-		$query = Hash::merge($query, array(
-			'conditions' => array(
-				'AssetsAssetUsage.model' => $model,
-				'AssetsAssetUsage.foreign_key' => $foreignKey,
-			),
-		));
+					'conditions' => [
+						'Assets.id = AssetUsages.asset_id',
+					],
+				],
+			]
+		]);
+		$query->contain('Assets');
+		$query->contain('AssetUsages');
+		$query->where([
+			'AssetUsages.model' => $model,
+			'AssetUsages.foreign_key' => $foreignKey,
+		]);
 		return $query;
 	}
 
@@ -149,8 +153,8 @@ class AttachmentsTable extends AssetsAppTable {
 					'className' => 'Assets.AssetsAsset',
 					'foreignKey' => false,
 					'conditions' => array(
-						'AssetsAsset.model = \'AssetsAttachment\'',
-						'AssetsAsset.foreign_key = AssetsAttachment.id',
+						'AssetsAsset.model = \'Attachments\'',
+						'AssetsAsset.foreign_key = Attachments.id',
 					),
 				),
 			)
@@ -188,7 +192,7 @@ class AttachmentsTable extends AssetsAppTable {
 	}
 
 /**
- * Create an AssetsAttachment data from $file
+ * Create an Attachments data from $file
  *
  * @param $file string Path to file
  * @return array|string Array of data or error message
@@ -208,7 +212,7 @@ class AttachmentsTable extends AssetsAppTable {
 			$this->find('duplicate', array('hash' => $hash)) :
 			false;
 		if ($duplicate) {
-			$firstDupe = $duplicate[0]['AssetsAttachment']['id'];
+			$firstDupe = $duplicate[0]['Attachments']['id'];
 			return sprintf('%s is duplicate to asset: %s', str_replace(APP, '', $file), $firstDupe);
 		}
 		$path = str_replace(rtrim(WWW_ROOT, '/'), '', $file);
@@ -237,7 +241,7 @@ class AttachmentsTable extends AssetsAppTable {
 			$asset = $this->createFromFile($file);
 			if (is_array($asset)) {
 				$data[] = $asset;
-				$copy[] = array('from' => $asset['AssetsAttachment']['import_path']);
+				$copy[] = array('from' => $asset['Attachments']['import_path']);
 				$error[] = null;
 			} else {
 				$data[] = null;

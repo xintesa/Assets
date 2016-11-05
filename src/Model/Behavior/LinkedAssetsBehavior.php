@@ -3,33 +3,41 @@
 namespace Xintesa\Assets\Model\Behavior;
 
 use Cake\ORM\Behavior;
+use Cake\ORM\Query;
+use Cake\Event\Event;
+use ArrayObject;
 
 class LinkedAssetsBehavior extends Behavior {
 
-	public function setup(Model $model, $config = array()) {
-		$config = Hash::merge(array(
-			'key' => 'LinkedAsset',
-		), $config);
-		$this->settings[$model->alias] = $config;
+	protected $_defaultConfig = [
+		'key' => 'LinkedAsset',
+	];
 
-		$model->bindModel(array(
-			'hasMany' => array(
-				'AssetsAssetUsage' => array(
-					'className' => 'Assets.AssetsAssetUsage',
+	public function initialize(array $config = array()) {
+		parent::initialize($config);
+		$this->_table->addAssociations([
+			'hasMany' => [
+				'AssetUsages' => [
+					'className' => 'Xintesa/Assets.AssetUsages',
 					'foreignKey' => 'foreign_key',
 					'dependent' => true,
-					'conditions' => array(
-						'model' => $model->alias,
-					),
-				),
-			),
-		), false);
+					'conditions' => [
+						'AssetUsages.model' => $this->_table->alias(),
+					],
+				],
+			],
+		]);
+
+		//debug($this->_table);
+		//debug('done'); die();
 	}
 
-	public function beforeFind(Model $model, $query) {
-		if ($model->findQueryType == 'list') {
-			return $query;
-		}
+	public function beforeFind(Event $event, Query $query, ArrayObject $options, $primary) {
+		//if ($model->findQueryType == 'list') {
+			//return $query;
+		//}
+
+		/*
 		if (!isset($query['contain'])) {
 			$contain = array();
 			$relationCheck = array('belongsTo', 'hasMany', 'hasOne', 'hasAndBelongsToMany');
@@ -47,6 +55,9 @@ class LinkedAssetsBehavior extends Behavior {
 				$query['contain']['AssetsAssetUsage'] = 'AssetsAsset';
 			}
 		}
+		*/
+
+		$query->contain('AssetUsages.Assets');
 		return $query;
 	}
 
@@ -124,7 +135,7 @@ class LinkedAssetsBehavior extends Behavior {
 		$options = Hash::merge(array(
 			'usage' => array(),
 		), $options);
-		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+		$Attachment = ClassRegistry::init('Assets.Attachments');
 		$attachment = $Attachment->createFromFile(WWW_ROOT . $path);
 
 		if (!is_array($attachment)) {

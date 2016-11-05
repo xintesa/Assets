@@ -3,6 +3,8 @@
 namespace Xintesa\Assets\Event;
 
 use Cake\Log\LogTrait;
+use Cake\Utility\Hash;
+use Cake\ORM\TableRegistry;
 
 abstract class BaseStorageHandler {
 
@@ -25,9 +27,8 @@ abstract class BaseStorageHandler {
 			'className' => $name,
 		), $config);
 		$this->_config = $config;
-		parent::__construct();
 		$this->_storage = str_replace('StorageHandler', '', $config['alias']);
-		$this->Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+		$this->Attachments = TableRegistry::get('Xintesa/Assets.Attachments');
 	}
 
 	protected abstract function _parentAsset($attachment);
@@ -97,10 +98,10 @@ abstract class BaseStorageHandler {
 		}
 
 		$src = $this->_pathFromHtml($Event->data['result']);
-		$this->Attachment->contain('AssetsAsset');
+		$this->Attachments->contain('AssetsAsset');
 		try {
 			$filename = rtrim(WWW_ROOT, '/') . $src;
-			$attachment = $this->Attachment->createFromFile($filename);
+			$attachment = $this->Attachments->createFromFile($filename);
 			if (is_string($attachment)) {
 				return false;
 			}
@@ -116,9 +117,9 @@ abstract class BaseStorageHandler {
  * Create AssetsAsset record from $attachment when necessary
  */
 	protected function _createAsset($attachment) {
-		$hash = $attachment['AssetsAttachment']['hash'];
-		$path = $attachment['AssetsAttachment']['import_path'];
-		$Asset = $this->Attachment->AssetsAsset;
+		$hash = $attachment['Attachments']['hash'];
+		$path = $attachment['Attachments']['import_path'];
+		$Asset = $this->Attachments->Assets;
 		$existing = $Asset->find('count', array(
 			'conditions' => array(
 				'OR' => array(

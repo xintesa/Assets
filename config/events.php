@@ -1,11 +1,13 @@
 <?php
 
+use Cake\Core\Configure;
+
 $handlers = array();
 if (Configure::read('Assets.installed')) {
 	$handlers = array(
-		'Assets.AssetsEventHandler',
-		'Assets.LegacyLocalAttachmentStorageHandler',
-		'Assets.LocalAttachmentStorageHandler',
+		'Xintesa/Assets.AssetsEventHandler',
+		'Xintesa/Assets.LegacyLocalAttachmentStorageHandler',
+		'Xintesa/Assets.LocalAttachmentStorageHandler',
 	);
 }
 

@@ -1,14 +1,22 @@
 <?php
 
+use Cake\Core\Configure;
+use Cake\Utility\Inflector;
+use Cake\ORM\TableRegistry;
+
 $this->Html->script('Assets.admin.js', array('block' => 'scriptBottom'));
 
 $model = isset($model) ? $model : $this->Form->defaultModel;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
-$id = isset($foreignKey) ? $foreignKey : $this->data[$model][$primaryKey];
+
+$data = ${Inflector::variable(Inflector::singularize($this->request->param('controller')))};
+
+$id = isset($foreignKey) ? $foreignKey : $data->get($primaryKey);
 
 $detailUrl = array(
-	'plugin' => 'assets',
-	'controller' => 'assets_attachments',
+	'prefix' => 'admin',
+	'plugin' => 'Xintesa/Assets',
+	'controller' => 'attachments',
 	'action' => 'browse',
 	'?' => array(
 		'model' => $model,
@@ -17,16 +25,16 @@ $detailUrl = array(
 );
 
 $changeTypeUrl = array(
-	'admin' => true,
-	'plugin' => 'assets',
-	'controller' => 'assets_asset_usages',
+	'prefix' => 'admin',
+	'plugin' => 'Xintesa/assets',
+	'controller' => 'AssetUsages',
 	'action' => 'change_type',
 );
 
 $assetListUrl = $this->Url->build(array(
-	'admin' => true,
-	'plugin' => 'assets',
-	'controller' => 'assets_attachments',
+	'prefix' => 'admin',
+	'plugin' => 'Xintesa/Assets',
+	'controller' => 'Attachments',
 	'action' => 'list',
 	'?' => array(
 		'model' => $model,
@@ -42,7 +50,7 @@ $unregisterUsageUrl = array(
 );
 
 if (!isset($attachments)):
-	$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+	$Attachment = TableRegistry::get('Xintesa/Assets.Attachments');
 	$attachments = $Attachment->find('modelAttachments', array(
 		'model' => $model,
 		'foreign_key' => $id,
@@ -56,8 +64,8 @@ $headers = array(
 	__d('croogo', 'Actions'),
 );
 
-if (!$this->Helpers->loaded('AssetsImage')) {
-	$this->AssetsImage = $this->Helpers->load('Assets.AssetsImage');
+if (!$this->helpers()->loaded('AssetsImage')) {
+	$this->loadHelper('Xintesa/Assets.AssetsImage');
 }
 
 $rows = array();
@@ -143,9 +151,9 @@ $browseUrl = array_merge(
 );
 
 $uploadUrl = array(
-	'admin' => true,
-	'plugin' => 'assets',
-	'controller' => 'assets_attachments',
+	'prefix' => 'admin',
+	'plugin' => 'Xintesa/Assets',
+	'controller' => 'Attachments',
 	'action' => 'add',
 	'editor' => true,
 	'?' => array(
@@ -193,9 +201,9 @@ $this->append('actions');
 $this->end();
 
 ?>
-<div class="<?php echo $this->Layout->cssClass('row'); ?>">
-	<div class="<?php echo $this->Layout->cssClass('fullColumn'); ?>">
-		<table class="<?php echo $this->Layout->cssClass('tableClass'); ?> asset-list" data-url="<?php echo $assetListUrl; ?>">
+<div class="<?php echo $this->Theme->getCssClass('row'); ?>">
+	<div class="<?php echo $this->Theme->getCssClass('fullColumn'); ?>">
+		<table class="<?php echo $this->Theme->getCssClass('tableClass'); ?> asset-list" data-url="<?php echo $assetListUrl; ?>">
 			<thead><?php echo $this->Html->tableHeaders($headers); ?></thead>
 			<tbody><?php echo $this->Html->tableCells($rows); ?></tbody>
 		</table>
@@ -209,7 +217,7 @@ $script =<<<EOF
 	} else {
 		console.log('Note: bootstrap-xeditable plugin not found. Ensure your admin theme provides this plugin or use http://github.com/rchavik/AdminExtras as an alternative.');
 	}
-	tb_init('a.thickbox');
+//	tb_init('a.thickbox');
 EOF;
 if ($this->request->is('ajax')):
 	echo $this->Html->scriptBlock($script);

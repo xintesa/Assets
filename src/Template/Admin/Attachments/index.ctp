@@ -2,10 +2,9 @@
 
 $this->Html->script('Assets.admin', array('inline' => false));
 
-$this->extend('/Common/admin_index');
+$this->extend('Croogo/Core./Common/admin_index');
 
 $this->Html
-	->addCrumb('', '/admin', array('icon' => 'home'))
 	->addCrumb(__d('croogo', 'Attachments'), '/' . $this->request->url);
 
 if (!empty($this->request->query)) {
@@ -26,11 +25,11 @@ $this->end();
 
 $detailUrl = array(
 	'plugin' => 'assets',
-	'controller' => 'assets_attachments',
+	'controller' => 'attachments',
 	'action' => 'browse',
 	'?' => array(
 		'manage' => true,
-		'model' => 'AssetsAttachment',
+		'model' => 'Attachments',
 		'foreign_key' => null,
 		'asset_id' => null,
 	),

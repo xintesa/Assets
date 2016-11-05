@@ -1,5 +1,7 @@
 <?php
 
+use Croogo\Core\Plugin;
+
 /**
  * Assets Activation
  *
@@ -18,13 +20,10 @@ class AssetsActivation {
  */
 	public function beforeActivation(&$controller) {
 		if (!Plugin::loaded('Imagine')) {
-			$plugins = App::objects('plugins');
-			if (in_array('Imagine', $plugins)) {
-				$plugin = new CroogoPlugin();
-				$plugin->addBootstrap('Imagine');
-				Plugin::load('Imagine');
-				Log::info('Imagine plugin added to bootstrap');
-			}
+			$plugin = new Plugin();
+			$plugin->addBootstrap('Imagine');
+			Plugin::load('Imagine');
+			Log::info('Imagine plugin added to bootstrap');
 		}
 		return true;
 	}
