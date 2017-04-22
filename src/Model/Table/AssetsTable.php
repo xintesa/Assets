@@ -30,6 +30,7 @@ class AssetsTable extends AssetsAppTable {
 			],
 		]);
 
+		$this->addBehavior('Search.Search');
 		$this->addBehavior('Croogo/Core.Trackable');
 
 	}

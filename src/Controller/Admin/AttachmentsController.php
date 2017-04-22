@@ -3,7 +3,7 @@
 namespace Xintesa\Assets\Controller\Admin;
 
 use Cake\Event\Event;
-use Xintesa\Assets\Controller\AssetsAppController;
+use Xintesa\Assets\Controller\Admin\AppController;
 
 /**
  * Attachments Controller
@@ -17,7 +17,7 @@ use Xintesa\Assets\Controller\AssetsAppController;
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link     http://www.croogo.org
  */
-class AttachmentsController extends AssetsAppController {
+class AttachmentsController extends AppController {
 
 /**
  * Helpers used by the Controller

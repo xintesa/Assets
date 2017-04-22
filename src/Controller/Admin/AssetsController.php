@@ -2,7 +2,7 @@
 
 namespace Xintesa\Assets\Controller\Admin;
 
-class AssetsController extends AssetsAppController {
+class AssetsController extends AppController {
 
 	public $uses = array(
 		'Assets.AssetsAsset',
