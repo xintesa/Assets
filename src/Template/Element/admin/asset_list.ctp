@@ -94,7 +94,7 @@ foreach ($attachments as $attachment):
 		);
 		$thumbnail = $this->Html->link($imgUrl, $path, [
 			'escape' => false,
-			'class' => 'thickbox',
+			'data-toggle' => 'lightbox',
 			'title' => $attachment->title
 		]);
 	else:
@@ -227,7 +227,6 @@ $script =<<<EOF
 	} else {
 		console.log('Note: bootstrap-xeditable plugin not found. Ensure your admin theme provides this plugin or use http://github.com/rchavik/AdminExtras as an alternative.');
 	}
-//	tb_init('a.thickbox');
 EOF;
 if ($this->request->is('ajax')):
 	echo $this->Html->scriptBlock($script);

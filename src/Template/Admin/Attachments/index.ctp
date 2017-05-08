@@ -107,9 +107,11 @@ $this->append('table-body');
 				array('adapter' => $attachment->asset->adapter),
 				array('alt' => $attachment->title)
 			);
-			$thumbnail = $this->Html->link($imgUrl, $path,
-				array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
-			);
+			$thumbnail = $this->Html->link($imgUrl, $path, [
+				'escape' => false,
+				'data-toggle' => 'lightbox',
+				'title' => $attachment['AssetsAttachment']['title'],
+			]);
 		} else {
 			$thumbnail = $this->Html->image('Croogo/Core./img/icons/page_white.png', array('alt' => $mimeType)) . ' ' . $mimeType . ' (' . $this->Assets->filename2ext($attachment->asset->path) . ')';
 		}
