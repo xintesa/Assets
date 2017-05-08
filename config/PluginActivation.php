@@ -1,5 +1,9 @@
 <?php
 
+namespace Xintesa\Assets\Config;
+
+use Cake\ORM\TableRegistry;
+use Cake\Cache\Cache;
 use Croogo\Core\Plugin;
 
 /**
@@ -10,7 +14,7 @@ use Croogo\Core\Plugin;
  * @author   Rachman Chavik <contact@xintesa.com>
  * @license  http://www.opensource.org/licenses/mit-license.php The MIT License
  */
-class AssetsActivation {
+class PluginActivation {
 
 /**
  * onActivate will be called if this returns true
@@ -19,12 +23,14 @@ class AssetsActivation {
  * @return boolean
  */
 	public function beforeActivation(&$controller) {
+		/*
 		if (!Plugin::loaded('Imagine')) {
 			$plugin = new Plugin();
 			$plugin->addBootstrap('Imagine');
 			Plugin::load('Imagine');
 			Log::info('Imagine plugin added to bootstrap');
 		}
+		*/
 		return true;
 	}
 
@@ -35,11 +41,12 @@ class AssetsActivation {
  * @return void
  */
 	public function onActivation(&$controller) {
-		$CroogoPlugin = new CroogoPlugin();
-		$result = $CroogoPlugin->migrate('Assets');
+		$CroogoPlugin = new Plugin();
+		$result = $CroogoPlugin->migrate('Xintesa/Assets');
 		if ($result) {
-			$Setting = ClassRegistry::init('Settings.Setting');
-			$Setting->write('Assets.installed', true);
+			$Settings = TableRegistry::get('Croogo/Settings.Settings');
+			$Settings->write('Assets.installed', true);
+			Cache::clearGroup('menus');
 		}
 		return $result;
 	}
@@ -61,8 +68,8 @@ class AssetsActivation {
  * @return void
  */
 	public function onDeactivation(&$controller) {
-		$Setting = ClassRegistry::init('Settings.Setting');
-		$Setting->deleteKey('Assets.installed');
+		$Settings = TableRegistry::get('Croogo/Settings.Settings');
+		$Settings->deleteKey('Assets.installed');
 	}
 
 }
