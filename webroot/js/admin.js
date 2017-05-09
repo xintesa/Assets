@@ -54,6 +54,7 @@ Assets.unregisterAssetUsage = function(e) {
 	var postData = {
 		id: $target.data('id')
 	};
+	$('.tooltip').tooltip('hide');
 	$.post($target.attr('href'), postData, function(data, textStatus) {
 		if (data == true) {
 			$target.parents('tr').hide('medium', function() {
