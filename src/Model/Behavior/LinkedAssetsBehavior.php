@@ -4,6 +4,7 @@ namespace Xintesa\Assets\Model\Behavior;
 
 use ArrayObject;
 use Cake\Collection\Collection;
+use Cake\Datasource\EntityInterface;
 use Cake\Event\Event;
 use Cake\Log\LogTrait;
 use Cake\ORM\Behavior;
@@ -78,17 +79,28 @@ class LinkedAssetsBehavior extends Behavior {
 		}
 
 		foreach ($results as $result) {
-			$result->$key = array();
-			if (!$result->has('asset_usages')) {
+			if (!$result instanceof EntityInterface || !$result->has('asset_usages')) {
 				continue;
 			}
+			$result->$key = array();
 			foreach ($result->asset_usages as &$assetUsage) {
 				if (!$assetUsage->has('asset')) {
 					continue;
 				}
+
 				if (empty($assetUsage->type)) {
-					$result->$key['DefaultAsset'][] = $assetUsage->asset;
+					$fields = [
+						'filename', 'filesize', 'width', 'height', 'mime_type',
+						'extension', 'hash', 'path', 'adapter',
+					];
+					foreach ($fields as $field) {
+						$assetUsage->{$field} = $assetUsage->asset->{$field};
+					}
+					unset($assetUsage->asset);
+					$assetUsage->clean();
+					$result->$key['DefaultAsset'][] = $assetUsage;
 				} elseif ($assetUsage->type === 'FeaturedImage') {
+
 					$result[$key][$assetUsage->type] = $assetUsage->asset;
 
 					$seedId = isset($assetUsage->asset->parent_asset_id) ?
