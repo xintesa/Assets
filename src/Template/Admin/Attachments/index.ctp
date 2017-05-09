@@ -46,7 +46,6 @@ $this->end();
 
 $this->append('table-body');
 	$rows = array();
-	$this->log($attachments);
 	foreach ($attachments as $attachment) {
 		$actions = array();
 

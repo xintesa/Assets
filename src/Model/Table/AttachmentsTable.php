@@ -209,9 +209,7 @@ class AttachmentsTable extends AssetsAppTable {
 	use \Cake\Log\LogTrait;
 
 	public function beforeSave(Event $event, EntityInterface $entity, ArrayObject $options = null) {
-		$this->log('Attachments::beforeSave');
-		$this->log($entity);
-		if (isset($entity->asset->file['name'])) {
+		if (!empty($entity->asset->file['name'])) {
 			$file = $entity->asset->file;
 			$attachment = $entity;
 			if (empty($attachment->title)) {

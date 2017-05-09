@@ -33,9 +33,6 @@ class LinkedAssetsBehavior extends Behavior {
 				],
 			],
 		]);
-
-		//debug($this->_table);
-		//debug('done'); die();
 	}
 
 	public function beforeFind(Event $event, Query $query, ArrayObject $options, $primary) {

@@ -22,20 +22,12 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 	}
 
 	public function onBeforeSave(Event $event) {
-		$this->log('onBeforeSave');
-		//$this->log($event->subject);
-		//$this->log($event->data);
 		if (!$this->_check($event)) {
-			//$this->log('returning true');
 			return true;
 		}
 		$model = $event->subject();
 
-		//$this->log($event->data['record']);
-		//$this->log($model->alias);
-		//$storage =& $model->data[$model->alias];
 		$storage = $event->data['record'];
-		$this->log($storage);
 
 		if (empty($storage->file)) {
 			if (isset($storage->path) && empty($storage->filename)) {
