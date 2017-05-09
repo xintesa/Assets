@@ -70,10 +70,14 @@ $unregisterUsageUrl = array(
 
 if (!isset($attachments)):
 	$Attachment = TableRegistry::get('Xintesa/Assets.Attachments');
-	$attachments = $Attachment->find('modelAttachments', array(
-		'model' => $model,
-		'foreign_key' => $id,
-	));
+	if (isset($id)):
+		$attachments = $Attachment->find('modelAttachments', array(
+			'model' => $model,
+			'foreign_key' => $id,
+		));
+	else:
+		$attachments = [];
+	endif;
 endif;
 
 $headers = array(
