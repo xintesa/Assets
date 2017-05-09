@@ -154,16 +154,14 @@ foreach ($attachments as $attachment):
 			'data-value' => 'FeaturedImage',
 			'tooltip' => __d('assets', 'Set as FeaturedImage'),
 		));
-
-		$action[] = $this->Croogo->adminRowAction('', $unregisterUsageUrl, array(
-			'icon' => 'delete',
-			'class' => 'unregister-usage red',
-			'data-id' => $attachment->asset_usage->id,
-			'tooltip' => __d('assets', 'Unregister asset from this resource'),
-		));
-	else:
-		$action[] = null;
 	endif;
+
+	$action[] = $this->Croogo->adminRowAction('', $unregisterUsageUrl, array(
+		'icon' => 'delete',
+		'class' => 'unregister-usage red',
+		'data-id' => $attachment->asset_usage->id,
+		'tooltip' => __d('assets', 'Unregister asset from this resource'),
+	));
 	$row[] = '<span class="actions">' . implode('&nbsp;', $action) . '</span>';
 	$rows[] = $row;
 endforeach;
