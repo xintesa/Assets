@@ -146,7 +146,7 @@ $script =<<<EOF
 			uploadContext.push(data.context);
 		}
 	});
-	\$('#start_upload').on('click', function(e) {
+	\$('#start_upload').one('click', function(e) {
 		for (var i in filesToUpload) {
 			\$form.fileupload('send', {
 				files: [filesToUpload[i]],
@@ -156,7 +156,9 @@ $script =<<<EOF
 		e.preventDefault();
 		if (filesToUpload.length > 0 && $editorMode == 1) {
 			$(this).text('Close').one('click', function(e) {
+				e.preventDefault();
 				window.close();
+				return false;
 			});
 		}
 		return false;
