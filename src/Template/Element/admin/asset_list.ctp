@@ -90,7 +90,7 @@ foreach ($attachments as $attachment):
 	if ($mimeType === 'image'):
 		$imgUrl = $this->AssetsImage->resize($path, 100, 200,
 			array('adapter' => $attachment->asset->adapter),
-			array('alt' => $attachment->title)
+			array('alt' => $attachment->title, 'class' => 'img-thumbnail')
 		);
 		$thumbnail = $this->Html->link($imgUrl, $path, [
 			'escape' => false,
