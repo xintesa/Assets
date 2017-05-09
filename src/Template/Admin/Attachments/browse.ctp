@@ -113,7 +113,7 @@ $this->append('table-body');
 		$mimeType = $mimeType['0'];
 
 		if (isset($this->request->query['editor'])):
-			if ($this->request->query['func']) {
+			if ($this->request->query('func')) {
 				$jActions = $this->request->query['func'];
 				$actions[] = $this->Html->link('', '#', array(
 					'onclick' => $jActions . "('" . $attachment['AssetsAsset']['path'] . "');",
