@@ -4,14 +4,27 @@ use Cake\Core\Configure;
 use Cake\Utility\Inflector;
 use Cake\ORM\TableRegistry;
 
-$this->Html->script('Assets.admin.js', array('block' => 'scriptBottom'));
+$this->Html->script('Xintesa/Assets.admin.js', array('block' => 'scriptBottom'));
 
-$model = isset($model) ? $model : $this->Form->defaultModel;
+$model = isset($model) ? $model : null;
+if (!$model):
+	$modelSource = $this->Form->context()->entity()->getSource();
+	list($junk, $model) = pluginSplit($modelSource);
+endif;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
 
-$data = ${Inflector::variable(Inflector::singularize($this->request->param('controller')))};
+$varName = Inflector::variable(Inflector::singularize($this->request->param('controller')));
+if (isset(${$varName})):
+	$data = ${$varName};
+endif;
 
-$id = isset($foreignKey) ? $foreignKey : $data->get($primaryKey);
+if (isset($foreignKey)):
+	$id = $foreignKey;
+else:
+	if (isset($data)):
+		$id = $data->get($primaryKey);
+	endif;
+endif;
 
 $detailUrl = array(
 	'prefix' => 'admin',
@@ -35,7 +48,7 @@ $assetListUrl = $this->Url->build(array(
 	'prefix' => 'admin',
 	'plugin' => 'Xintesa/Assets',
 	'controller' => 'Attachments',
-	'action' => 'list',
+	'action' => 'listing',
 	'?' => array(
 		'model' => $model,
 		'foreign_key' => $id,
@@ -43,9 +56,9 @@ $assetListUrl = $this->Url->build(array(
 ));
 
 $unregisterUsageUrl = array(
-	'admin' => true,
-	'plugin' => 'assets',
-	'controller' => 'assets_asset_usages',
+	'prefix' => 'admin',
+	'plugin' => 'Xintesa/Assets',
+	'controller' => 'AssetUsages',
 	'action' => 'unregister',
 );
 
@@ -64,28 +77,30 @@ $headers = array(
 	__d('croogo', 'Actions'),
 );
 
-if (!$this->helpers()->loaded('AssetsImage')) {
+//if (!$this->helpers()->loaded('AssetsImage')) {
 	$this->loadHelper('Xintesa/Assets.AssetsImage');
-}
+//}
 
 $rows = array();
 foreach ($attachments as $attachment):
 	$row = $action = array();
-	$path = $attachment['AssetsAsset']['path'];
-	list($mimeType, ) = explode('/', $attachment['AssetsAsset']['mime_type']);
+	$path = $attachment->asset->path;
+	list($mimeType, ) = explode('/', $attachment->asset->mime_type);
 
 	if ($mimeType === 'image'):
 		$imgUrl = $this->AssetsImage->resize($path, 100, 200,
-			array('adapter' => $attachment['AssetsAsset']['adapter']),
-			array('alt' => $attachment['AssetsAttachment']['title'])
+			array('adapter' => $attachment->asset->adapter),
+			array('alt' => $attachment->title)
 		);
-		$thumbnail = $this->Html->link($imgUrl, $path,
-			array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
-		);
+		$thumbnail = $this->Html->link($imgUrl, $path, [
+			'escape' => false,
+			'class' => 'thickbox',
+			'title' => $attachment->title
+		]);
 	else:
-		$imgUrl = $this->Html->image('/croogo/img/icons/page_white.png') . ' ' . $attachment['AssetsAsset']['filename'];
+		$imgUrl = $this->Html->image('Croogo/Core./img/icons/page_white.png') . ' ' . $attachment->asset->filename;
 		$thumbnail = $this->Html->link($imgUrl,
-			$attachment['AssetsAsset']['path'], array(
+			$attachment->asset->path, array(
 				'escape' => false,
 				'target' => '_blank',
 			)
@@ -95,25 +110,25 @@ foreach ($attachments as $attachment):
 	$preview = $this->Html->div(null, $thumbnail);
 	if ($mimeType === 'image'):
 		$preview .= $this->Html->div(null, sprintf(
-			'<small>Shortcode: [image:%s]</small>', $attachment['AssetsAssetUsage']['id']
+			'<small>Shortcode: [image:%s]</small>', $attachment->asset_usage->id
 		));
 		$preview .= $this->Html->tag('small', sprintf(
-			'Dimension: %sx%s', $attachment['AssetsAsset']['width'], $attachment['AssetsAsset']['height']
+			'Dimension: %sx%s', $attachment->asset->width, $attachment->asset->height
 		));
 	endif;
 
-	$detailUrl['?']['asset_id'] = $attachment['AssetsAsset']['id'];
+	$detailUrl['?']['asset_id'] = $attachment->asset->id;
 
-	$typeCell = $this->Html->link($attachment['AssetsAssetUsage']['type'], 'javascript:void(0)', array(
+	$typeCell = $this->Html->link($attachment->asset_usage->type, 'javascript:void(0)', array(
 		'class' => 'editable editable-click usage-type',
-		'data-pk' => $attachment['AssetsAssetUsage']['id'],
+		'data-pk' => $attachment->asset_usage->id,
 		'data-url' => $this->Url->build($changeTypeUrl),
 		'data-name' => 'type',
 	));
 
 	$row[] = $preview;
 	$row[] = $typeCell;
-	$row[] = $this->Number->toReadableSize($attachment['AssetsAsset']['filesize']);
+	$row[] = $this->Number->toReadableSize($attachment->asset->filesize);
 
 	if ($mimeType === 'image'):
 		$action[] = $this->Croogo->adminRowAction('', $detailUrl, array(
@@ -125,7 +140,7 @@ foreach ($attachments as $attachment):
 		$action[] = $this->Croogo->adminRowAction('', $changeTypeUrl, array(
 			'icon' => 'star',
 			'class' => 'change-usage-type',
-			'data-pk' => $attachment['AssetsAssetUsage']['id'],
+			'data-pk' => $attachment->asset_usage->id,
 			'data-value' => 'FeaturedImage',
 			'tooltip' => __d('assets', 'Set as FeaturedImage'),
 		));
@@ -133,7 +148,7 @@ foreach ($attachments as $attachment):
 		$action[] = $this->Croogo->adminRowAction('', $unregisterUsageUrl, array(
 			'icon' => 'delete',
 			'class' => 'unregister-usage red',
-			'data-id' => $attachment['AssetsAssetUsage']['id'],
+			'data-id' => $attachment->asset_usage->id,
 			'tooltip' => __d('assets', 'Unregister asset from this resource'),
 		));
 	else:
@@ -162,42 +177,37 @@ $uploadUrl = array(
 	),
 );
 
-$this->append('actions');
-	echo '<div class="btn-group">';
-	echo $this->Html->link(__d('assets', 'Reload'),
+$this->append('action-buttons');
+	echo $this->Croogo->adminAction(__d('assets', 'Reload'),
 		$browseUrl,
 		array(
 			'div' => false,
 			'icon' => 'refresh',
 			'iconSize' => 'small',
 			'data-toggle' => 'refresh',
-			'button' => 'default',
 			'tooltip' => __d('assets', 'Reload asset list for this content'),
 		)
 	);
-	echo $this->Html->link(__d('assets', 'Browse'),
+	echo $this->Croogo->adminAction(__d('assets', 'Browse'),
 		$browseUrl,
 		array(
 			'div' => false,
 			'icon' => 'folder-open',
 			'iconSize' => 'small',
 			'data-toggle' => 'browse',
-			'button' => 'default',
 			'tooltip' => __d('assets', 'Browse available assets'),
 		)
 	);
-	echo $this->Html->link(__d('assets', 'Upload'),
+	echo $this->Croogo->adminAction(__d('assets', 'Upload'),
 		$uploadUrl,
 		array(
 			'div' => false,
 			'icon' => 'upload',
 			'iconSize' => 'small',
 			'data-toggle' => 'browse',
-			'button' => 'default',
 			'tooltip' => __d('assets', 'Upload new asset for this content'),
 		)
 	);
-	echo "</div>";
 $this->end();
 
 ?>

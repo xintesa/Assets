@@ -2,6 +2,8 @@
 
 namespace Xintesa\Assets\View\Helper;
 
+use Cake\Utility\Hash;
+use Croogo\Core\Croogo;
 use Croogo\Core\View\Helper\ImageHelper;
 
 class AssetsImageHelper extends ImageHelper {

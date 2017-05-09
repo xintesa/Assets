@@ -2,12 +2,18 @@
 
 namespace Xintesa\Assets\Model\Behavior;
 
+use ArrayObject;
+use Cake\Collection\Collection;
+use Cake\Event\Event;
+use Cake\Log\LogTrait;
 use Cake\ORM\Behavior;
 use Cake\ORM\Query;
-use Cake\Event\Event;
-use ArrayObject;
+use Cake\ORM\ResultSet;
+use Cake\ORM\TableRegistry;
 
 class LinkedAssetsBehavior extends Behavior {
+
+	use LogTrait;
 
 	protected $_defaultConfig = [
 		'key' => 'LinkedAsset',
@@ -58,58 +64,54 @@ class LinkedAssetsBehavior extends Behavior {
 		*/
 
 		$query->contain('AssetUsages.Assets');
+
+		$query->formatResults(function ($resultSet) {
+			return $this->_formatResults($resultSet);
+		});
 		return $query;
 	}
 
-	public function afterFind(Model $model, $results, $primary = true) {
-		if (!$primary) {
-			return $results;
-		}
-		$key = 'LinkedAssets';
+	protected function _formatResults($results) {
+		$key = 'linked_assets';
 
-		if (isset($model->AssetsAsset)) {
-			$Asset = $model->AssetsAsset;
+		if (isset($model->Assets)) {
+			$Assets = $model->Assets;
 		} else {
-			$Asset = ClassRegistry::init('Assets.AssetsAsset');
+			$Assets = TableRegistry::get('Xintesa/Assets.Assets');
 		}
-		foreach ($results as &$result) {
-			$result[$key] = array();
-			if (empty($result['AssetsAssetUsage'])) {
-				unset($result['AssetsAssetUsage']);
+
+		foreach ($results as $result) {
+			$result->$key = array();
+			if (!$result->has('asset_usages')) {
 				continue;
 			}
-			foreach ($result['AssetsAssetUsage'] as &$asset) {
-				if (empty($asset['AssetsAsset'])) {
+			foreach ($result->asset_usages as &$assetUsage) {
+				if (!$assetUsage->has('asset')) {
 					continue;
 				}
-				if (empty($asset['type'])) {
-					$result[$key]['DefaultAsset'][] = $asset['AssetsAsset'];
-				} elseif ($asset['type'] === 'FeaturedImage') {
-					$result[$key][$asset['type']] = $asset['AssetsAsset'];
+				if (empty($assetUsage->type)) {
+					$result->$key['DefaultAsset'][] = $assetUsage->asset;
+				} elseif ($assetUsage->type === 'FeaturedImage') {
+					$result[$key][$assetUsage->type] = $assetUsage->asset;
 
-					$seedId = isset($asset['AssetsAsset']['parent_asset_id']) ?
-						$asset['AssetsAsset']['parent_asset_id'] :
-						$asset['AssetsAsset']['id'];
-					$relatedAssets = $Asset->find('all', array(
-						'recursive' => -1,
-						'order' => 'width DESC',
-						'conditions' => array(
-							'AssetsAsset.parent_asset_id' => $seedId,
-						),
-						'cache' => array(
-							'name' => 'linked_assets_' . $asset['AssetsAsset']['id'],
-							'config' => 'nodes',
-						),
-					));
+					$seedId = isset($assetUsage->asset->parent_asset_id) ?
+						$assetUsage->asset->parent_asset_id :
+						$assetUsage->asset->id;
+					$relatedAssets = $Assets->find()
+						->where([
+							'Assets.parent_asset_id' => $seedId,
+						])
+						->cache('linked_assets_' . $assetUsage->asset->id, 'nodes')
+						->order(['width' => 'DESC']);
 					foreach ($relatedAssets as $related) {
-						$result[$key]['FeaturedImage']['Versions'][] = $related['AssetsAsset'];
+						$result[$key]['FeaturedImage']['Versions'][] = $related->asset;
 					}
 
 				} else {
-					$result[$key][$asset['type']][] = $asset['AssetsAsset'];
+					$result[$key][$assetUsage->type][] = $assetUsage->asset;
 				}
 			}
-			unset($result['AssetsAssetUsage']);
+			unset($result->asset_usages);
 		}
 		return $results;
 	}
@@ -139,7 +141,6 @@ class LinkedAssetsBehavior extends Behavior {
 		$attachment = $Attachment->createFromFile(WWW_ROOT . $path);
 
 		if (!is_array($attachment)) {
-			$this->log($attachment);
 			return false;
 		}
 

@@ -2,6 +2,8 @@
 
 namespace Xintesa\Assets\Utility;
 
+use ReflectionClass;
+
 /**
  * StorageManager - manages and instantiates gaufrette storage engine instances
  *

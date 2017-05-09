@@ -4,8 +4,8 @@ $this->Html->script('Assets.admin', array('inline' => false));
 
 $this->extend('Croogo/Core./Common/admin_index');
 
-$this->Html
-	->addCrumb(__d('croogo', 'Attachments'), '/' . $this->request->url);
+$this->Breadcrumbs
+	->add(__d('croogo', 'Attachments'), $this->request->getUri()->getPath());
 
 if (!empty($this->request->query)) {
 	$query = $this->request->query;
@@ -24,8 +24,8 @@ echo $this->Croogo->adminAction(
 $this->end();
 
 $detailUrl = array(
-	'plugin' => 'assets',
-	'controller' => 'attachments',
+	'plugin' => 'Xintesa/Assets',
+	'controller' => 'Attachments',
 	'action' => 'browse',
 	'?' => array(
 		'manage' => true,
@@ -49,26 +49,27 @@ $this->end();
 
 $this->append('table-body');
 	$rows = array();
+	$this->log($attachments);
 	foreach ($attachments as $attachment) {
 		$actions = array();
 
-		$mimeType = explode('/', $attachment['AssetsAsset']['mime_type']);
+		$mimeType = explode('/', $attachment->asset->mime_type);
 		$mimeType = $mimeType['0'];
-		$assetCount = $attachment['AssetsAttachment']['asset_count'] . '&nbsp;';
+		$assetCount = $attachment->asset_count . '&nbsp;';
 		if ($mimeType == 'image') {
-			$detailUrl['?']['foreign_key'] = $attachment['AssetsAttachment']['id'];
-			$detailUrl['?']['asset_id'] = $attachment['AssetsAsset']['id'];
+			$detailUrl['?']['foreign_key'] = $attachment->id;
+			$detailUrl['?']['asset_id'] = $attachment->asset->id;
 			$actions[] = $this->Croogo->adminRowAction('', $detailUrl, array(
 				'icon' => 'suitcase',
 				'data-toggle' => 'browse',
 				'tooltip' => __d('assets', 'View other sizes'),
 			));
 
-			$actions[] = $this->Croogo->adminRowActions($attachment['AssetsAttachment']['id']);
+			$actions[] = $this->Croogo->adminRowActions($attachment->id);
 			$resizeUrl = array_merge(
 				array(
 					'action' => 'resize',
-					$attachment['AssetsAttachment']['id'],
+					$attachment->id,
 					'ext' => 'json'
 				),
 				array('?' => $query)
@@ -77,21 +78,21 @@ $this->append('table-body');
 
 		if (isset($resizeUrl)) {
 			$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
-				'icon' => 'resize',
+				'icon' => 'arrows-alt',
 				'tooltip' => __d('croogo', 'Resize this item'),
 				'data-toggle' => 'resize-asset'
 			));
 		}
 
 		$editUrl = array_merge(
-			array('action' => 'edit', $attachment['AssetsAttachment']['id']),
+			array('action' => 'edit', $attachment->id),
 			array('?' => $query)
 		);
 		$actions[] = $this->Croogo->adminRowAction('', $editUrl, array(
 			'icon' => 'update',
 			'tooltip' => __d('croogo', 'Edit this item'),
 		));
-		$deleteUrl = array('action' => 'delete', $attachment['AssetsAttachment']['id']);
+		$deleteUrl = array('action' => 'delete', $attachment->id);
 		$deleteUrl = array_merge(array('?' => $query), $deleteUrl);
 		$actions[] = $this->Croogo->adminRowAction('', $deleteUrl, array(
 			'icon' => 'delete',
@@ -99,26 +100,26 @@ $this->append('table-body');
 			'escapeTitle' => false,
 		), __d('croogo', 'Are you sure?'));
 
-		$path = $attachment['AssetsAsset']['path'];
+		$path = $attachment->asset->path;
 		if ($mimeType == 'image') {
 
 			$imgUrl = $this->AssetsImage->resize($path, 100, 200,
-				array('adapter' => $attachment['AssetsAsset']['adapter']),
-				array('alt' => $attachment['AssetsAttachment']['title'])
+				array('adapter' => $attachment->asset->adapter),
+				array('alt' => $attachment->title)
 			);
 			$thumbnail = $this->Html->link($imgUrl, $path,
 				array('escape' => false, 'class' => 'thickbox', 'title' => $attachment['AssetsAttachment']['title'])
 			);
 		} else {
-			$thumbnail = $this->Html->image('/croogo/img/icons/page_white.png', array('alt' => $mimeType)) . ' ' . $mimeType . ' (' . $this->Assets->filename2ext($attachment['AssetsAsset']['path']) . ')';
+			$thumbnail = $this->Html->image('Croogo/Core./img/icons/page_white.png', array('alt' => $mimeType)) . ' ' . $mimeType . ' (' . $this->Assets->filename2ext($attachment->asset->path) . ')';
 		}
 
 		$actions = $this->Html->div('item-actions', implode(' ', $actions));
 
 		$rows[] = array(
-			$attachment['AssetsAttachment']['id'],
+			$attachment->id,
 			$thumbnail,
-			$this->Html->div(null, $attachment['AssetsAttachment']['title']) . '&nbsp;' .
+			$this->Html->div(null, $attachment->title) . '&nbsp;' .
 			$this->Html->link(
 				$this->Url->build($path, true),
 				$path,

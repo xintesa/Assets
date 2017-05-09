@@ -2,6 +2,11 @@
 
 namespace Xintesa\Assets\Model\Table;
 
+use ArrayObject;
+use Cake\Event\Event;
+use Cake\Datasource\EntityInterface;
+use Croogo\Core\Croogo;
+
 class AssetsTable extends AssetsAppTable {
 
 	public $validate = array(
@@ -35,12 +40,16 @@ class AssetsTable extends AssetsAppTable {
 
 	}
 
-	public function beforeSave($options = array()) {
-		$adapter = isset($this->data[$this->alias]['adapter']) ?
-			$this->data[$this->alias]['adapter'] :
-			null;
+	public function beforeSave(Event $event, EntityInterface $entity, ArrayObject $options = null) {
+		$adapter = $entity->get('adapter');
+		if (!$entity->filename) {
+			$entity->filename = '';
+		}
+		if (!$entity->path) {
+			$entity->path = '';
+		}
 		$Event = Croogo::dispatchEvent('FileStorage.beforeSave', $this, array(
-			'record' => $this->data,
+			'record' => $entity,
 			'adapter' => $adapter,
 		));
 		if ($Event->isStopped()) {

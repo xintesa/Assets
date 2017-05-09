@@ -2,9 +2,16 @@
 
 namespace Xintesa\Assets\Event;
 
+use Cake\Event\Event;;
 use Cake\Event\EventListenerInterface;
+use Cake\Log\LogTrait;
+
+use Xintesa\Assets\Utility\FileStorageUtils;
+use Xintesa\Assets\Utility\StorageManager;
 
 class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventListenerInterface {
+
+	use LogTrait;
 
 	public function implementedEvents() {
 		return array(
@@ -14,16 +21,25 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 		);
 	}
 
-	public function onBeforeSave($Event) {
-		if (!$this->_check($Event)) {
+	public function onBeforeSave(Event $event) {
+		$this->log('onBeforeSave');
+		//$this->log($event->subject);
+		//$this->log($event->data);
+		if (!$this->_check($event)) {
+			//$this->log('returning true');
 			return true;
 		}
-		$model = $Event->subject();
-		$storage =& $model->data[$model->alias];
+		$model = $event->subject();
 
-		if (empty($storage['file'])) {
-			if (isset($storage['path']) && empty($storage['filename'])) {
-				$path = rtrim(WWW_ROOT, '/') . $storage['path'];
+		//$this->log($event->data['record']);
+		//$this->log($model->alias);
+		//$storage =& $model->data[$model->alias];
+		$storage = $event->data['record'];
+		$this->log($storage);
+
+		if (empty($storage->file)) {
+			if (isset($storage->path) && empty($storage->filename)) {
+				$path = rtrim(WWW_ROOT, '/') . $storage->path;
 				$imageInfo = $this->__getImageInfo($path);
 
 				$fp = fopen($path, 'r');
@@ -39,8 +55,8 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 			return true;
 		}
 
-		$file = $storage['file'];
-		$filesystem = StorageManager::adapter($storage['adapter']);
+		$file = $storage->file;
+		$filesystem = StorageManager::adapter($storage->adapter);
 		try {
 			$raw = file_get_contents($file['tmp_name']);
 			$key = sha1($raw);
@@ -53,6 +69,7 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 				$mimeType = $file['type'];
 			}
 
+			$prefix = null;
 			if (empty($storage['path'])) {
 				$prefix = FileStorageUtils::trimPath(FileStorageUtils::randomPath($file['name']));
 			}

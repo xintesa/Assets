@@ -15,7 +15,7 @@ $cancelIcon = $this->Html->icon('delete');
 		<span class="btn btn-success fileinput-button">
 			<?php echo $addIcon; ?>
 			<span><?php echo __d('assets', 'Add files'); ?></span>
-			<?php echo $this->Form->input('AssetsAsset.file', array(
+			<?php echo $this->Form->input('asset.file', array(
 				'label' => false,
 				'div' => false,
 				'type' => 'file',

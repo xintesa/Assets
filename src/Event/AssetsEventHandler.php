@@ -4,6 +4,7 @@ namespace Xintesa\Assets\Event;
 
 use Cake\Log\Log;
 use Cake\Event\EventListenerInterface;
+use Cake\ORM\TableRegistry;
 use Croogo\Core\Nav;
 
 /**
@@ -38,19 +39,19 @@ class AssetsEventHandler implements EventListenerInterface {
 		$request = $controller->request;
 		$attachment = $event->data['attachment'];
 
-		if (empty($request->data['AssetsAsset']['AssetsAssetUsage'])) {
+		if (empty($attachment->asset->asset_usage)) {
 			Log::error('No asset usage record to register');
 			return;
 		}
 
-		$usage = $request->data['AssetsAsset']['AssetsAssetUsage'][0];
-		$Usage = ClassRegistry::init('Assets.AssetsAssetUsage');
-		$data = $Usage->create(array(
-			'asset_id' => $attachment['AssetsAsset']['id'],
+		$usage = $attachment->asset->asset_usage[0];
+		$Usage = TableRegistry::get('Xintesa/Assets.AssetUsages');
+		$data = $Usage->newEntity([
+			'asset_id' => $attachment->asset->id,
 			'model' => $usage['model'],
 			'foreign_key' => $usage['foreign_key'],
 			'featured_image' => $usage['featured_image'],
-		));
+		]);
 		$result = $Usage->save($data);
 		if (!$result) {
 			Log::error('Asset Usage registration failed');

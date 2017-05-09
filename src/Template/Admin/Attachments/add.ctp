@@ -24,13 +24,13 @@ $this->Croogo->adminScript(array(
 	'Xintesa/Assets.fileupload/jquery.fileupload-ui',
 ));
 
-$this->Html
-	->addCrumb(__d('croogo', 'Attachments'), [
+$this->Breadcrumbs
+	->add(__d('croogo', 'Attachments'), [
 		'plugin' => 'Xintesa/Assets',
 		'controller' => 'Attachments',
 		'action' => 'index'
 	])
-	->addCrumb(__d('croogo', 'Upload'), '/' . $this->request->url);
+	->add(__d('croogo', 'Upload'), $this->request->getUri()->getPath());
 
 if ($this->layout === 'admin_popup'):
 	$this->append('title', ' ');
@@ -40,9 +40,11 @@ $formUrl = ['plugin' => 'Xintesa/Assets', 'controller' => 'Attachments', 'action
 if ($this->request->query('editor')) {
 	$formUrl['editor'] = 1;
 }
-$this->append('form-start', $this->Form->create('Attachments', array(
-	'url' => $formUrl, 'type' => 'file',
-)));
+$this->append('form-start', $this->Form->create($attachment, [
+	'url' => $formUrl,
+	'type' => 'file',
+	'id' => 'attachment-upload-form',
+]));
 
 $model = isset($this->request->query['model']) ? $this->request->query['model'] : null;
 $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->query['foreign_key'] : null;
@@ -57,7 +59,7 @@ $this->append('tab-content');
 	echo $this->Html->tabStart('attachment-upload');
 
 		if (isset($model) && isset($foreignKey)):
-			$assetUsage = 'AssetsAsset.AssetsAssetUsage.0.';
+			$assetUsage = 'asset.asset_usage.0.';
 			echo $this->Form->input($assetUsage . 'model', array(
 				'type' => 'hidden',
 				'value' => $model,
@@ -77,7 +79,7 @@ $this->append('tab-content');
 			));
 		endif;
 
-		echo $this->Form->input('AssetsAsset.adapter', array(
+		echo $this->Form->input('asset.adapter', array(
 			'type' => 'select',
 			'default' => 'LocalAttachment',
 			'options' => StorageManager::configured(),
@@ -89,9 +91,9 @@ $this->append('tab-content');
 		echo $this->Form->input('status', array(
 			'type' => 'hidden', 'value' => true,
 		));
-		echo $this->Form->input('AssetsAsset.model', array(
+		echo $this->Form->input('asset.model', array(
 			'type' => 'hidden',
-			'value' => 'AssetsAttachment',
+			'value' => 'Attachments',
 		));
 
 	echo $this->Html->tabEnd();
@@ -113,13 +115,13 @@ $this->append('panels');
 		$this->Form->button(__d('croogo', 'Upload'), array(
 			'icon' => 'upload',
 			'button' => 'primary',
-			'class' => 'start',
+			'class' => 'start btn-success',
 			'type' => 'submit',
 			'id' => 'start_upload',
 		)) .
-		$this->Form->end() .
+		$this->Form->end() . ' ' .
 		$this->Html->link(__d('croogo', 'Cancel'), $redirect, array(
-			'button' => 'danger',
+			'class' => 'btn btn-danger',
 		));
 	echo $this->Html->endBox();
 	echo $this->Croogo->adminBoxes();
@@ -134,7 +136,7 @@ $script =<<<EOF
 	\$('[data-toggle=tab]:first').tab('show');
 	var filesToUpload = [];
 	var uploadContext = [];
-	var \$form = \$('#AssetsAttachmentAdminAddForm');
+	var \$form = \$('#attachment-upload-form');
 	\$form.fileupload({
 		url: '$xhrUploadUrl',
 		add: function(e, data) {
@@ -144,7 +146,7 @@ $script =<<<EOF
 			uploadContext.push(data.context);
 		}
 	});
-	\$('#start_upload').one('click', function(e) {
+	\$('#start_upload').on('click', function(e) {
 		for (var i in filesToUpload) {
 			\$form.fileupload('send', {
 				files: [filesToUpload[i]],
@@ -157,6 +159,7 @@ $script =<<<EOF
 				window.close();
 			});
 		}
+		return false;
 	});
 EOF;
 

@@ -2,14 +2,19 @@
 
 namespace Xintesa\Assets\View\Helper;
 
+use Cake\Event\Event;
+use Cake\Log\LogTrait;
+use Cake\ORM\TableRegistry;
 use Cake\View\View;
 use Cake\View\Helper;
 
 class AssetsFilterHelper extends Helper {
 
+	use LogTrait;
+
 	public $helpers = array(
 		'Html',
-		'Nodes.Nodes',
+		'Croogo/Nodes.Nodes',
 	);
 
 	public function __construct(View $view, $settings = array()) {
@@ -29,34 +34,36 @@ class AssetsFilterHelper extends Helper {
 		}
 	}
 
-	public function filter(&$content, $options = array()) {
+	//public function filter(&$content, $options = array()) {
+	public function filter(Event $event) {
+		$content =& $event->result['content'];
+		$options =& $event->result['options'];
 		$conditions = array();
 		$identifier = '';
 		if (isset($options['model']) && isset($options['id'])) {
 			$conditions = array(
-				'AssetsAssetUsage.model' => $options['model'],
-				'AssetsAssetUsage.foreign_key' => $options['id'],
+				'AssetUsages.model' => $options['model'],
+				'AssetUsages.foreign_key' => $options['id'],
 			);
 			$identifier = $options['model'] . '.' . $options['id'];
 		}
 
 		preg_match_all('/\[(image):[ ]*([A-Za-z0-9_\-]*)(.*?)\]/i', $content, $tagMatches);
-		$Asset = ClassRegistry::init('Assets.AssetsAssetUsage');
+		$AssetUsages = TableRegistry::get('Xintesa/Assets.AssetUsages');
 
 		for ($i = 0, $ii = count($tagMatches[1]); $i < $ii; $i++) {
 			$assets = $this->parseString('image|i', $tagMatches[0][$i]);
 			$assetId = $tagMatches[2][$i];
-			$conditions['AssetsAssetUsage.id'] = $assetId;
-			$asset = $Asset->find('first', array(
-				'recursive' => -1,
-				'contain' => array('AssetsAsset'),
-				'conditions' => $conditions,
-				'cache' => array(
+			$conditions['AssetUsages.id'] = $assetId;
+			$assetUsage = $AssetUsages->find()
+				->contain('Assets')
+				->where($conditions)
+				->cache([
 					'name' => 'asset_filtered_' . $assetId,
 					'config' => 'nodes',
-				),
-			));
-			if (empty($asset['AssetsAsset'])) {
+				])
+				->first();
+			if (!$assetUsage) {
 				$this->log(sprintf('%s - Asset not found for %s',
 					$identifier, $tagMatches[0][$i]
 				));
@@ -66,7 +73,7 @@ class AssetsFilterHelper extends Helper {
 			}
 
 			$options = isset($assets[$assetId]) ? $assets[$assetId] : array();
-			$img = $this->Html->image($asset['AssetsAsset']['path'], $options);
+			$img = $this->Html->image($assetUsage->asset->path, $options);
 			$regex = '/' . preg_quote($tagMatches[0][$i]) . '/';
 			$content = preg_replace($regex, $img, $content);
 		}

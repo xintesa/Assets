@@ -2,7 +2,12 @@
 
 namespace Xintesa\Assets\Model\Table;
 
+use ArrayObject;
 use Cake\ORM\Query;
+use Cake\Event\Event;
+use Cake\Datasource\EntityInterface;
+use Cake\Utility\Hash;
+use Croogo\Core\Croogo;
 use Xintesa\Assets\Model\Table\AssetsAppTable;
 
 /**
@@ -13,7 +18,6 @@ class AttachmentsTable extends AssetsAppTable {
 
 	public $filterArgs = array(
 		'filter' => array('type' => 'query', 'method' => 'filterAttachments'),
-		'filename' => array('type' => 'like', 'field' => 'AssetsAsset.filename'),
 		'type' => array('type' => 'value', 'field' => 'AssetsAssetUsage.type'),
 	);
 
@@ -33,7 +37,7 @@ class AttachmentsTable extends AssetsAppTable {
 			'foreignKey' => 'foreign_key',
 			'dependent' => true,
 			'conditions' => [
-				'Assets.parent_asset_id' => null,
+				'Assets.parent_asset_id IS' => null,
 				'Assets.model' => 'Attachments',
 			],
 		]);
@@ -43,8 +47,22 @@ class AttachmentsTable extends AssetsAppTable {
 		//$this->addBehavior('Burzum/Imagine.Imagine');
 
 		$this->searchManager()
+			->add('filename', 'Search.Like', [
+				'field' => $this->Assets->aliasField('filename'),
+				'before' => true,
+				'after' => true,
+			])
+			->value('model', [
+				'field' => $this->Assets->AssetUsages->aliasField('model'),
+			])
+			->value('foreign_key', [
+				'field' => $this->Assets->AssetUsages->aliasField('foreign_key'),
+			])
+			->value('asset_id', [
+				'field' => $this->Assets->aliasField('id'),
+			])
 			->value('type', [
-				'field' => 'AssetUsages.type',
+				'field' => $this->Assets->AssetUsages->aliasField('type'),
 			]);
 	}
 
@@ -118,74 +136,89 @@ class AttachmentsTable extends AssetsAppTable {
 		]);
 		$query->contain('Assets');
 		$query->contain('AssetUsages');
-		$query->where([
-			'AssetUsages.model' => $model,
-			'AssetUsages.foreign_key' => $foreignKey,
-		]);
+
+		if (isset($model) && isset($foreignKey)) {
+			$query->where([
+				'AssetUsages.model' => $model,
+				'AssetUsages.foreign_key' => $foreignKey,
+			]);
+		}
+
 		return $query;
 	}
 
-	protected function _findVersions($state, $query = array(), $results = array()) {
-		if ($state === 'after') {
-			return $results;
-		}
+	public function findVersions(Query $query, array $options) {
 		$assetId = $model = $foreignKey = null;
-		if (isset($query['asset_id'])) {
-			$assetId = $query['asset_id'];
-			unset($query['asset_id']);
+		if (isset($options['asset_id'])) {
+			$assetId = $options['asset_id'];
+			unset($options['asset_id']);
 		}
-		if (isset($query['model'])) {
-			$model = $query['model'];
-			unset($query['model']);
+		if (isset($options['model'])) {
+			$model = $options['model'];
+			unset($options['model']);
 		}
-		if (isset($query['foreign_key'])) {
-			$foreignKey = $query['foreign_key'];
-			unset($query['foreign_key']);
+		if (isset($options['foreign_key'])) {
+			$foreignKey = $options['foreign_key'];
+			unset($options['foreign_key']);
 		}
-		if (isset($query['all'])) {
-			$all = $query['all'];
-			unset($query['all']);
+		if (isset($options['all'])) {
+			$all = $options['all'];
+			unset($options['all']);
 		}
-		$this->unbindModel(array('hasOne' => array('AssetsAsset')));
-		$this->bindModel(array(
-			'hasOne' => array(
-				'AssetsAsset' => array(
-					'className' => 'Assets.AssetsAsset',
+		$this->associations()->remove('Assets');
+		$this->addAssociations([
+			'hasOne' => [
+				'Assets' => array(
+					'className' => 'Xintesa/Assets.Assets',
 					'foreignKey' => false,
 					'conditions' => array(
-						'AssetsAsset.model = \'Attachments\'',
-						'AssetsAsset.foreign_key = Attachments.id',
+						'Assets.model = \'Attachments\'',
+						'Assets.foreign_key = Attachments.id',
 					),
 				),
-			)
-		));
-		$contain = isset($query['contain']) ? $query['contain'] : array();
-		$query['contain'] = Hash::merge($contain, array(
-			'AssetsAsset' => array('AssetsAssetUsage'),
-		));
+				'AssetUsages' => [
+					'className' => 'Xintesa/Assets.AssetUsages',
+					'foreignKey' => false,
+					'conditions' => [
+						'Assets.id = AssetUsages.asset_id',
+					],
+				],
+			]
+		]);
+		$contain = isset($options['contain']) ? $options['contain'] : array();
+		$contain = Hash::merge($contain, [
+			'Assets',
+			'AssetUsages',
+		]);
+		$query->contain($contain);
 		if ($assetId && !isset($all)) {
-			$query['conditions'] = Hash::merge($query['conditions'], array(
-				'OR' => array(
-					'AssetsAsset.id' => $assetId,
-					'AssetsAsset.parent_asset_id' => $assetId,
-				),
-			));
+			$conditions = Hash::merge($options['conditions'], [
+				'OR' => [
+					'Assets.id' => $assetId,
+					'Assets.parent_asset_id' => $assetId,
+				],
+			]);
+			$query->where($conditions);
 		}
 		return $query;
 	}
 
-	public function beforeSave($options = array()) {
-		if (isset($this->data['AssetsAsset']['file']['name'])) {
-			$file = $this->data['AssetsAsset']['file'];
-			$attachment =& $this->data[$this->alias];
-			if (empty($attachment['title'])) {
-				$attachment['title'] = $file['name'];
+	use \Cake\Log\LogTrait;
+
+	public function beforeSave(Event $event, EntityInterface $entity, ArrayObject $options = null) {
+		$this->log('Attachments::beforeSave');
+		$this->log($entity);
+		if (isset($entity->asset->file['name'])) {
+			$file = $entity->asset->file;
+			$attachment = $entity;
+			if (empty($attachment->title)) {
+				$attachment->title = $file['name'];
 			}
-			if (empty($attachment['slug'])) {
-				$attachment['slug'] = $file['name'];
+			if (empty($attachment->slug)) {
+				$attachment->slug = $file['name'];
 			}
-			if (empty($attachment['hash'])) {
-				$attachment['hash'] = sha1_file($file['tmp_name']);
+			if (empty($attachment->hash)) {
+				$attachment->hash = sha1_file($file['tmp_name']);
 			}
 		}
 		return true;

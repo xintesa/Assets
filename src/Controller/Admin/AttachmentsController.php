@@ -3,6 +3,8 @@
 namespace Xintesa\Assets\Controller\Admin;
 
 use Cake\Event\Event;
+use Cake\Log\Log;
+use Croogo\Core\Croogo;
 use Xintesa\Assets\Controller\Admin\AppController;
 
 /**
@@ -36,22 +38,15 @@ class AttachmentsController extends AppController {
 		'limit' => 5,
 	);
 
-	public $components = array(
-		'Search.Prg' => array(
-			'presetForm' => array(
-				'paramType' => 'querystring',
-			),
-			'commonProcess' => array(
-				'paramType' => 'querystring',
-				'filterEmpty' => 'true',
-			),
-		),
-	);
-
 	public $presetVars = true;
 
 	public function initialize() {
 		parent::initialize();
+		$this->loadComponent('Search.Prg', [
+			'actions' => [
+				'index', 'browse', 'listings',
+			],
+		]);
 		$this->loadModel('Xintesa/Assets.Attachments');
 	}
 
@@ -86,62 +81,64 @@ class AttachmentsController extends AppController {
 			'search' => $this->request->query
 		]);
 
-		$this->set('attachments', $this->paginate($query));
+		$finder = 'modelAttachments';
 
-/*
-		$this->Prg->commonProcess();
 		$isChooser = false;
 
-
-		if (isset($this->request->params['named']['links']) || isset($this->request->query['chooser'])) {
+		if ($this->request->query('links') || $this->request->query('chooser')) {
 			$isChooser = true;
 		}
 
-		$criteria = $this->Attachments->parseCriteria($this->Prg->parsedParams());
-
-		if (empty($this->request->query)) {
-			$this->Attachments->recursive = 0;
-			$this->paginate['Attachments']['order'] = 'Attachments.created DESC';
+		if ($this->request->query('sort')) {
+			$query->order(['Attachments.created' => 'DESC']);
 		} else {
 			if (isset($this->request->query['asset_id']) ||
 				isset($this->request->query['all'])
 			) {
-				$this->paginate = array_merge(array('versions'), $this->paginate);
-				if (!$this->request->query('sort') && empty($this->request->params['named']['sort'])) {
-					$this->paginate['Attachments']['order'] = array(
-						'id' => 'desc',
-					);
+				$finder = 'versions';
+				if (!$this->request->query('sort')) {
+					$query->order([
+						$this->Attachments->aliasField('id') => 'desc',
+					]);
 				}
 
-				if (isset($this->request->query['asset_id'])) {
-					$this->paginate['asset_id'] = $this->request->query['asset_id'];
-				}
-				if (isset($this->request->query['all'])) {
-					$this->paginate['all'] = true;
-				}
+				//if (isset($this->request->query['asset_id'])) {
+				//	$this->paginate['asset_id'] = $this->request->query['asset_id'];
+				//}
+				//if (isset($this->request->query['all'])) {
+				//	$this->paginate['all'] = true;
+				//}
 			} else {
-				$this->paginate = array_merge(array('modelAttachments'), $this->paginate);
+				$finder = 'modelAttachments';
 			}
-			if (isset($this->request->query['model'])) {
-				$this->paginate['model'] = $this->request->query['model'];
-			}
-			if (isset($this->request->query['foreign_key'])) {
-				$this->paginate['foreign_key'] = $this->request->query['foreign_key'];
-			};
+			//if (isset($this->request->query['model'])) {
+			//	$this->paginate['model'] = $this->request->query['model'];
+			//}
+			//if (isset($this->request->query['foreign_key'])) {
+			//	$this->paginate['foreign_key'] = $this->request->query['foreign_key'];
+			//};
 
 		}
 		if ($isChooser) {
 			if ($this->request->query['chooser_type'] == 'image') {
-				$this->paginate['Attachments']['conditions']['AssetsAsset.mime_type LIKE'] = 'image/%';
+				$query->where([
+					'Assets.mime_type LIKE' => 'image/%',
+				]);
 			} else {
-				$this->paginate['Attachments']['conditions']['AssetsAsset.mime_type NOT LIKE'] = 'image/%';
+				$query->where([
+					'Assets.mime_type NOT LIKE' => 'image/%',
+				]);
 			}
 		}
-		$this->set('attachments', $criteria));
-*/
 
-		if (isset($this->request->params['named']['links']) || isset($this->request->query['chooser'])) {
-			$this->layout = 'admin_popup';
+		if (isset($finder)) {
+			$query->find($finder);
+		}
+
+		$this->set('attachments', $this->paginate($query));
+
+		if ($this->request->query('links') || $this->request->query('chooser')) {
+			$this->viewBuilder()->setLayout('admin_popup');
 			$this->render('admin_chooser');
 		}
 	}
@@ -155,74 +152,92 @@ class AttachmentsController extends AppController {
 	public function add() {
 		$this->set('title_for_layout', __d('croogo', 'Add Attachment'));
 
-		if (isset($this->request->params['named']['editor'])) {
-			$this->layout = 'admin_popup';
+		if ($this->request->query('editor')) {
+			$this->viewBuilder()->setLayout('admin_popup');
 		}
 
-		if ($this->request->is('post') || !empty($this->request->data)) {
+		if ($this->request->is('post')) {
 
+/*
 			if (empty($this->data['Attachments'])) {
 				$this->Attachments->invalidate('file', __d('croogo', 'Upload failed. Please ensure size does not exceed the server limit.'));
 				return;
 			}
+*/
 
-			$this->Attachments->create();
-			$saved = $this->Attachments->saveAll($this->request->data);
+			$entity = $this->Attachments->newEntity($this->request->data());
+			$attachment = $this->Attachments->save($entity);
 
-			if ($saved) {
-				$attachmentId = $this->Attachments->id;
-				$attachment = $this->Attachments->findById($attachmentId);
+			if ($attachment) {
+				/*
+				$attachmentId = $saved->id;
+				$attachment = $this->Attachments->find()
+					->where([
+						$this->Attachments->aliasField('id') => $attachmentId,
+					])
+					->contain([
+						'Assets',
+						'Assets.AssetUsages',
+					])
+					->first();
+				*/
 				$eventKey = 'Controller.AssetsAttachment.newAttachment';
 				Croogo::dispatchEvent($eventKey, $this, compact('attachment'));
+			} else {
+				Log::error('Failed saving attachments');
 			}
 
 			if ($this->request->is('ajax')) {
 				$files = array();
 				$error = false;
-				if ($saved) {
-					$this->viewClass = 'Json';
+
+				if (empty($attachment->errors())) {
+					$this->viewBuilder()->className('Json');
 					$files = array(array(
-						'url' => $attachment['AssetsAsset']['path'],
-						'thumbnail_url' => $attachment['AssetsAsset']['path'],
-						'name' => $attachment['Attachments']['title'],
-						'type' => $attachment['AssetsAsset']['mime_type'],
-						'size' => $attachment['AssetsAsset']['filesize'],
+						'url' => $attachment->path,
+						'thumbnail_url' => $attachment->path,
+						'name' => $attachment->title,
+						'type' => $attachment->mime_type,
+						'size' => $attachment->filesize,
 					));
 				} else {
-					if (!empty($this->Attachments->validationErrors)) {
-						$errors = Hash::extract(
-							$this->Attachments->validationErrors,
-							'{s}.{s}.{n}'
-						);
-						$files = array(array('error' => $errors));
-						$error = implode("\n", $errors);
-					}
+					$errors = $this->Attachments->errors();
+					$files = array(array('error' => $errors));
+					$error = implode("\n", $errors);
 				}
+
 				$this->set(compact('files', 'error'));
 				$this->set('_serialize', array('files', 'error'));
-				return true;
+				return;
+			} else {
+				// noop
 			}
 
-			if ($saved) {
-				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'flash', array('class' => 'success'));
+			if ($attachment) {
+				$this->Flash->success(__d('croogo', 'The Attachment has been saved'));
 				$url = array();
-				if (isset($this->request->data['AssetsAsset']['AssetsAssetUsage'][0])) {
-					$usage = $this->request->data['AssetsAsset']['AssetsAssetUsage'][0];
-					if (!empty($usage['model']) && !empty($usage['foreign_key'])) {
-						$url['?']['model'] = $usage['model'];
-						$url['?']['foreign_key'] = $usage['foreign_key'];
+				if (isset($saved->asset->asset_usage[0])) {
+					$usage = $saved->asset->asset_usage[0];
+					if (!empty($usage->model) && !empty($usage->foreign_key)) {
+						$url['?']['model'] = $usage->model;
+						$url['?']['foreign_key'] = $usage->foreign_key;
 					}
 				}
-				if (isset($this->request->params['named']['editor'])) {
+				if ($this->request->query('editor')) {
 					$url = array_merge($url, array('action' => 'browse'));
 				} else {
 					$url = array_merge($url, array('action' => 'index'));
 				}
 				return $this->redirect($url);
 			} else {
-				$this->Session->setFlash(__d('croogo', 'The Attachment could not be saved. Please, try again.'), 'flash', array('class' => 'error'));
+				$this->Flash->error(__d('croogo', 'The Attachment could not be saved. Please, try again.'));
 			}
+		} else {
+			// noop
 		}
+
+		$attachment = $this->Attachments->newEntity();
+		$this->set(compact('attachment'));
 	}
 
 /**
@@ -303,21 +318,22 @@ class AttachmentsController extends AppController {
  * @access public
  */
 	public function browse() {
-		$this->layout = 'admin_popup';
+		$this->viewBuilder()->setLayout('admin_popup');
 		$this->index();
 	}
 
-	public function list() {
-		$this->paginate = array(
-			'modelAttachments',
-			'model' => $this->request->query['model'],
-			'foreign_key' => $this->request->query['foreign_key'],
-		);
+	public function listing() {
 		if ($this->request->is('ajax')) {
-			$this->layout = 'ajax';
+			$this->viewBuilder()->setLayout('ajax');
 			$this->paginate['limit'] = 100;
 		}
-		$attachments = $this->paginate();
+
+		$query = $this->Attachments
+			->find('search', [
+				'search' => $this->request->query,
+			])
+			->find('modelAttachments');
+		$attachments = $this->paginate($query);
 		$this->set(compact('attachments'));
 	}
 

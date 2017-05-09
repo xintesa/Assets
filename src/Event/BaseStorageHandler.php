@@ -2,6 +2,7 @@
 
 namespace Xintesa\Assets\Event;
 
+use Cake\Core\App;
 use Cake\Log\LogTrait;
 use Cake\Utility\Hash;
 use Cake\ORM\TableRegistry;
@@ -27,17 +28,28 @@ abstract class BaseStorageHandler {
 			'className' => $name,
 		), $config);
 		$this->_config = $config;
-		$this->_storage = str_replace('StorageHandler', '', $config['alias']);
+		//$this->_storage = str_replace('StorageHandler', '', $config['alias']);
+		list($plugin, $storage) = pluginSplit(App::shortName($config['alias'], 'Event', 'StorageHandler'));
+		$this->_storage = $storage;
+
 		$this->Attachments = TableRegistry::get('Xintesa/Assets.Attachments');
 	}
 
 	protected abstract function _parentAsset($attachment);
 
-	protected function _check($Event) {
-		if (empty($Event->data['adapter'])) {
+	protected function _check($event) {
+		if (empty($event->data['record']->adapter)) {
+//			$this->log('_check: returning false');
 			return false;
 		}
-		return $this->_storage == $Event->data['adapter'];
+		$return = $this->_storage == $event->data['record']->adapter;
+//		$this->log('return');
+//		$this->log($return);
+//		$this->log('this->_storage' . $this->_storage);
+//		$this->log('record-adapter' . $event->data['record']->adapter);
+//		$this->log('event->data');
+//		$this->log($event->data);
+		return $return;
 	}
 
 	public function storage() {
