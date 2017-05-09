@@ -2,7 +2,9 @@
 
 namespace Xintesa\Assets\Controller\Admin;
 
-class AssetsAssetUsagesController extends AssetsAppController {
+use Cake\Event\Event;
+
+class AssetUsagesController extends AppController {
 
 	public $uses = array(
 		'Assets.AssetsAssetUsage',
@@ -15,14 +17,13 @@ class AssetsAssetUsagesController extends AssetsAppController {
 			'change_type', 'unregister',
 		);
 		if (in_array($this->request->params['action'], $excludeActions)) {
-			$this->Security->validatePost = false;
-			$this->Security->csrfCheck = false;
+			$this->Security->config('validatePost', false);
+			$this->eventManager()->off($this->Csrf);
 		}
 	}
 
 	public function add() {
 		if (isset($this->request->query)) {
-			$assetId = $model = $foreignKey = $type = null;
 			$assetId = $this->request->query('asset_id');
 			$model = $this->request->query('model');
 			$foreignKey = $this->request->query('foreign_key');
@@ -33,27 +34,22 @@ class AssetsAssetUsagesController extends AssetsAppController {
 				'model' => $model,
 				'foreign_key' => $foreignKey,
 			);
-			$exist = $this->AssetsAssetUsage->find('count', array(
-				'recursive' => -1,
-				'conditions' => $conditions,
-			));
+			$exist = $this->AssetUsages->find()
+				->where($conditions)
+				->count();
 			if ($exist === 0) {
-				$assetUsage = $this->AssetsAssetUsage->create(array(
+				$assetUsage = $this->AssetUsages->newEntity([
 					'asset_id' => $assetId,
 					'model' => $model,
 					'foreign_key' => $foreignKey,
 					'type' => $type,
-				));
-				$saved = $this->AssetsAssetUsage->save($assetUsage);
+				]);
+				$saved = $this->AssetUsages->save($assetUsage);
 				if ($saved) {
-					$this->Session->setFlash('Asset added', 'flash', array(
-						'class' => 'success',
-					));
+					$this->Flash->success('Asset added');
 				}
 			} else {
-				$this->Session->setFlash('Asset already exist', 'flash', array(
-					'class' => 'warning',
-				));
+				$this->Flash->error('Asset already exist');
 			}
 		}
 		$this->redirect($this->referer());
@@ -81,10 +77,11 @@ class AssetsAssetUsagesController extends AssetsAppController {
 	}
 
 	public function unregister() {
-		$this->viewClass = 'Json';
+		$this->viewBuilder()->className('Json');
 		$result = false;
-		if (isset($this->request->data['id'])) {
-			$result = $this->AssetsAssetUsage->delete($this->request->data['id']);
+		if ($id = $this->request->getData('id')) {
+			$assetUsage = $this->AssetUsages->get($id);
+			$result = $this->AssetUsages->delete($assetUsage);
 		}
 		$this->set(compact('result'));
 		$this->set('_serialize', 'result');

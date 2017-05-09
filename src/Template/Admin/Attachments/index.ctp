@@ -1,6 +1,6 @@
 <?php
 
-$this->Html->script('Assets.admin', array('inline' => false));
+$this->Croogo->adminScript('Xintesa/Assets.admin');
 
 $this->extend('Croogo/Core./Common/admin_index');
 
@@ -13,10 +13,10 @@ if (!empty($this->request->query)) {
 	$query = array();
 }
 
-$this->append('actions');
+$this->append('action-buttons');
 
 echo $this->Croogo->adminAction(
-	__d('croogo', 'New {0}', __d('croogo', 'Attachment')),
+	__d('croogo', 'New ' . __d('croogo', 'Attachment')),
 	array_merge(array('?' => $query), array('action' => 'add')),
 	array('button' => 'success')
 );
@@ -29,9 +29,6 @@ $detailUrl = array(
 	'action' => 'browse',
 	'?' => array(
 		'manage' => true,
-		'model' => 'Attachments',
-		'foreign_key' => null,
-		'asset_id' => null,
 	),
 );
 
@@ -57,8 +54,7 @@ $this->append('table-body');
 		$mimeType = $mimeType['0'];
 		$assetCount = $attachment->asset_count . '&nbsp;';
 		if ($mimeType == 'image') {
-			$detailUrl['?']['foreign_key'] = $attachment->id;
-			$detailUrl['?']['asset_id'] = $attachment->asset->id;
+			$detailUrl['?']['id'] = $attachment->id;
 			$actions[] = $this->Croogo->adminRowAction('', $detailUrl, array(
 				'icon' => 'suitcase',
 				'data-toggle' => 'browse',
@@ -70,7 +66,7 @@ $this->append('table-body');
 				array(
 					'action' => 'resize',
 					$attachment->id,
-					'ext' => 'json'
+					'_ext' => 'json'
 				),
 				array('?' => $query)
 			);
@@ -78,7 +74,7 @@ $this->append('table-body');
 
 		if (isset($resizeUrl)) {
 			$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
-				'icon' => 'arrows-alt',
+				'icon' => $this->Theme->getIcon('resize'),
 				'tooltip' => __d('croogo', 'Resize this item'),
 				'data-toggle' => 'resize-asset'
 			));

@@ -14,14 +14,12 @@ a i[class^=icon]:hover { text-decoration: none; }
 $this->end();
 
 $this->Html->script('Xintesa/Assets.admin', array('block' => 'scriptBottom'));
-//$this->Html->script('Croogo.jquery/thickbox-compressed', array('block' => 'scriptBottom'));
-//$this->Html->css('Croogo.thickbox', array('inline' => false));
 
-$model = $foreignKey = $assetId = $filter = $filename = $type = $all = null;
-if (!empty($this->request->query['model'])):
+$assetId = $filter = $filename = $type = $all = null;
+if (empty($model) && !empty($this->request->query['model'])):
 	$model = $this->request->query['model'];
 endif;
-if (!empty($this->request->query['foreign_key'])):
+if (empty($foreignKey) && !empty($this->request->query['foreign_key'])):
 	$foreignKey = $this->request->query['foreign_key'];
 endif;
 if (!empty($this->request->query['asset_id'])):
@@ -41,24 +39,18 @@ if (!empty($this->request->query['all'])):
 endif;
 
 $extractPath = "asset.asset_usage.{n}[model=$model][foreign_key=$foreignKey]";
-?>
 
-	<?php if ($this->layout != 'admin_popup'): ?>
-	<h2><?php echo $title_for_layout; ?></h2>
-	<?php endif; ?>
-
-<?php
-$this->append('actions');
+$this->append('action-buttons');
 	echo $this->Croogo->adminAction(
 		__d('croogo', 'New Attachment'),
 		array_merge(
-			array('controller' => 'assets_attachments', 'action' => 'add', 'editor' => 1),
+			array('controller' => 'Attachments', 'action' => 'add', 'editor' => 1),
 			array('?' => $this->request->query)
 		)
-	);
+	) . ' ';
 
 	$listUrl = array(
-		'controller' => 'assets_attachments',
+		'controller' => 'Attachments',
 		'action' => 'browse',
 		'?' => array(
 			'model' => $model,
@@ -116,7 +108,6 @@ $this->append('table-body');
 	$query = array('?' => $this->request->query);
 	$rows = array();
 	foreach ($attachments as $attachment):
-		$this->log($attachment);
 		$actions = array();
 		$mimeType = explode('/', $attachment->asset->mime_type);
 		$mimeType = $mimeType['0'];
@@ -213,16 +204,20 @@ $this->append('table-body');
 				));
 			endif;
 		elseif ($mimeType === 'image'):
-			$detailUrl = Hash::merge(array(
-				'action' => 'browse',
-				'?' => array(
-					'asset_id' => $attachment->asset->id,
-				)
-			), $query);
-			$actions[] = $this->Html->link('', $detailUrl, array(
-				'icon' => 'suitcase',
-				'tooltip' => __d('assets', 'View other sizes'),
-			));
+
+			if (!$this->request->query('manage')):
+				$detailUrl = Hash::merge(array(
+					'action' => 'browse',
+					'?' => array(
+						'asset_id' => $attachment->asset->id,
+					)
+				), $query);
+				$actions[] = $this->Html->link('', $detailUrl, array(
+					'icon' => 'suitcase',
+					'tooltip' => __d('assets', 'View other sizes'),
+				));
+			endif;
+
 		endif;
 
 		if ($mimeType == 'image') {
@@ -233,7 +228,7 @@ $this->append('table-body');
 			$thumbnail = $this->Html->link($img,
 				$attachment->asset->path,
 				array(
-					'class' => 'thickbox',
+					'data-toggle' => 'lightbox',
 					'escape' => false,
 					'title' => $attachment->title,
 				)

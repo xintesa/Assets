@@ -37,8 +37,8 @@ class AttachmentsTable extends AssetsAppTable {
 			'foreignKey' => 'foreign_key',
 			'dependent' => true,
 			'conditions' => [
-				'Assets.parent_asset_id IS' => null,
-				'Assets.model' => 'Attachments',
+				'parent_asset_id IS' => null,
+				'model' => 'Attachments',
 			],
 		]);
 
@@ -60,6 +60,9 @@ class AttachmentsTable extends AssetsAppTable {
 			])
 			->value('asset_id', [
 				'field' => $this->Assets->aliasField('id'),
+			])
+			->value('id', [
+				'field' => $this->aliasField('id'),
 			])
 			->value('type', [
 				'field' => $this->Assets->AssetUsages->aliasField('type'),

@@ -85,9 +85,10 @@ Assets.resizeAsset = function(e) {
 }
 
 $(function() {
-	$('body').on('click', 'a[data-toggle=browse]', Assets.popup);
-	$('body').on('click', 'a[data-toggle=refresh]', Assets.reloadAssetsTab);
-	$('body').on('click', 'a[data-toggle=resize-asset]', Assets.resizeAsset);
-	$('body').on('click', 'a.change-usage-type', Assets.changeUsageType);
-	$('body').on('click', 'a.unregister-usage', Assets.unregisterAssetUsage);
+	var $body = $('body');
+	$body.on('click', 'a[data-toggle=browse]', Assets.popup);
+	$body.on('click', 'a[data-toggle=refresh]', Assets.reloadAssetsTab);
+	$body.on('click', 'a[data-toggle=resize-asset]', Assets.resizeAsset);
+	$body.on('click', 'a.change-usage-type', Assets.changeUsageType);
+	$body.on('click', 'a.unregister-usage', Assets.unregisterAssetUsage);
 });

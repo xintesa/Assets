@@ -2,21 +2,20 @@
 
 $this->extend('/Common/admin_edit');
 
-$this->Html
-	->addCrumb('', '/admin', array('icon' => 'home'))
-	->addCrumb(__d('croogo', 'Attachments'), array('plugin' => 'assets', 'controller' => 'assets_attachments', 'action' => 'index'))
-	->addCrumb($this->data['AssetsAttachment']['title'], '/' . $this->request->url);
+$this->Breadcrumbs
+	->add(__d('croogo', 'Attachments'), array('plugin' => 'Xintesa/Assets', 'controller' => 'Attachments', 'action' => 'index'))
+	->add($attachment->title, $this->request->getUri()->getPath());
 
 if ($this->layout === 'admin_popup'):
 	$this->append('title', ' ');
 endif;
 
-$formUrl = array('controller' => 'assets_attachments', 'action' => 'edit');
+$formUrl = array('controller' => 'Attachments', 'action' => 'edit');
 if (isset($this->request->query)) {
 	$formUrl = array_merge($formUrl, $this->request->query);
 }
 
-$this->append('form-start', $this->Form->create('AssetsAttachment', array(
+$this->append('form-start', $this->Form->create($attachment, array(
 	'url' => $formUrl,
 )));
 
@@ -38,13 +37,13 @@ $this->append('tab-content');
 
 		echo $this->Form->input('file_url', array(
 			'label' => __d('croogo', 'File URL'),
-			'value' => Router::url($this->data['AssetsAsset']['path'], true),
+			'value' => $this->Url->build($attachment->asset->path, true),
 			'readonly' => 'readonly')
 		);
 
 		echo $this->Form->input('file_type', array(
 			'label' => __d('croogo', 'Mime Type'),
-			'value' => $this->data['AssetsAsset']['mime_type'],
+			'value' => $attachment->asset->mime_type,
 			'readonly' => 'readonly')
 		);
 	echo $this->Html->tabEnd();
@@ -54,8 +53,8 @@ $this->end();
 
 $this->append('panels');
 	$redirect = array('action' => 'index');
-	if ($this->Session->check('Wysiwyg.redirect')) {
-		$redirect = $this->Session->read('Wysiwyg.redirect');
+	if ($this->request->session()->check('Wysiwyg.redirect')) {
+		$redirect = $this->request->session()->read('Wysiwyg.redirect');
 	}
 	if (isset($this->request->query['model'])) {
 		$redirect = array_merge(
@@ -64,27 +63,29 @@ $this->append('panels');
 		);
 	}
 	echo $this->Html->beginBox(__d('croogo', 'Publishing')) .
-		$this->Form->button(__d('croogo', 'Save')) .
+		$this->Form->button(__d('croogo', 'Save'), [
+			'class' => 'btn-outline-success',
+		]) . ' ' .
 		$this->Html->link(
 			__d('croogo', 'Cancel'),
 			$redirect,
-			array('class' => 'cancel', 'button' => 'danger')
+			['class' => 'cancel btn btn-outline-danger']
 		);
 	echo $this->Html->endBox();
 
-	$fileType = explode('/', $this->data['AssetsAsset']['mime_type']);
+	$fileType = explode('/', $attachment->asset->mime_type);
 	$fileType = $fileType['0'];
-	$path = $this->data['AssetsAsset']['path'];
+	$path = $attachment->asset->path;
 	if ($fileType == 'image'):
 		$imgUrl = $this->AssetsImage->resize($path, 200, 300,
-			array('adapter' => $this->data['AssetsAsset']['adapter'])
+			array('adapter' => $attachment->asset->adapter)
 		);
 	else:
-		$imgUrl = $this->Html->image('/croogo/img/icons/' . $this->Filemanager->mimeTypeToImage($this->data['AssetsAttachment']['mime_type'])) . ' ' . $this->data['AssetsAttachment']['mime_type'];
+		$imgUrl = $this->Html->image('Croogo/Core./img/icons/' . $this->Filemanager->mimeTypeToImage($attachment->mime_type)) . ' ' . $attachment->mime_type;
 	endif;
 	echo $this->Html->beginBox(__d('croogo', 'Preview')) .
-		$this->Html->link($imgUrl, $this->data['AssetsAsset']['path'], array(
-			'class' => 'thickbox',
+		$this->Html->link($imgUrl, $attachment->asset->path, array(
+			'data-toggle' => 'lightbox',
 		));
 	echo $this->Html->endBox();
 

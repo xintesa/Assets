@@ -60,11 +60,11 @@ class AttachmentsController extends AppController {
 		parent::beforeFilter($event);
 
 		$noCsrfCheck = array('add', 'resize');
-		if (in_array($this->action, $noCsrfCheck)) {
-			$this->Security->csrfCheck = false;
+		if (in_array($this->request->action, $noCsrfCheck)) {
+			$this->eventManager()->off($this->Csrf);
 		}
-		if ($this->action == 'resize') {
-			$this->Security->validatePost = false;
+		if ($this->request->action == 'resize') {
+			$this->Security->config('validatePost', false);
 		}
 	}
 
@@ -77,9 +77,7 @@ class AttachmentsController extends AppController {
 	public function index() {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
-		$query = $this->Attachments->find('search', [
-			'search' => $this->request->query
-		]);
+		$query = $this->Attachments->find();
 
 		$finder = 'modelAttachments';
 
@@ -89,6 +87,15 @@ class AttachmentsController extends AppController {
 			$isChooser = true;
 		}
 
+		if ($this->request->query('manage')) {
+			$finder = 'versions';
+			$model = $this->request->query('model');
+			$foreignKey = $this->request->query('foreign_key');
+			$this->set(compact('model', 'foreignKey'));
+			unset($this->request->query['model']);
+			unset($this->request->query['foreign_key']);
+		}
+
 		if ($this->request->query('sort')) {
 			$query->order(['Attachments.created' => 'DESC']);
 		} else {
@@ -96,29 +103,20 @@ class AttachmentsController extends AppController {
 				isset($this->request->query['all'])
 			) {
 				$finder = 'versions';
+				$model = $this->request->query('model');
+				$foreignKey = $this->request->query('foreign_key');
+				$this->set(compact('model', 'foreignKey'));
+				unset($this->request->query['model']);
+				unset($this->request->query['foreign_key']);
+
 				if (!$this->request->query('sort')) {
 					$query->order([
 						$this->Attachments->aliasField('id') => 'desc',
 					]);
 				}
-
-				//if (isset($this->request->query['asset_id'])) {
-				//	$this->paginate['asset_id'] = $this->request->query['asset_id'];
-				//}
-				//if (isset($this->request->query['all'])) {
-				//	$this->paginate['all'] = true;
-				//}
-			} else {
-				$finder = 'modelAttachments';
 			}
-			//if (isset($this->request->query['model'])) {
-			//	$this->paginate['model'] = $this->request->query['model'];
-			//}
-			//if (isset($this->request->query['foreign_key'])) {
-			//	$this->paginate['foreign_key'] = $this->request->query['foreign_key'];
-			//};
-
 		}
+
 		if ($isChooser) {
 			if ($this->request->query['chooser_type'] == 'image') {
 				$query->where([
@@ -130,6 +128,10 @@ class AttachmentsController extends AppController {
 				]);
 			}
 		}
+
+		$query->find('search', [
+			'search' => $this->request->query
+		]);
 
 		if (isset($finder)) {
 			$query->find($finder);
@@ -263,20 +265,24 @@ class AttachmentsController extends AppController {
 		}
 
 		if (!$id && empty($this->request->data)) {
-			$this->Session->setFlash(__d('croogo', 'Invalid Attachment'), 'flash', array('class' => 'error'));
+			$this->Flash->error(__d('croogo', 'Invalid Attachment'));
 			return $this->redirect($redirect);
 		}
-		if (!empty($this->request->data)) {
-			if ($this->Attachments->save($this->request->data)) {
-				$this->Session->setFlash(__d('croogo', 'The Attachment has been saved'), 'flash', array('class' => 'success'));
+		$attachment = $this->Attachments->get($id, [
+			'contain' => [
+				'Assets',
+			],
+		]);
+		if ($this->request->is('post')) {
+			$attachment = $this->Attachments->patchEntity($this->request->data());
+			if ($this->Attachments->save($attachment)) {
+				$this->Flash->success(__d('croogo', 'The Attachment has been saved'));
 				return $this->redirect($redirect);
 			} else {
-				$this->Session->setFlash(__d('croogo', 'The Attachment could not be saved. Please, try again.'), 'flash', array('class' => 'error'));
+				$this->Flash->error(__d('croogo', 'The Attachment could not be saved. Please, try again.'));
 			}
 		}
-		if (empty($this->request->data)) {
-			$this->request->data = $this->Attachments->read(null, $id);
-		}
+		$this->set(compact('attachment'));
 	}
 
 /**
@@ -288,7 +294,7 @@ class AttachmentsController extends AppController {
  */
 	public function delete($id = null) {
 		if (!$id) {
-			$this->Session->setFlash(__d('croogo', 'Invalid id for Attachment'), 'flash', array('class' => 'error'));
+			$this->Flash->error(__d('croogo', 'Invalid id for Attachment'));
 			return $this->redirect(array('action' => 'index'));
 		}
 
@@ -300,13 +306,14 @@ class AttachmentsController extends AppController {
 			);
 		}
 
-		$this->Attachments->begin();
-		if ($this->Attachments->delete($id)) {
-			$this->Attachments->commit();
-			$this->Session->setFlash(__d('croogo', 'Attachment deleted'), 'flash', array('class' => 'success'));
+		$attachment = $this->Attachments->get($id);
+		$this->Attachments->connection()->begin();
+		if ($this->Attachments->delete($attachment)) {
+			$this->Attachments->connection()->commit();
+			$this->Flash->success(__d('croogo', 'Attachment deleted'));
 			return $this->redirect($redirect);
 		} else {
-			$this->Session->setFlash(__d('croogo', 'Invalid id for Attachment'), 'flash', array('class' => 'error'));
+			$this->Flash->error(__d('croogo', 'Invalid id for Attachment'));
 			return $this->redirect($redirect);
 		}
 	}
