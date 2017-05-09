@@ -3,13 +3,19 @@
 use Cake\Core\Configure;
 use Cake\Utility\Inflector;
 use Cake\ORM\TableRegistry;
+use Cake\view\Form\NullContext;
 
 $this->Html->script('Xintesa/Assets.admin.js', array('block' => 'scriptBottom'));
 
 $model = isset($model) ? $model : null;
 if (!$model):
-	$modelSource = $this->Form->context()->entity()->getSource();
-	list($junk, $model) = pluginSplit($modelSource);
+	$context = $this->Form->context();
+	if ($context instanceof NullContext):
+		$model = $this->request->param('controller');
+	else:
+		$modelSource = $this->Form->context()->entity()->getSource();
+		list($junk, $model) = pluginSplit($modelSource);
+	endif;
 endif;
 $primaryKey = isset($primaryKey) ? $primaryKey : 'id';
 
