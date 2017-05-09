@@ -211,14 +211,10 @@ $this->append('action-buttons');
 $this->end();
 
 ?>
-<div class="<?php echo $this->Theme->getCssClass('row'); ?>">
-	<div class="<?php echo $this->Theme->getCssClass('fullColumn'); ?>">
-		<table class="<?php echo $this->Theme->getCssClass('tableClass'); ?> asset-list" data-url="<?php echo $assetListUrl; ?>">
-			<thead><?php echo $this->Html->tableHeaders($headers); ?></thead>
-			<tbody><?php echo $this->Html->tableCells($rows); ?></tbody>
-		</table>
-	</div>
-</div>
+<table class="<?php echo $this->Theme->getCssClass('tableClass'); ?> asset-list" data-url="<?php echo $assetListUrl; ?>">
+	<thead><?php echo $this->Html->tableHeaders($headers); ?></thead>
+	<tbody><?php echo $this->Html->tableCells($rows); ?></tbody>
+</table>
 <?php
 
 $script =<<<EOF
