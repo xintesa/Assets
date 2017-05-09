@@ -177,6 +177,7 @@ $uploadUrl = array(
 	),
 );
 
+if (!isset($_assetButtons)):
 $this->append('action-buttons');
 	echo $this->Croogo->adminAction(__d('assets', 'Reload'),
 		$browseUrl,
@@ -209,7 +210,8 @@ $this->append('action-buttons');
 		)
 	);
 $this->end();
-
+$this->set('_assetButtons', true);
+endif;
 ?>
 <table class="<?php echo $this->Theme->getCssClass('tableClass'); ?> asset-list" data-url="<?php echo $assetListUrl; ?>">
 	<thead><?php echo $this->Html->tableHeaders($headers); ?></thead>
