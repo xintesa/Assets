@@ -300,9 +300,30 @@ class AttachmentsTable extends AssetsAppTable {
 				continue;
 			}
 
+			$file = WWW_ROOT . $source['from'];
+
+			$fp = fopen($file, 'r');
+			$stat = fstat($fp);
+			fclose($fp);
+
+			$pathinfo = pathinfo($file);
+
+			$width = $height = null;
+			if (strcmp($task['data'][$i]->mime_type, 'image') !== false) {
+				$sizeinfo = getimagesize($file);
+				$width = $sizeinfo[0];
+				$height = $sizeinfo[1];
+			}
+
 			$task['data'][$i]->asset = $this->Assets->newEntity([
 				'model' => 'Attachments',
 				'adapter' => 'LegacyLocalAttachment',
+				'filesize' => $stat['size'],
+				'width' => $width,
+				'height' => $height,
+				'hash' => $task['data'][$i]->hash,
+				'extension' => $pathinfo['extension'],
+				'mime_type' => $task['data'][$i]->mime_type,
 				'path' => $source['from'],
 			]);
 			$result = $this->save($task['data'][$i], array('atomic' => true));
