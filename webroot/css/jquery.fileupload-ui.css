@@ -36,6 +36,11 @@
   max-width: 300px;
 }
 
+.files .name {
+		max-width: 100px;
+		word-wrap: break-word;
+}
+
 @media (max-width: 767px) {
   .fileupload-buttonbar .toggle,
   .files .toggle,

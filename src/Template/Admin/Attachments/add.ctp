@@ -5,12 +5,14 @@ use Xintesa\Assets\Utility\StorageManager;
 $this->extend('Croogo/Core./Common/admin_edit');
 
 $this->Html->css(array(
-	'Assets.jquery.fileupload',
+	'Xintesa/Assets.jquery.fileupload',
+	'Xintesa/Assets.jquery.fileupload-ui',
 ), array(
-	'inline' => false,
+	'block' => true,
 ));
+
 $this->Croogo->adminScript(array(
-	'Xintesa/Assets.fileupload/vendor/jquery.ui.widget',
+//	'Xintesa/Assets.fileupload/vendor/jquery.ui.widget',
 	'Xintesa/Assets.fileupload/tmpl.min.js',
 	'Xintesa/Assets.fileupload/load-image.all.min',
 	'Xintesa/Assets.fileupload/canvas-to-blob.min',

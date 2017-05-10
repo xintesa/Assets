@@ -1,5 +1,4 @@
 <!-- Redirect browsers with JavaScript disabled to the origin page -->
-<noscript><input type="hidden" name="redirect" value="https://blueimp.github.io/jQuery-File-Upload/"></noscript>
 <?php
 
 $uploadIcon = $this->Html->icon('upload');
@@ -9,19 +8,22 @@ $cancelIcon = $this->Html->icon('delete');
 ?>
 <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
 <div class="input text clearfix fileupload-buttonbar">
-	<div class="span8">
+	<div class="col-8">
 
 		<!-- The fileinput-button span is used to style the file input field as button -->
 		<span class="btn btn-success fileinput-button">
 			<?php echo $addIcon; ?>
 			<span><?php echo __d('assets', 'Add files'); ?></span>
-			<?php echo $this->Form->input('asset.file', array(
+			<?php echo $this->Form->input('asset.file', [
 				'label' => false,
 				'div' => false,
 				'type' => 'file',
 				'multiple' => true,
 				'required' => false,
-			)); ?>
+				'templates' => [
+					'inputContainer' => '{{content}}',
+				],
+			]); ?>
 		</span>
 
 		<button type="reset" class="btn btn-warning cancel">
@@ -34,7 +36,7 @@ $cancelIcon = $this->Html->icon('delete');
 	</div>
 
 	<!-- The global progress state -->
-	<div class="span4 fileupload-progress fade">
+	<div class="col-4 fileupload-progress fade">
 		<!-- The global progress bar -->
 		<div class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100">
 			<div class="progress-bar progress-bar-success" style="width:0%;"></div>
@@ -64,15 +66,14 @@ $cancelIcon = $this->Html->icon('delete');
         </td>
         <td>
             {% if (!i && !o.options.autoUpload) { %}
-                <button class="btn btn-small btn-primary start" disabled
+                <button class="btn btn-sm btn-primary start" disabled
                     title="<?php echo __d('assets', 'Start'); ?>"
                 >
                     <?php echo $uploadIcon; ?>
                 </button>
             {% } %}
             {% if (!i) { %}
-                <button
-                    class="btn btn-small btn-warning cancel"
+                <button class="btn btn-sm btn-warning cancel"
                     title="<?php echo __d('assets', 'Cancel'); ?>"
                 >
                     <?php echo $cancelIcon; ?>
@@ -114,14 +115,14 @@ $cancelIcon = $this->Html->icon('delete');
                 <button class="btn btn-danger delete" data-type="{%=file.deleteType%}" data-url="{%=file.deleteUrl%}"{% if (file.deleteWithCredentials) { %} data-xhr-fields='{"withCredentials":true}'{% } %}
                     title="<?php echo __d('assets', 'Delete'); ?>"
                 >
-                    <i class="icon icon-trash"></i>
+                    <?= $cancelIcon ?>
                 </button>
                 <input type="checkbox" name="delete" value="1" class="toggle">
             {% } else { %}
-                <button class="btn btn-warning cancel"
-                    title="<?php echo __d('assets', 'Cancel'); ?>"
+                <button class="btn btn-sm btn-warning cancel"
+                    title="<?= __d('croogo', 'Cancel') ?>"
                 >
-                    <i class="icon icon-ban-circle"></i>
+                    <?= $cancelIcon ?>
                 </button>
             {% } %}
         </td>
