@@ -31,7 +31,11 @@ abstract class BaseStorageHandler {
 		list($plugin, $storage) = pluginSplit(App::shortName($config['alias'], 'Event', 'StorageHandler'));
 		$this->_storage = $storage;
 
-		$this->Attachments = TableRegistry::get('Xintesa/Assets.Attachments');
+		try {
+			$this->Attachments = TableRegistry::get('Xintesa/Assets.Attachments');
+		} catch (\Exception $e) {
+			$this->log(App::shortName(get_class($this), 'Event', 'StorageHandler') . ': ' . $e->getMessage(), LOG_CRIT);
+		}
 	}
 
 	protected abstract function _parentAsset($attachment);
