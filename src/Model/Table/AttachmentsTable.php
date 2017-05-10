@@ -3,11 +3,13 @@
 namespace Xintesa\Assets\Model\Table;
 
 use ArrayObject;
-use Cake\ORM\Query;
-use Cake\Event\Event;
 use Cake\Datasource\EntityInterface;
+use Cake\Event\Event;
 use Cake\Filesystem\Folder;
+use Cake\Log\LogTrait;
+use Cake\ORM\Query;
 use Cake\Utility\Hash;
+use Cake\Validation\Validator;
 use Croogo\Core\Croogo;
 use Xintesa\Assets\Model\Table\AssetsAppTable;
 
@@ -16,6 +18,8 @@ use Xintesa\Assets\Model\Table\AssetsAppTable;
  *
  */
 class AttachmentsTable extends AssetsAppTable {
+
+	use LogTrait;
 
 	public $filterArgs = array(
 		'filter' => array('type' => 'query', 'method' => 'filterAttachments'),
@@ -199,8 +203,6 @@ class AttachmentsTable extends AssetsAppTable {
 		}
 		return $query;
 	}
-
-	use \Cake\Log\LogTrait;
 
 	public function beforeSave(Event $event, EntityInterface $entity, ArrayObject $options = null) {
 		if (!empty($entity->asset->file['name'])) {

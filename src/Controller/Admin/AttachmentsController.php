@@ -4,6 +4,7 @@ namespace Xintesa\Assets\Controller\Admin;
 
 use Cake\Event\Event;
 use Cake\Log\Log;
+use Cake\Utility\Hash;
 use Croogo\Core\Croogo;
 use Xintesa\Assets\Controller\Admin\AppController;
 
@@ -168,44 +169,37 @@ class AttachmentsController extends AppController {
 */
 
 			$entity = $this->Attachments->newEntity($this->request->data());
-			$attachment = $this->Attachments->save($entity);
 
-			if ($attachment) {
-				/*
-				$attachmentId = $saved->id;
-				$attachment = $this->Attachments->find()
-					->where([
-						$this->Attachments->aliasField('id') => $attachmentId,
-					])
-					->contain([
-						'Assets',
-						'Assets.AssetUsages',
-					])
-					->first();
-				*/
-				$eventKey = 'Controller.AssetsAttachment.newAttachment';
-				Croogo::dispatchEvent($eventKey, $this, compact('attachment'));
+			$errors = $entity->errors();
+
+			if (empty($errors)) {
+				$attachment = $this->Attachments->save($entity);
+
+				if ($attachment) {
+					$eventKey = 'Controller.AssetsAttachment.newAttachment';
+					Croogo::dispatchEvent($eventKey, $this, compact('attachment'));
+				}
 			} else {
-				Log::error('Failed saving attachments');
+				Log::error('Failed saving attachments:');
+				Log::error(print_r($errors, true));
 			}
 
 			if ($this->request->is('ajax')) {
 				$files = array();
 				$error = false;
 
-				if (empty($attachment->errors())) {
+				if (empty($errors)) {
 					$this->viewBuilder()->className('Json');
 					$files = array(array(
-						'url' => $attachment->path,
-						'thumbnail_url' => $attachment->path,
+						'url' => $attachment->asset->path,
+						'thumbnail_url' => $attachment->asset->path,
 						'name' => $attachment->title,
-						'type' => $attachment->mime_type,
-						'size' => $attachment->filesize,
+						'type' => $attachment->asset->mime_type,
+						'size' => $attachment->asset->filesize,
 					));
 				} else {
-					$errors = $this->Attachments->errors();
 					$files = array(array('error' => $errors));
-					$error = implode("\n", $errors);
+					$error = implode("\n", Hash::flatten($errors));
 				}
 
 				$this->set(compact('files', 'error'));

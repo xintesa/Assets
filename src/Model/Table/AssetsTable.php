@@ -5,6 +5,7 @@ namespace Xintesa\Assets\Model\Table;
 use ArrayObject;
 use Cake\Event\Event;
 use Cake\Datasource\EntityInterface;
+use Cake\Validation\Validator;
 use Croogo\Core\Croogo;
 
 class AssetsTable extends AssetsAppTable {
@@ -38,6 +39,12 @@ class AssetsTable extends AssetsAppTable {
 		$this->addBehavior('Search.Search');
 		$this->addBehavior('Croogo/Core.Trackable');
 
+	}
+
+	public function validationDefault(Validator $validator) {
+		$validator
+			->requirePresence('adapter', 'create');
+		return $validator;
 	}
 
 	public function beforeSave(Event $event, EntityInterface $entity, ArrayObject $options = null) {
