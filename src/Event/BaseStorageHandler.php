@@ -28,7 +28,6 @@ abstract class BaseStorageHandler {
 			'className' => $name,
 		), $config);
 		$this->_config = $config;
-		//$this->_storage = str_replace('StorageHandler', '', $config['alias']);
 		list($plugin, $storage) = pluginSplit(App::shortName($config['alias'], 'Event', 'StorageHandler'));
 		$this->_storage = $storage;
 
@@ -39,16 +38,9 @@ abstract class BaseStorageHandler {
 
 	protected function _check($event) {
 		if (empty($event->data['record']->adapter)) {
-//			$this->log('_check: returning false');
 			return false;
 		}
 		$return = $this->_storage == $event->data['record']->adapter;
-//		$this->log('return');
-//		$this->log($return);
-//		$this->log('this->_storage' . $this->_storage);
-//		$this->log('record-adapter' . $event->data['record']->adapter);
-//		$this->log('event->data');
-//		$this->log($event->data);
 		return $return;
 	}
 
