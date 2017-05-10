@@ -89,18 +89,19 @@ class AttachmentsController extends AppController {
 		$model = $this->request->query('model');
 		$foreignKey = $this->request->query('foreign_key');
 		$this->set(compact('model', 'foreignKey'));
+		$httpQuery = $this->request->query();
 
 		if ($this->request->query('manage')) {
 			$finder = 'versions';
-			unset($this->request->query['model']);
-			unset($this->request->query['foreign_key']);
+			unset($httpQuery['model']);
+			unset($httpQuery['foreign_key']);
 		} elseif (
-			isset($this->request->query['asset_id']) ||
-			isset($this->request->query['all'])
+			isset($httpQuery['asset_id']) ||
+			isset($httpQuery['all'])
 		) {
 			$finder = 'versions';
-			unset($this->request->query['model']);
-			unset($this->request->query['foreign_key']);
+			unset($httpQuery['model']);
+			unset($httpQuery['foreign_key']);
 
 			if (!$this->request->query('sort')) {
 				$query->order([
@@ -135,7 +136,7 @@ class AttachmentsController extends AppController {
 		}
 
 		$query->find('search', [
-			'search' => $this->request->query
+			'search' => $httpQuery,
 		]);
 
 		if (isset($finder)) {
