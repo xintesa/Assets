@@ -41,6 +41,7 @@ class AttachmentsTable extends AssetsAppTable {
 			'className' => 'Xintesa/Assets.Assets',
 			'foreignKey' => 'foreign_key',
 			'dependent' => true,
+			'cascadeCallbacks' => true,
 			'conditions' => [
 				'parent_asset_id IS' => null,
 				'model' => 'Attachments',
@@ -178,6 +179,7 @@ class AttachmentsTable extends AssetsAppTable {
 				'Assets' => array(
 					'className' => 'Xintesa/Assets.Assets',
 					'foreignKey' => false,
+					'dependent'=> true,
 					'conditions' => array(
 						'Assets.model = \'Attachments\'',
 						'Assets.foreign_key = Attachments.id',

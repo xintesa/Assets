@@ -90,7 +90,7 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 	}
 
 	protected function _parentAsset($attachment) {
-		$path = $attachment['AssetsAttachment']['import_path'];
+		$path = $attachment->import_path;
 		$parts = pathinfo($path);
 		if (strpos($parts['filename'], '.') === false) {
 			// old style, no resize indicator, dimension prepended
@@ -109,8 +109,7 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 
 		$filename = rtrim(WWW_ROOT, '/') . $dirname . '/' . $filename . '.' . $parts['extension'];
 		$hash = sha1_file($filename);
-		$this->Attachment->AssetsAsset->recursive = -1;
-		return $this->Attachment->AssetsAsset->findByHash($hash);
+		return $this->Attachments->Assets->findByHash($hash)->first();
 	}
 
 }

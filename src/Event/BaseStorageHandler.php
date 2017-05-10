@@ -2,6 +2,7 @@
 
 namespace Xintesa\Assets\Event;
 
+use DOMDocument;
 use Cake\Core\App;
 use Cake\Log\LogTrait;
 use Cake\Utility\Hash;
@@ -41,10 +42,10 @@ abstract class BaseStorageHandler {
 	protected abstract function _parentAsset($attachment);
 
 	protected function _check($event) {
-		if (empty($event->data['record']->adapter)) {
+		if (empty($event->data['record']['adapter'])) {
 			return false;
 		}
-		$return = $this->_storage == $event->data['record']->adapter;
+		$return = $this->_storage == $event->data['record']['adapter'];
 		return $return;
 	}
 
@@ -101,12 +102,11 @@ abstract class BaseStorageHandler {
 		if (!$this->_check($Event)) {
 			return true;
 		}
-		if (!$Event->data['result']) {
+		if (!$Event->data['record']) {
 			return true;
 		}
 
-		$src = $this->_pathFromHtml($Event->data['result']);
-		$this->Attachments->contain('AssetsAsset');
+		$src = $this->_pathFromHtml($Event->data['record']['result']);
 		try {
 			$filename = rtrim(WWW_ROOT, '/') . $src;
 			$attachment = $this->Attachments->createFromFile($filename);
@@ -125,17 +125,17 @@ abstract class BaseStorageHandler {
  * Create AssetsAsset record from $attachment when necessary
  */
 	protected function _createAsset($attachment) {
-		$hash = $attachment['Attachments']['hash'];
-		$path = $attachment['Attachments']['import_path'];
-		$Asset = $this->Attachments->Assets;
-		$existing = $Asset->find('count', array(
-			'conditions' => array(
-				'OR' => array(
-					$Asset->escapeField('hash') => $hash,
-					$Asset->escapeField('path') => $path,
-				),
-			),
-		));
+		$hash = $attachment->hash;
+		$path = $attachment->import_path;
+		$Assets = TableRegistry::get('Xintesa/Assets.Assets');
+		$existing = $Assets->find()
+			->where([
+				'OR' => [
+					$Assets->aliasField('hash') => $hash,
+					$Assets->aliasField('path') => $path,
+				],
+			])
+			->count();
 		if ($existing > 0) {
 			return false;
 		}
@@ -145,15 +145,15 @@ abstract class BaseStorageHandler {
 			return false;
 		}
 
-		$asset = $Asset->create(array(
-			'parent_asset_id' => $parent['AssetsAsset']['id'],
-			'model' => $parent['AssetsAsset']['model'],
-			'foreign_key' => $parent['AssetsAsset']['foreign_key'],
-			'adapter' => $parent['AssetsAsset']['adapter'],
+		$asset = $Assets->newEntity([
+			'parent_asset_id' => $parent->id,
+			'model' => $parent->model,
+			'foreign_key' => $parent->foreign_key,
+			'adapter' => $parent->adapter,
 			'path' => $path,
 			'hash' => $hash,
-		));
-		return $Asset->save($asset);
+		]);
+		return $Assets->save($asset);
 	}
 
 }

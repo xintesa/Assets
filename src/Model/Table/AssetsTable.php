@@ -66,13 +66,9 @@ class AssetsTable extends AssetsAppTable {
 		return true;
 	}
 
-	public function beforeDelete($cascade = true) {
-		if (!parent::beforeDelete($cascade)) {
-			return false;
-		}
+	public function beforeDelete(Event $event, EntityInterface $entity, ArrayObject $options = null) {
 		$Event = Croogo::dispatchEvent('FileStorage.beforeDelete', $this, array(
-			'cascade' => $cascade,
-			'adapter' => $this->field('adapter'),
+			'record' => $entity,
 		));
 		if ($Event->isStopped()) {
 			return false;

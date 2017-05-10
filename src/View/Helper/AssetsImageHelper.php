@@ -28,8 +28,8 @@ class AssetsImageHelper extends ImageHelper {
 			$options['uploadsDir'] = 'uploads';
 		}
 		$result = parent::resize($path, $width, $height, $options, $htmlAttributes, $return);
-		$data = compact('result', 'path', 'width', 'height', 'aspect', 'htmlAttributes', 'adapter');
-		Croogo::dispatchEvent('Assets.AssetsImageHelper.resize', $this->_View, $data);
+		$record = compact('result', 'path', 'width', 'height', 'aspect', 'htmlAttributes', 'adapter');
+		Croogo::dispatchEvent('Assets.AssetsImageHelper.resize', $this->_View, compact('record'));
 		return $result;
 	}
 

@@ -82,34 +82,45 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 		}
 	}
 
-	public function onBeforeDelete($Event) {
-		$model = $Event->subject();
-		if (!$this->_check($Event)) {
+	public function onBeforeDelete($event) {
+		$model = $event->subject();
+		if (!$this->_check($event)) {
 			return true;
 		}
-		$model = $Event->subject();
+
+		$entity = $event->data['record'];
+
+		$model = $event->subject();
 		$fields = array('adapter', 'path');
-		$data = $model->findById($model->id, $fields);
-		$asset =& $data['AssetsAsset'];
-		$filesystem = StorageManager::adapter($asset['adapter']);
-		$key = str_replace('/assets', '', $asset['path']);
+		$data = $model->get($entity->id, compact('fields'));
+
+
+		$filesystem = StorageManager::adapter($data->adapter);
+		$key = str_replace('/assets', '', $data->path);
 		if ($filesystem->has($key)) {
 			$filesystem->delete($key);
 		}
-		return $model->deleteAll(array('parent_asset_id' => $model->id), true, true);
+
+		$forDeletions = $model->find()
+			->select(['id', 'adapter', 'path'])
+			->where(['parent_asset_id' => $entity->id])
+			->toArray();
+		foreach ($forDeletions as $toDelete) {
+			$model->delete($toDelete);
+		}
+		return true;
 	}
 
 /**
  * Find parent of the resized image
  */
 	protected function _parentAsset($attachment) {
-		$path = $attachment['AssetsAttachment']['import_path'];
+		$path = $attachment->import_path;
 		$parts = pathinfo($path);
 		list($filename, ) = explode('.', $parts['filename'], 2);
 		$filename = rtrim(WWW_ROOT, '/') . $parts['dirname'] . '/' . $filename . '.' . $parts['extension'];
 		$hash = sha1_file($filename);
-		$this->Attachment->AssetsAsset->recursive = -1;
-		return $this->Attachment->AssetsAsset->findByHash($hash);
+		return $this->Attachments->Assets->findByHash($hash)->first();
 	}
 
 }
