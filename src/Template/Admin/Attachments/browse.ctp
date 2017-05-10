@@ -292,24 +292,24 @@ $this->append('table-body');
 		));
 
 		$title = $this->Html->para(null, $attachment->title);
-		$title .= $this->Html->para(null,
+		$title .= $this->Html->para('small',
 			$this->Text->truncate(
 				$attachment->asset->filename, 30
 			) . '&nbsp;' . $urlPopover,
 			array('title' => $attachment->asset->filename)
 		);
 
-		$title .= $this->Html->para(null, 'Dimension: ' .
+		$title .= $this->Html->para('small', 'Dimension: ' .
 			$attachment->asset->width . ' x ' .
 			$attachment->asset->height
 		);
 
-		$title .= $this->Html->para(null,
+		$title .= $this->Html->para('small',
 			'Size: ' . $this->Number->toReadableSize($attachment->asset->filesize)
 		);
 
 		if (empty($this->request->query['all']) && empty($this->request->query['asset_id'])) {
-			$title .= $this->Html->para(null,
+			$title .= $this->Html->para('small',
 				'Number of versions: ' . $attachment->asset_count
 			);
 		}
