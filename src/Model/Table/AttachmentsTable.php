@@ -47,7 +47,13 @@ class AttachmentsTable extends AssetsAppTable {
 			],
 		]);
 
-		$this->addBehavior('Croogo/Core.Trackable');
+		$this->addBehavior('Timestamp');
+		$this->addBehavior('Croogo/Core.Trackable', [
+			'fields' => [
+				'created_by' => 'created_by',
+				'updated_by' => 'modified_by',
+			]
+		]);
 		$this->addBehavior('Search.Search');
 		//$this->addBehavior('Burzum/Imagine.Imagine');
 
@@ -255,7 +261,7 @@ class AttachmentsTable extends AssetsAppTable {
 			'hash' => $hash,
 			'status' => true,
 			'created' => date('Y-m-d H:i:s', $stat[9]),
-			'updated' => date('Y-m-d H:i:s', time()),
+			'modified' => date('Y-m-d H:i:s', time()),
 		));
 		return $asset;
 	}

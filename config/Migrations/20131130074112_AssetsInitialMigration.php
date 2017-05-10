@@ -48,10 +48,10 @@ class AssetsInitialMigration extends AbstractMigration {
 			->addColumn('created_by', 'integer', [
 				'null' => true,
 			])
-			->addColumn('updated', 'datetime', [
+			->addColumn('modified', 'datetime', [
 				'null' => true,
 			])
-			->addColumn('updated_by', 'integer', [
+			->addColumn('modified_by', 'integer', [
 				'null' => true,
 			])
 			->addIndex(['hash'], [

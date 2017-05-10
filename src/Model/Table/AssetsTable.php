@@ -36,6 +36,7 @@ class AssetsTable extends AssetsAppTable {
 			],
 		]);
 
+		$this->addBehavior('Timestamp');
 		$this->addBehavior('Search.Search');
 		$this->addBehavior('Croogo/Core.Trackable');
 
