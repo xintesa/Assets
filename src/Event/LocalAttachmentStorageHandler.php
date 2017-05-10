@@ -122,8 +122,11 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 		$parts = pathinfo($path);
 		list($filename, ) = explode('.', $parts['filename'], 2);
 		$filename = rtrim(WWW_ROOT, '/') . $parts['dirname'] . '/' . $filename . '.' . $parts['extension'];
-		$hash = sha1_file($filename);
-		return $this->Attachments->Assets->findByHash($hash)->first();
+		if (file_exists($filename)) {
+			$hash = sha1_file($filename);
+			return $this->Attachments->Assets->findByHash($hash)->first();
+		}
+		return false;
 	}
 
 }

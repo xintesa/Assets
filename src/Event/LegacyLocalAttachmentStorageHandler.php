@@ -108,8 +108,11 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		}
 
 		$filename = rtrim(WWW_ROOT, '/') . $dirname . '/' . $filename . '.' . $parts['extension'];
-		$hash = sha1_file($filename);
-		return $this->Attachments->Assets->findByHash($hash)->first();
+		if (file_exists($filename)) {
+			$hash = sha1_file($filename);
+			return $this->Attachments->Assets->findByHash($hash)->first();
+		}
+		return false;
 	}
 
 }
