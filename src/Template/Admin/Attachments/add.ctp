@@ -24,12 +24,14 @@ $this->Croogo->adminScript(array(
 	'Xintesa/Assets.fileupload/jquery.fileupload-ui',
 ));
 
+$indexUrl = [
+	'plugin' => 'Xintesa/Assets',
+	'controller' => 'Attachments',
+	'action' => 'index'
+];
+
 $this->Breadcrumbs
-	->add(__d('croogo', 'Attachments'), [
-		'plugin' => 'Xintesa/Assets',
-		'controller' => 'Attachments',
-		'action' => 'index'
-	])
+	->add(__d('croogo', 'Attachments'), $indexUrl)
 	->add(__d('croogo', 'Upload'), $this->request->getUri()->getPath());
 
 if ($this->layout === 'admin_popup'):
@@ -131,11 +133,13 @@ $this->append('form-end', $this->Form->end());
 
 $editorMode = isset($formUrl['editor']) ? $formUrl['editor'] : 0;
 $xhrUploadUrl = $this->Url->build($formUrl);
+$redirectUrl = $this->Url->build($indexUrl);
 $script =<<<EOF
 
 	\$('[data-toggle=tab]:first').tab('show');
 	var filesToUpload = [];
 	var uploadContext = [];
+	var uploadResults = [];
 	var \$form = \$('#attachment-upload-form');
 	\$form.fileupload({
 		url: '$xhrUploadUrl',
@@ -146,23 +150,87 @@ $script =<<<EOF
 			uploadContext.push(data.context);
 		}
 	});
-	\$('#start_upload').one('click', function(e) {
+
+	var \$startUpload = $('#start_upload');
+
+	var uploadHandler = function(e) {
+		var self = this;
 		for (var i in filesToUpload) {
-			\$form.fileupload('send', {
+			var xhr = \$form.fileupload('send', {
 				files: [filesToUpload[i]],
 				context: uploadContext[i]
-			});
+			})
+				.success(function(result, textStatus, jqXHR) {
+					uploadResults.push(result);
+				})
+				.error(function(jqXHR, textStatus, errorThrown) {
+					if (jqXHR.responseJSON) {
+						uploadResults.push(jqXHR.responseJSON);
+					} else {
+						uploadResults.push(errorThrown);
+					}
+				});
 		}
-		e.preventDefault();
-		if (filesToUpload.length > 0 && $editorMode == 1) {
-			$(this).text('Close').one('click', function(e) {
-				e.preventDefault();
-				window.close();
-				return false;
-			});
-		}
+
+		\$startUpload.html('<i class="fa fa-spin fa-spinner"></i> Upload')
+			.attr('disabled', true);
+
+		var checkInterval = setInterval(function() {
+			var uploadCount = filesToUpload.length;
+			var uploadSuccess = false;
+			var errorMessage = false;
+			for (var i = 0; i < uploadCount; i++) {
+				if (typeof uploadResults[i] !== 'undefined') {
+					if (typeof uploadResults[i].error !== 'undefined') {
+						uploadSuccess = uploadResults[i].error === false;
+					}
+					if (typeof uploadResults[i].message !== 'undefined') {
+						errorMessage = uploadResults[i].message;
+						uploadSuccess = false
+					}
+
+				}
+				if (!uploadSuccess) {
+					break;
+				}
+			}
+
+			if (uploadSuccess) {
+				clearInterval(checkInterval);
+				if (uploadCount > 1) {
+					alert(uploadCount + ' files uploaded successfully');
+				}
+				if ($editorMode == 1) {
+					\$startUpload
+						.removeAttr('disabled')
+						.text('Close')
+						.one('click', function(e) {
+							e.preventDefault();
+							window.close();
+							return false;
+						});
+				} else {
+					window.location = '$redirectUrl';
+				}
+			}
+
+			if (errorMessage) {
+				clearInterval(checkInterval);
+				alert(errorMessage)
+				filesToUpload = [];
+				uploadContext = [];
+				uploadResults = [];
+				\$('#start_upload')
+					.html('Upload')
+					.removeAttr('disabled')
+					.one('click', self);
+			}
+		}, 1000);
+
 		return false;
-	});
+	};
+
+	\$startUpload.one('click', uploadHandler);
 EOF;
 
 $this->Js->buffer($script);
