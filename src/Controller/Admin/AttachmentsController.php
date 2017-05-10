@@ -95,27 +95,30 @@ class AttachmentsController extends AppController {
 			$this->set(compact('model', 'foreignKey'));
 			unset($this->request->query['model']);
 			unset($this->request->query['foreign_key']);
+		} elseif (
+			isset($this->request->query['asset_id']) ||
+			isset($this->request->query['all'])
+		) {
+			$finder = 'versions';
+			$model = $this->request->query('model');
+			$foreignKey = $this->request->query('foreign_key');
+			$this->set(compact('model', 'foreignKey'));
+			unset($this->request->query['model']);
+			unset($this->request->query['foreign_key']);
+
+			if (!$this->request->query('sort')) {
+				$query->order([
+					$this->Attachments->aliasField('id') => 'desc',
+				]);
+			}
+		} else {
+			$query->where([
+				'Assets.parent_asset_id IS' => null,
+			]);
 		}
 
 		if (!$this->request->query('sort')) {
 			$query->order(['Attachments.created' => 'DESC']);
-		} else {
-			if (isset($this->request->query['asset_id']) ||
-				isset($this->request->query['all'])
-			) {
-				$finder = 'versions';
-				$model = $this->request->query('model');
-				$foreignKey = $this->request->query('foreign_key');
-				$this->set(compact('model', 'foreignKey'));
-				unset($this->request->query['model']);
-				unset($this->request->query['foreign_key']);
-
-				if (!$this->request->query('sort')) {
-					$query->order([
-						$this->Attachments->aliasField('id') => 'desc',
-					]);
-				}
-			}
 		}
 
 		if ($isChooser) {
