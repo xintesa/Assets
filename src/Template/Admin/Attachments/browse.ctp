@@ -13,6 +13,8 @@ a i[class^=icon]:hover { text-decoration: none; }
 <?php
 $this->end();
 
+$this->Breadcrumbs->add(__d('croogo', 'Attachments'));
+
 $this->Html->script('Xintesa/Assets.admin', array('block' => 'scriptBottom'));
 
 $assetId = $filter = $filename = $type = $all = null;
