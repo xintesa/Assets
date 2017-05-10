@@ -108,8 +108,8 @@ foreach ($attachments as $attachment):
 			'title' => $attachment->title
 		]);
 	else:
-		$imgUrl = $this->Html->image('Croogo/Core./img/icons/page_white.png') . ' ' . $attachment->asset->filename;
-		$thumbnail = $this->Html->link($imgUrl,
+		$imgUrl = $this->Html->image('Croogo/Core./img/icons/page_white.png') . ' ';
+		$thumbnail = $imgUrl . $this->Html->link($attachment->asset->filename,
 			$attachment->asset->path, array(
 				'escape' => false,
 				'target' => '_blank',
