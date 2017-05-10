@@ -97,7 +97,7 @@ class AttachmentsController extends AppController {
 			unset($this->request->query['foreign_key']);
 		}
 
-		if ($this->request->query('sort')) {
+		if (!$this->request->query('sort')) {
 			$query->order(['Attachments.created' => 'DESC']);
 		} else {
 			if (isset($this->request->query['asset_id']) ||
