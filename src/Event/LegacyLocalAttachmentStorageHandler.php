@@ -2,9 +2,13 @@
 
 namespace Xintesa\Assets\Event;
 
+use Cake\Event\Event;
 use Cake\Event\EventListenerInterface;
+use Cake\Log\LogTrait;
 
 class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements EventListenerInterface {
+
+	use LogTrait;
 
 	public function implementedEvents() {
 		return array(
@@ -20,11 +24,11 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 		}
 
 		$model = $Event->subject();
-		$storage =& $model->data[$model->alias];
+		$storage =& $event->data['record'];
 
-		if (empty($storage['file'])) {
-			if (isset($storage['path']) && empty($storage['filename'])) {
-				$path = rtrim(WWW_ROOT, '/') . $storage['path'];
+		if (empty($storage->file)) {
+			if (isset($storage->path) && empty($storage->filename)) {
+				$path = rtrim(WWW_ROOT, '/') . $storage->path;
 				$fp = fopen($path, 'r');
 				$stat = fstat($fp);
 				$imageInfo = $this->__getImageInfo($path);
@@ -39,8 +43,8 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 			return true;
 		}
 
-		$file = $storage['file'];
-		$adapter = StorageManager::adapter($storage['adapter']);
+		$file = $storage->file;
+		$adapter = StorageManager::adapter($storage->adapter);
 		try {
 			$raw = file_get_contents($file['tmp_name']);
 			$extension = substr($file['name'], strrpos($file['name'], '.') + 1);

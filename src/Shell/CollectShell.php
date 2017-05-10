@@ -2,7 +2,10 @@
 
 namespace Xintesa\Assets\Shell;
 
-class CollectShell extends AppShell {
+use Cake\Console\Shell;
+use Cake\ORM\TableRegistry;
+
+class CollectShell extends Shell {
 
 	public function getOptionParser() {
 		return parent::getOptionParser()
@@ -24,14 +27,14 @@ class CollectShell extends AppShell {
 
 	public function main() {
 		$dir = $this->args[0];
-		$regex = '.*\.(jpg)';
+		$regex = '.*\.(jpg)|(jpeg)|(png)';
 		if (strpos($dir, ',') !== false) {
 			$dir = explode(',', $dir);
 		}
 		if (isset($this->params['regex'])) {
 			$regex = $this->params['regex'];
 		}
-		$Attachment = ClassRegistry::init('Assets.AssetsAttachment');
+		$Attachment = TableRegistry::get('Xintesa/Assets.Attachments');
 		$importTask = $Attachment->importTask((array)$dir, $regex);
 		if (!empty($importTask['error'])) {
 			$this->out('<error>Warnings/Errors:</error>');

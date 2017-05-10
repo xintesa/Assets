@@ -6,6 +6,7 @@ use ArrayObject;
 use Cake\ORM\Query;
 use Cake\Event\Event;
 use Cake\Datasource\EntityInterface;
+use Cake\Filesystem\Folder;
 use Cake\Utility\Hash;
 use Croogo\Core\Croogo;
 use Xintesa\Assets\Model\Table\AssetsAppTable;
@@ -87,24 +88,17 @@ class AttachmentsTable extends AssetsAppTable {
 /**
  * Find duplicates based on hash
  */
-	protected function _findDuplicate($state, $query, $results = array()) {
-		if ($state == 'before') {
-			if (empty($query['hash'])) {
-				return array();
-			}
-			$hash = $query['hash'];
-			$query = Hash::merge($query, array(
-				'type' => 'first',
-				'recursive' => -1,
-				'conditions' => array(
-					$this->escapeField('hash') => $hash,
-				),
-			));
-			unset($query['hash']);
+	public function findDuplicate(Query $query, array $options) {
+
+		if (empty($options['hash'])) {
 			return $query;
-		} else {
-			return $results;
 		}
+		$hash = $options['hash'];
+		$query->where([
+			$this->aliasField('hash') => $hash,
+		]);
+		return $query;
+
 	}
 
 	public function findModelAttachments(Query $query, array $options) {
@@ -237,20 +231,20 @@ class AttachmentsTable extends AssetsAppTable {
 			throw new InvalidArgumentException(__('{0} cannot be found', $file));
 		}
 
-		$finfo = new finfo(FILEINFO_MIME_TYPE);
+		$finfo = new \finfo(FILEINFO_MIME_TYPE);
 		$fp = fopen($file, 'r');
 		$stat = fstat($fp);
 		fclose($fp);
 		$hash = sha1_file($file);
 		$duplicate = isset($hash) ?
-			$this->find('duplicate', array('hash' => $hash)) :
+			$this->find('duplicate', array('hash' => $hash))->toArray() :
 			false;
 		if ($duplicate) {
-			$firstDupe = $duplicate[0]['Attachments']['id'];
+			$firstDupe = $duplicate[0]->id;
 			return sprintf('%s is duplicate to asset: %s', str_replace(APP, '', $file), $firstDupe);
 		}
 		$path = str_replace(rtrim(WWW_ROOT, '/'), '', $file);
-		$asset = $this->create(array(
+		$asset = $this->newEntity(array(
 			'path' => $path,
 			'import_path' => $path,
 			'title' => basename($file),
@@ -273,9 +267,9 @@ class AttachmentsTable extends AssetsAppTable {
 		$error = array();
 		foreach ($files as $file) {
 			$asset = $this->createFromFile($file);
-			if (is_array($asset)) {
+			if ($asset instanceof EntityInterface) {
 				$data[] = $asset;
-				$copy[] = array('from' => $asset['Attachments']['import_path']);
+				$copy[] = array('from' => $asset->import_path);
 				$error[] = null;
 			} else {
 				$data[] = null;
@@ -297,10 +291,13 @@ class AttachmentsTable extends AssetsAppTable {
 			if (!$source) {
 				continue;
 			}
-			$task['data'][$i]['AssetsAsset']['model'] = $this->alias;
-			$task['data'][$i]['AssetsAsset']['adapter'] = 'LegacyLocalAttachment';
-			$task['data'][$i]['AssetsAsset']['path'] = $source['from'];
-			$result = $this->saveAll($task['data'][$i], array('atomic' => true));
+
+			$task['data'][$i]->asset = $this->Assets->newEntity([
+				'model' => 'Attachments',
+				'adapter' => 'LegacyLocalAttachment',
+				'path' => $source['from'],
+			]);
+			$result = $this->save($task['data'][$i], array('atomic' => true));
 			if ($result) {
 				$imports++;
 			} else {
@@ -320,7 +317,7 @@ class AttachmentsTable extends AssetsAppTable {
  */
 	public function importTask($dirs = array(), $regex = '.*', $options = array()) {
 		$options = Hash::merge(array(
-			'recursive' => false,
+			'recursive' => true,
 		), $options);
 		foreach ($dirs as $dir) {
 			if (substr($dir, -1) === '/') {
