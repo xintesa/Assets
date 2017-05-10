@@ -116,18 +116,34 @@ $this->append('table-body');
 		$rows[] = array(
 			$attachment->id,
 			$thumbnail,
-			$this->Html->div(null, $attachment->title) . '&nbsp;' .
-			$this->Html->link(
-				$this->Url->build($path, true),
-				$path,
-				array(
-					'target' => '_blank',
-				)
-			),
+			[
+				$this->Html->div(null, $attachment->title) .
+				$this->Html->link(
+					$this->Url->build($path, true),
+					$path,
+					[
+						'target' => '_blank',
+					]
+				),
+				['class' => 'title']
+			],
 			$assetCount,
 			$actions,
 		);
 	}
 
 	echo $this->Html->tableCells($rows);
+$this->end();
+
+$this->append('page-footer');
+?>
+<style>
+	td.title {
+		text-overflow: ellipsis;
+		max-width: 300px;
+		white-space: nowrap;
+		overflow: hidden;
+	}
+</style>
+<?php
 $this->end();
