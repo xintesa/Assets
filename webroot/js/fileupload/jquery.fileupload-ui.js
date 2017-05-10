@@ -567,9 +567,9 @@
                             dfd.resolveWith(node);
                         }
                     }
-                ).toggleClass('in');
+                ).toggleClass('show');
             } else {
-                node.toggleClass('in');
+                node.toggleClass('show');
                 dfd.resolveWith(node);
             }
             return dfd;
