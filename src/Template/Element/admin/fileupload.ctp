@@ -104,7 +104,7 @@ $cancelIcon = $this->Html->icon('delete');
                 {% } %}
             </p>
             {% if (file.error) { %}
-                <div><span class="label label-danger">Error</span> {%=file.error%}</div>
+                <div><span class="badge badge-danger">Error</span> {%=file.error%}</div>
             {% } %}
         </td>
         <td>

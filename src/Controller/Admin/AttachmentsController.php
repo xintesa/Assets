@@ -164,16 +164,15 @@ class AttachmentsController extends AppController {
 
 		if ($this->request->is('post')) {
 
-/*
-			if (empty($this->data['Attachments'])) {
-				$this->Attachments->invalidate('file', __d('croogo', 'Upload failed. Please ensure size does not exceed the server limit.'));
-				return;
+			$data = $this->request->getData();
+			if (!empty($data)) {
+				$entity = $this->Attachments->newEntity($data);
+				$errors = $entity->errors();
+			} else {
+				$errors = [
+					'file' => __d('croogo', 'Upload failed. Please ensure size does not exceed the server limit.')
+				];
 			}
-*/
-
-			$entity = $this->Attachments->newEntity($this->request->data());
-
-			$errors = $entity->errors();
 
 			if (empty($errors)) {
 				$attachment = $this->Attachments->save($entity);
@@ -201,8 +200,10 @@ class AttachmentsController extends AppController {
 						'size' => $attachment->asset->filesize,
 					));
 				} else {
-					$files = array(array('error' => $errors));
 					$error = implode("\n", Hash::flatten($errors));
+					$files = array(array(
+						'error' => $error,
+					));
 				}
 
 				$this->set(compact('files', 'error'));
