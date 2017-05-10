@@ -15,7 +15,11 @@ $this->end();
 
 $this->Breadcrumbs->add(__d('croogo', 'Attachments'));
 
-$this->Html->script('Xintesa/Assets.admin', array('block' => 'scriptBottom'));
+$this->Croogo->adminScript([
+	'Croogo/Wysiwyg.wysiwyg',
+	'Croogo/Ckeditor.wysiwyg',
+	'Xintesa/Assets.admin',
+]);
 
 $assetId = $filter = $filename = $type = $all = null;
 if (empty($model) && !empty($this->request->query['model'])):
@@ -40,8 +44,6 @@ if (!empty($this->request->query['all'])):
 	$all = $this->request->query['all'];
 endif;
 
-$extractPath = "asset.asset_usage.{n}[model=$model][foreign_key=$foreignKey]";
-
 $this->append('action-buttons');
 	echo $this->Croogo->adminAction(
 		__d('croogo', 'New Attachment'),
@@ -51,18 +53,19 @@ $this->append('action-buttons');
 		)
 	) . ' ';
 
-	$listUrl = array(
+	$listUrl = [
 		'controller' => 'Attachments',
 		'action' => 'browse',
-		'?' => array(
+	];
+	if (isset($model) && isset($foreignKey)):
+		$listUrl['?'] = [
 			'model' => $model,
 			'foreign_key' => $foreignKey,
-		),
-	);
+		];
+	endif;
 
 	if (!$all):
 		$listUrl['?']['all'] = true;
-		$listUrl['?'] = array_merge($listUrl['?'], $this->request->query);
 		$listTitle = __d('assets', 'List All Attachments');
 	else:
 		$listTitle = __d('assets', 'List Attachments');
@@ -189,21 +192,24 @@ $this->append('table-body');
 		):
 			unset($query['?']['asset_id']);
 
-			$usage = Hash::extract($attachment, $extractPath);
-			if (empty($usage) && $model !== 'Attachments'):
-				$addUrl = Hash::merge(array(
-					'controller' => 'AssetUsages',
-					'action' => 'add',
-					'?' => array(
-						'asset_id' => $attachment->asset->id,
-						'model' => $model,
-						'foreign_key' => $foreignKey,
-					)
-				), $query);
-				$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
-					'icon' => 'create',
-					'method' => 'post',
-				));
+			if (isset($model) && isset($foreignKey)):
+				$extractPath = "asset.asset_usage.{n}[model=$model][foreign_key=$foreignKey]";
+				$usage = Hash::extract($attachment, $extractPath);
+				if (empty($usage) && $model !== 'Attachments'):
+					$addUrl = Hash::merge(array(
+						'controller' => 'AssetUsages',
+						'action' => 'add',
+						'?' => array(
+							'asset_id' => $attachment->asset->id,
+							'model' => $model,
+							'foreign_key' => $foreignKey,
+						)
+					), $query);
+					$actions[] = $this->Croogo->adminRowAction('', $addUrl, array(
+						'icon' => 'create',
+						'method' => 'post',
+					));
+				endif;
 			endif;
 		elseif ($mimeType === 'image'):
 
@@ -279,8 +285,9 @@ $this->append('table-body');
 			'icon' => 'link',
 			'iconSize' => 'small',
 			'data-title' => __d('croogo', 'URL'),
-			'data-html' => true,
+			'data-html' => 'true',
 			'data-placement' => 'top',
+			'data-trigger' => 'click|focus',
 			'data-content' => $url,
 		));
 

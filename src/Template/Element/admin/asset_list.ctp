@@ -38,6 +38,7 @@ $detailUrl = array(
 	'controller' => 'attachments',
 	'action' => 'browse',
 	'?' => array(
+		'manage' => true,
 		'model' => $model,
 		'foreign_key' => $id,
 	),
@@ -167,10 +168,11 @@ foreach ($attachments as $attachment):
 endforeach;
 
 $browseUrl = array_merge(
-	Configure::read('Wysiwyg.attachmentBrowseUrl'),
-	array(
-		'?' => array('model' => $model, 'foreign_key' => $id),
-	)
+	Configure::read('Wysiwyg.attachmentBrowseUrl'), [
+		'model' => $model,
+		'foreign_key' => $id,
+		'all' => true
+	]
 );
 
 $uploadUrl = array(

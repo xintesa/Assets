@@ -161,6 +161,10 @@ class AttachmentsTable extends AssetsAppTable {
 			$assetId = $options['asset_id'];
 			unset($options['asset_id']);
 		}
+		if (isset($options['search']['asset_id'])) {
+			$assetId = $options['search']['asset_id'];
+			unset($options['search']['asset_id']);
+		}
 		if (isset($options['model'])) {
 			$model = $options['model'];
 			unset($options['model']);
@@ -194,20 +198,17 @@ class AttachmentsTable extends AssetsAppTable {
 				],
 			]
 		]);
-		$contain = isset($options['contain']) ? $options['contain'] : array();
-		$contain = Hash::merge($contain, [
-			'Assets',
-			'AssetUsages',
-		]);
-		$query->contain($contain);
+
+		$query->contain('Assets');
+
 		if ($assetId && !isset($all)) {
-			$conditions = Hash::merge($options['conditions'], [
+			$conditions = [
 				'OR' => [
 					'Assets.id' => $assetId,
 					'Assets.parent_asset_id' => $assetId,
 				],
-			]);
-			$query->where($conditions);
+			];
+			$query->orWhere($conditions);
 		}
 		return $query;
 	}

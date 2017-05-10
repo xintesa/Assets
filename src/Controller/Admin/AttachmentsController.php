@@ -80,19 +80,18 @@ class AttachmentsController extends AppController {
 
 		$query = $this->Attachments->find();
 
-		$finder = 'modelAttachments';
-
 		$isChooser = false;
 
 		if ($this->request->query('links') || $this->request->query('chooser')) {
 			$isChooser = true;
 		}
 
+		$model = $this->request->query('model');
+		$foreignKey = $this->request->query('foreign_key');
+		$this->set(compact('model', 'foreignKey'));
+
 		if ($this->request->query('manage')) {
 			$finder = 'versions';
-			$model = $this->request->query('model');
-			$foreignKey = $this->request->query('foreign_key');
-			$this->set(compact('model', 'foreignKey'));
 			unset($this->request->query['model']);
 			unset($this->request->query['foreign_key']);
 		} elseif (
@@ -100,9 +99,6 @@ class AttachmentsController extends AppController {
 			isset($this->request->query['all'])
 		) {
 			$finder = 'versions';
-			$model = $this->request->query('model');
-			$foreignKey = $this->request->query('foreign_key');
-			$this->set(compact('model', 'foreignKey'));
 			unset($this->request->query['model']);
 			unset($this->request->query['foreign_key']);
 
@@ -112,6 +108,11 @@ class AttachmentsController extends AppController {
 				]);
 			}
 		} else {
+			if (empty($model) || empty($foreignKey)) {
+				$finder = 'versions';
+			} else {
+				$finder = 'modelAttachments';
+			}
 			$query->where([
 				'Assets.parent_asset_id IS' => null,
 			]);
