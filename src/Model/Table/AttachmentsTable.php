@@ -223,7 +223,11 @@ class AttachmentsTable extends AssetsAppTable {
 				$attachment->slug = $file['name'];
 			}
 			if (empty($attachment->hash)) {
-				$attachment->hash = sha1_file($file['tmp_name']);
+				if (empty($file['tmp_name'])) {
+					return 'Uploaded file is empty';
+				} else {
+					$attachment->hash = sha1_file($file['tmp_name']);
+				}
 			}
 		}
 		return true;

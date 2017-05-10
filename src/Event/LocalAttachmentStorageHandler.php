@@ -50,6 +50,9 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 		$file = $storage->file;
 		$filesystem = StorageManager::adapter($storage->adapter);
 		try {
+			if (!file_exists($file['tmp_name'])) {
+				throw new \Exception($this->Attachments->Assets->checkFileUpload($storage));
+			}
 			$raw = file_get_contents($file['tmp_name']);
 			$key = sha1($raw);
 			$extension = strtolower(FileStorageUtils::fileExtension($file['name']));
