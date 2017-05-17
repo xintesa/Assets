@@ -5,6 +5,7 @@ namespace Xintesa\Assets\Event;
 use Cake\Log\Log;
 use Cake\Event\EventListenerInterface;
 use Cake\ORM\TableRegistry;
+use Croogo\Core\Croogo;
 use Croogo\Core\Nav;
 
 /**
