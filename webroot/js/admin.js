@@ -31,22 +31,42 @@ Assets.popup = function(e) {
 
 Assets.changeUsageType = function(e) {
 	var $target = $(e.currentTarget);
-	var $editable = $target.parents('tr').find('.usage-type.editable');
 	var type = 'FeaturedImage';
+
 	e && e.preventDefault();
-	var curValue = $editable.editable('getValue');
-	if (curValue.type !== '') {
-		return alert('Type already set');
-	}
+
+	var curValue = $target.val();
 	var postData = {
 		pk: $target.data('pk'),
-		value: $target.data('value')
+		value: curValue,
 	};
-	$.post($target.attr('href'), postData, function(data, textStatus) {
-		$target.parents('tr').find('.usage-type.editable').editable('setValue', type, type);
+	$.post($target.data('url'), postData, function(data, textStatus) {
+		$target.select2('destroy');
+		if (curValue) {
+			$target.html('<option value="' + curValue + '">' + curValue + '</option>')
+		} else {
+			$target.html('');
+		}
+		$target.select2({placeholder: {id: '', text: ''}})
 	});
 	return false;
 };
+
+Assets.setFeaturedImage = function(e) {
+	var $target = $(e.currentTarget)
+	var pk = $target.data('pk');
+	var curValue = 'FeaturedImage';
+	var $select = $('.change-usage-type[data-pk=' + pk + ']');
+	$select
+		.select2('destroy')
+		.html('<option value="' + curValue + '">' + curValue + '</option>')
+		.val(curValue)
+		.change()
+		.select2({placeholder: {id: '', text: ''}})
+
+	e && e.preventDefault();
+	return false;
+}
 
 Assets.unregisterAssetUsage = function(e) {
 	e && e.preventDefault();
@@ -93,6 +113,7 @@ $(function() {
 	$body.on('click', 'a[data-toggle=browse]', Assets.popup);
 	$body.on('click', 'a[data-toggle=refresh]', Assets.reloadAssetsTab);
 	$body.on('click', 'a[data-toggle=resize-asset]', Assets.resizeAsset);
-	$body.on('click', 'a.change-usage-type', Assets.changeUsageType);
+	$body.on('change', '.change-usage-type', Assets.changeUsageType);
 	$body.on('click', 'a.unregister-usage', Assets.unregisterAssetUsage);
+	$body.on('click', 'a.set-featured-image', Assets.setFeaturedImage);
 });

@@ -10,13 +10,13 @@ class AssetUsagesController extends AppController {
 		'Assets.AssetsAssetUsage',
 	);
 
-	public function beforeFilter(Event $event) {
-		parent::beforeFilter($event);
+	public function initialize() {
+		parent::initialize();
 
 		$excludeActions = array(
-			'change_type', 'unregister',
+			'changeType', 'unregister',
 		);
-		if (in_array($this->request->params['action'], $excludeActions)) {
+		if (in_array($this->request->param('action'), $excludeActions)) {
 			$this->Security->config('validatePost', false);
 			$this->eventManager()->off($this->Csrf);
 		}
@@ -55,8 +55,8 @@ class AssetUsagesController extends AppController {
 		$this->redirect($this->referer());
 	}
 
-	public function change_type() {
-		$this->viewClass = 'Json';
+	public function changeType() {
+		$this->viewBuilder()->className('Json');
 		$result = true;
 		$data = array('pk' => null, 'value' => null);
 		if (isset($this->request->data['pk'])) {
@@ -69,8 +69,9 @@ class AssetUsagesController extends AppController {
 		$value = $data['value'];
 
 		if (isset($id)) {
-			$this->AssetsAssetUsage->id = $id;
-			$result = $this->AssetsAssetUsage->saveField('type', $value);
+			$entity = $this->AssetUsages->get($id);
+			$entity->set('type', $value);
+			$result = $this->AssetUsages->save($entity);
 		}
 		$this->set(compact('result'));
 		$this->set('_serialize', 'result');

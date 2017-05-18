@@ -130,12 +130,22 @@ foreach ($attachments as $attachment):
 
 	$detailUrl['?']['asset_id'] = $attachment->asset->id;
 
-	$typeCell = $this->Html->link($attachment->asset_usage->type, 'javascript:void(0)', array(
-		'class' => 'editable editable-click usage-type',
+	$typeCell = $this->Form->input('usage-type', [
+		'type' => 'select',
+		'label' => false,
+		'options' => [
+			$attachment->asset_usage->type => $attachment->asset_usage->type,
+		],
+		'class' => 'change-usage-type',
 		'data-pk' => $attachment->asset_usage->id,
 		'data-url' => $this->Url->build($changeTypeUrl),
 		'data-name' => 'type',
-	));
+		'data-theme' => 'bootstrap',
+		'data-width' => '150px',
+		'data-tags' => 'true',
+		'data-allow-clear' => 'true',
+		'data-token-separators' => [' ', ','],
+	]);
 
 	$row[] = $preview;
 	$row[] = $typeCell;
@@ -150,9 +160,8 @@ foreach ($attachments as $attachment):
 
 		$action[] = $this->Croogo->adminRowAction('', $changeTypeUrl, array(
 			'icon' => 'star',
-			'class' => 'change-usage-type',
+			'class' => 'set-featured-image',
 			'data-pk' => $attachment->asset_usage->id,
-			'data-value' => 'FeaturedImage',
 			'tooltip' => __d('assets', 'Set as FeaturedImage'),
 		));
 	endif;
@@ -230,10 +239,8 @@ endif;
 <?php
 
 $script =<<<EOF
-	if (typeof $.fn.editable == 'function') {
-		$('.editable').editable();
-	} else {
-		console.log('Note: bootstrap-xeditable plugin not found. Ensure your admin theme provides this plugin or use http://github.com/rchavik/AdminExtras as an alternative.');
+	if (typeof $.fn.select2 == 'function') {
+		$('.usage-type-select2').select2({ placeholder: { id: '', text: ''}})
 	}
 EOF;
 if ($this->request->is('ajax')):
