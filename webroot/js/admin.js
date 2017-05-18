@@ -41,13 +41,15 @@ Assets.changeUsageType = function(e) {
 		value: curValue,
 	};
 	$.post($target.data('url'), postData, function(data, textStatus) {
-		$target.select2('destroy');
+		if ($target.hasClass('select2-hidden-accessible')) {
+			$target.select2('destroy');
+		}
 		if (curValue) {
 			$target.html('<option value="' + curValue + '">' + curValue + '</option>')
 		} else {
 			$target.html('');
 		}
-		$target.select2({placeholder: {id: '', text: ''}})
+		$target.select2()
 	});
 	return false;
 };
@@ -57,12 +59,14 @@ Assets.setFeaturedImage = function(e) {
 	var pk = $target.data('pk');
 	var curValue = 'FeaturedImage';
 	var $select = $('.change-usage-type[data-pk=' + pk + ']');
+	if ($select.hasClass('select2-hidden-accessible')) {
+		$select.select2('destroy');
+	}
 	$select
-		.select2('destroy')
 		.html('<option value="' + curValue + '">' + curValue + '</option>')
 		.val(curValue)
 		.change()
-		.select2({placeholder: {id: '', text: ''}})
+		.select2()
 
 	e && e.preventDefault();
 	return false;

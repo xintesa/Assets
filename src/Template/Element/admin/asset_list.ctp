@@ -143,6 +143,7 @@ foreach ($attachments as $attachment):
 		'data-theme' => 'bootstrap',
 		'data-width' => '150px',
 		'data-tags' => 'true',
+		'data-placeholder' => '',
 		'data-allow-clear' => 'true',
 		'data-token-separators' => [' ', ','],
 	]);
@@ -240,7 +241,7 @@ endif;
 
 $script =<<<EOF
 	if (typeof $.fn.select2 == 'function') {
-		$('.usage-type-select2').select2({ placeholder: { id: '', text: ''}})
+		$('.change-usage-type').select2();
 	}
 EOF;
 if ($this->request->is('ajax')):
