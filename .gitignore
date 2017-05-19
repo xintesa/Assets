@@ -1,6 +1,9 @@
 *.swp
 *.log
+*.lock
 .DS_Store
+
+webroot/js/**/*map
 
 # Composer
 composer.lock
