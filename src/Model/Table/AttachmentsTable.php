@@ -15,6 +15,7 @@ use RuntimeException;
 use Xintesa\Assets\Model\Table\AssetsAppTable;
 use Xintesa\Assets\Utility\StorageManager;
 use Intervention\Image\ImageManagerStatic as Image;
+use InvalidArgumentException;
 
 /**
  * Attachments Model
