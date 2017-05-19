@@ -98,7 +98,7 @@ class LinkedAssetsBehavior extends Behavior {
 					}
 					unset($assetUsage->asset);
 					$assetUsage->clean();
-					$result->$key['DefaultAsset'][] = $assetUsage;
+					$result->{$key}['DefaultAsset'][] = $assetUsage;
 				} elseif ($assetUsage->type === 'FeaturedImage') {
 
 					$result[$key][$assetUsage->type] = $assetUsage->asset;
