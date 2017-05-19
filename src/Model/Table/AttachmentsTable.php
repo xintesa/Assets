@@ -492,6 +492,7 @@ class AttachmentsTable extends AssetsAppTable {
 			'width' => $newWidth,
 			'height' => $newHeight,
 			'filesize' => $image->filesize(),
+			'hash' => sha1($stream),
 		]);
 
 		$asset = $this->Assets->save($entity);
