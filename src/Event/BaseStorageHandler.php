@@ -57,6 +57,9 @@ abstract class BaseStorageHandler {
  * Parse <img> tag and retrieves the value of the 'src' attribute
  */
 	protected function _pathFromHtml($html) {
+		if (!$html) {
+			return;
+		}
 		$doc = new DOMDocument();
 		$doc->loadHTML($html);
 		$imgTags = $doc->getElementsByTagName('img');
@@ -107,6 +110,11 @@ abstract class BaseStorageHandler {
 		}
 
 		$src = $this->_pathFromHtml($Event->data['record']['result']);
+
+		if (!$src){
+			return false;
+		}
+
 		try {
 			$filename = rtrim(WWW_ROOT, '/') . $src;
 			$attachment = $this->Attachments->createFromFile($filename);
