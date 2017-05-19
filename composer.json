@@ -17,6 +17,9 @@
 		"croogo/croogo": "3.0.x-dev",
 		"knplabs/gaufrette": "v0.1.8"
 	},
+	"suggest": {
+		"char0n/ffmpeg-php": "FFMpeg php"
+	},
 	"autoload": {
 		"psr-4": {
 			"Xintesa\\Assets\\": "src"

@@ -11,6 +11,7 @@ use Cake\ORM\Query;
 use Cake\Utility\Hash;
 use Cake\Validation\Validator;
 use Croogo\Core\Croogo;
+use RuntimeException;
 use Xintesa\Assets\Model\Table\AssetsAppTable;
 
 /**
@@ -392,20 +393,22 @@ class AttachmentsTable extends AssetsAppTable {
 			throw new RunTimeException('FFmpegMovie class not found');
 		}
 		$this->recursive = -1;
-		$this->contain(array('AssetsAsset'));
-		$attachment = $this->findById($id);
-		$asset =& $attachment['AssetsAsset'];
-		$path = rtrim(WWW_ROOT, '/') . $asset['path'];
 
-		$info = pathinfo($asset['path']);
+		$attachment = $this->get($id, [
+			'contain' => ['Assets'],
+		]);
+		$asset =& $attachment->asset;
+		$path = rtrim(WWW_ROOT, '/') . $asset->path;
+
+		$info = pathinfo($asset->path);
 		$ind = sprintf('.resized-%dx%d.', $w, $h);
 
-		$uploadsDir = str_replace('/' . $options['uploadsDir'] . '/', '', dirname($asset['path'])) . '/';
 		$filename = $info['filename'] . $ind . 'jpg';
-		$writePath = WWW_ROOT . 'galleries' . DS . $uploadsDir . $filename;
+		$thumbnailPath = $info['dirname'] . DS . $filename;
+		$writePath = rtrim(WWW_ROOT, '/') . $thumbnailPath;
 
-		$ffmpeg = new FFmpegMovie($path, null, 'avconv');
-		$frame = $ffmpeg->getFrame(null, 200, 150);
+		$ffmpeg = new \FFmpegMovie($path, null);
+		$frame = $ffmpeg->getFrame(null, $w, $h);
 		imagejpeg($frame->toGDImage(), $writePath, 100);
 
 		$fp = fopen($writePath, 'r');
@@ -414,21 +417,21 @@ class AttachmentsTable extends AssetsAppTable {
 
 		$adapter = $asset['adapter'];
 
-		$data = $this->AssetsAsset->create(array(
+		$entity = $this->Assets->newEntity([
 			'filename' => $filename,
-			'path' => dirname($asset['path']) . '/' . $filename,
-			'model' => $asset['model'],
-			'extension' => $asset['extension'],
-			'parent_asset_id' => $asset['id'],
-			'foreign_key' => $asset['foreign_key'],
+			'path' => dirname($asset->path) . '/' . $filename,
+			'model' => $asset->model,
+			'extension' => 'jpg',
+			'parent_asset_id' => $asset->id,
+			'foreign_key' => $asset->foreign_key,
 			'adapter' => $adapter,
-			'mime_type' => $asset['mime_type'],
-			'width' => $newWidth,
-			'height' => $newHeight,
+			'mime_type' => 'image/jpeg',
+			'width' => $w,
+			'height' => $h,
 			'filesize' => $stat[7],
-		));
+		]);
 
-		$asset = $this->AssetsAsset->save($data);
+		$asset = $this->Assets->save($entity);
 		return $asset;
 	}
 
