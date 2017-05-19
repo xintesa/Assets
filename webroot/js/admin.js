@@ -57,14 +57,23 @@ Assets.changeUsageType = function(e) {
 Assets.setFeaturedImage = function(e) {
 	var $target = $(e.currentTarget)
 	var pk = $target.data('pk');
-	var curValue = 'FeaturedImage';
+	var newValue = 'FeaturedImage';
 	var $select = $('.change-usage-type[data-pk=' + pk + ']');
+
+	var curValue = $select.val();
+	if (curValue && curValue != newValue) {
+		if (!confirm('Type already set. Overwrite?')) {
+			return false;
+		}
+	}
+
 	if ($select.hasClass('select2-hidden-accessible')) {
 		$select.select2('destroy');
 	}
+
 	$select
-		.html('<option value="' + curValue + '">' + curValue + '</option>')
-		.val(curValue)
+		.html('<option value="' + newValue + '">' + newValue + '</option>')
+		.val(newValue)
 		.change()
 		.select2()
 
