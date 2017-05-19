@@ -96,19 +96,28 @@ $this->append('table-body');
 		), __d('croogo', 'Are you sure?'));
 
 		$path = $attachment->asset->path;
-		if ($mimeType == 'image') {
-
-			$imgUrl = $this->AssetsImage->resize($path, 100, 200,
-				array('adapter' => $attachment->asset->adapter),
-				array('alt' => $attachment->title)
-			);
-			$thumbnail = $this->Html->link($imgUrl, $path, [
-				'escape' => false,
-				'data-toggle' => 'lightbox',
-				'title' => $attachment['AssetsAttachment']['title'],
-			]);
-		} else {
-			$thumbnail = $this->Html->image('Croogo/Core./img/icons/page_white.png', array('alt' => $mimeType)) . ' ' . $mimeType . ' (' . $this->Assets->filename2ext($attachment->asset->path) . ')';
+		switch ($mimeType) {
+			case 'image':
+				$imgUrl = $this->AssetsImage->resize($path, 100, 200, [
+					'adapter' => $attachment->asset->adapter,
+				], [
+					'alt' => $attachment->title
+				]);
+				$thumbnail = $this->Html->link($imgUrl, $path, [
+					'escape' => false,
+					'data-toggle' => 'lightbox',
+					'title' => $attachment['AssetsAttachment']['title'],
+				]);
+			break;
+			default:
+				$thumbnail = sprintf('%s %s (%s)',
+					$this->Html->image('Croogo/Core./img/icons/page_white.png', [
+						'alt' => $mimeType,
+					]),
+					$mimeType,
+					$this->Assets->filename2ext($attachment->asset->path)
+				);
+			break;
 		}
 
 		$actions = $this->Html->div('item-actions', implode(' ', $actions));
