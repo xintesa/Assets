@@ -92,7 +92,7 @@ Assets.unregisterAssetUsage = function(e) {
 Assets.resizeAsset = function(e) {
 	e && e.preventDefault();
 
-	var width = parseInt(prompt('Resize to width: '));
+	var width = parseInt(prompt('Resize to width: ', 300));
 	if (isNaN(width)) {
 		return alert('Invalid number');
 	}
@@ -101,13 +101,25 @@ Assets.resizeAsset = function(e) {
 	var postData = {
 		width: width
 	};
-	$.post($target.attr('href'), postData, function(data, textStatus) {
-		if (textStatus === 'success') {
-			if (typeof data === 'string') {
-				return alert(data);
+	$.ajax({
+		method: 'post',
+		url: $target.attr('href'),
+		data: postData,
+		success: function(data, textStatus) {
+			if (textStatus === 'success') {
+				if (typeof data === 'string') {
+					return alert(data);
+				}
+				return prompt("Asset id: "+ data.id + " created", data.path);
 			}
-			return prompt("Asset id: "+ data.AssetsAsset.id + " created", data.AssetsAsset.path);
 		}
+	})
+	.fail(function(xhr, textStatus, errorThrown) {
+		console.log(xhr, textStatus, errorThrown);
+		if (typeof xhr.responseJSON.message !== 'undefined') {
+			return alert(xhr.responseJSON.message);
+		}
+		return alert(errorThrown);
 	});
 	return false;
 }

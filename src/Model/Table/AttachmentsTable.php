@@ -13,6 +13,8 @@ use Cake\Validation\Validator;
 use Croogo\Core\Croogo;
 use RuntimeException;
 use Xintesa\Assets\Model\Table\AssetsAppTable;
+use Xintesa\Assets\Utility\StorageManager;
+use Intervention\Image\ImageManagerStatic as Image;
 
 /**
  * Attachments Model
@@ -447,72 +449,51 @@ class AttachmentsTable extends AssetsAppTable {
 		$options = Hash::merge(array(
 			'uploadsDir' => 'assets',
 		), $options);
-		$imagine = $this->imagineObject();
-		$this->recursive = -1;
-		$this->contain(array('AssetsAsset'));
-		$attachment = $this->findById($id);
-		$asset =& $attachment['AssetsAsset'];
-		$path = rtrim(WWW_ROOT, '/') . $asset['path'];
+		$attachment = $this->get($id, [
+			'contain' => ['Assets'],
+		]);
+		$asset = $attachment->asset;
+		$path = rtrim(WWW_ROOT, '/') . $asset->path;
 
-		$image = $imagine->open($path);
-		$size = $image->getSize();
-		$width = $size->getWidth();
-		$height = $size->getHeight();
+		$image = Image::make($path);
 
-		if (empty($h) && !empty($w)) {
-			$scale = $w / $width;
-			$newSize = $size->scale($scale);
-		} elseif (empty($w) && !empty($h)) {
-			$scale = $h / $height;
-			$newSize = $size->scale($scale);
-		} else {
-			$scaleWidth = $w / $width;
-			$scaleHeight = $h / $height;
-			$scale = $scaleWidth > $scaleHeight ? $scaleWidth : $scaleHeight;
-			$newSize = $size->scale($scale);
-		}
+		$stream = $image
+			->resize($w, null, function($constraint) {
+				$constraint->aspectRatio();
+				$constraint->upsize();
+			})
+			->stream();
 
-		$newWidth = $newSize->getWidth();
-		$newHeight = $newSize->getHeight();
+		$newWidth = $image->width();
+		$newHeight = $image->height();
 
-		$image->resize($newSize);
-
-		$tmpName = tempnam('/tmp', 'qq');
-		$image->save($tmpName, array('format' => $asset['extension']));
-
-		$fp = fopen($tmpName, 'r');
-		$stat = fstat($fp);
-		fclose($fp);
-
-		$raw = file_get_contents($tmpName);
-		unlink($tmpName);
-
-		$info = pathinfo($asset['path']);
+		$info = pathinfo($asset->path);
 		$ind = sprintf('.resized-%dx%d.', $newWidth, $newHeight);
 
 		$uploadsDir = str_replace('/' . $options['uploadsDir'] . '/', '', dirname($asset['path'])) . '/';
 		$filename = $info['filename'] . $ind . $info['extension'];
 		$writePath = $uploadsDir . $filename;
 
-		$adapter = $asset['adapter'];
-		$filesystem = StorageManager::adapter($adapter);
-		$filesystem->write($writePath, $raw);
+		$adapter = $asset->adapter;
 
-		$data = $this->AssetsAsset->create(array(
+		$filesystem = StorageManager::adapter($adapter);
+		$filesystem->write($writePath, $stream);
+
+		$entity = $this->Assets->newEntity([
 			'filename' => $filename,
-			'path' => dirname($asset['path']) . '/' . $filename,
-			'model' => $asset['model'],
-			'extension' => $asset['extension'],
-			'parent_asset_id' => $asset['id'],
-			'foreign_key' => $asset['foreign_key'],
+			'path' => dirname($asset->path) . '/' . $filename,
+			'model' => $asset->model,
+			'extension' => $asset->extension,
+			'parent_asset_id' => $asset->id,
+			'foreign_key' => $asset->foreign_key,
 			'adapter' => $adapter,
-			'mime_type' => $asset['mime_type'],
+			'mime_type' => $asset->mime_type,
 			'width' => $newWidth,
 			'height' => $newHeight,
-			'filesize' => $stat[7],
-		));
+			'filesize' => $image->filesize(),
+		]);
 
-		$asset = $this->AssetsAsset->save($data);
+		$asset = $this->Assets->save($entity);
 		return $asset;
 	}
 
