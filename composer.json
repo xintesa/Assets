@@ -14,12 +14,17 @@
 	"minimum-stability": "dev",
 	"require": {
 		"php": ">=5.3.0",
-		"croogo/croogo": "3.0.x-dev",
+		"croogo/croogo": "^3.0.0-beta1",
 		"knplabs/gaufrette": "v0.1.8",
 		"intervention/image": "^2.3"
 	},
 	"suggest": {
 		"char0n/ffmpeg-php": "FFMpeg php"
+	},
+	"extra": {
+		"branch-alias": {
+			"3.0-wip-dev": "3.0.x-dev"
+		}
 	},
 	"autoload": {
 		"psr-4": {
