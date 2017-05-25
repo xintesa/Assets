@@ -2,6 +2,11 @@
 
 namespace Xintesa\Assets\Model\Table;
 
+use ArrayObject;
+use Cake\Datasource\EntityInterface;
+use Cake\Event\Event;
+
+
 /**
  * AssetUsages Table
  *
@@ -20,10 +25,10 @@ class AssetUsagesTable extends AssetsAppTable {
 		$this->addBehavior('Croogo/Core.Trackable');
 	}
 
-	public function beforeSave($options = array()) {
-		if (!empty($this->data['AssetsAssetUsage']['featured_image'])) {
-			$this->data['AssetsAssetUsage']['type'] = 'FeaturedImage';
-			unset($this->data['AssetsAssetUsage']['featured_image']);
+	public function beforeSave(Event $event, EntityInterface $entity, ArrayObject $options) {
+		if (!empty($entity->featured_image)) {
+			$entity->type = 'FeaturedImage';
+			$entity->unsetProperty('featured_image');
 		}
 		return true;
 	}
