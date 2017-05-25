@@ -112,8 +112,11 @@ class LinkedAssetsBehavior extends Behavior {
 						])
 						->cache('linked_assets_' . $assetUsage->asset->id, 'nodes')
 						->order(['width' => 'DESC']);
+					if (!isset($result->{$key}['FeaturedImage']->versions)) {
+						$result->{$key}['FeaturedImage']->versions = [];
+					}
 					foreach ($relatedAssets as $related) {
-						$result[$key]['FeaturedImage']['Versions'][] = $related->asset;
+						$result->{$key}['FeaturedImage']->versions[] = $related;
 					}
 
 				} else {
