@@ -116,7 +116,10 @@ abstract class BaseStorageHandler {
 		}
 
 		try {
-			$filename = rtrim(WWW_ROOT, '/') . $src;
+			$base = $Event->subject()->request->base;
+			$filename = rtrim(WWW_ROOT, '/') . preg_replace(
+				'/^' . preg_quote($base, '/') . '/', '', $src
+			);
 			$attachment = $this->Attachments->createFromFile($filename);
 			if (is_string($attachment)) {
 				return false;
