@@ -58,10 +58,7 @@ class AssetsFilterHelper extends Helper {
 			$assetUsage = $AssetUsages->find()
 				->contain('Assets')
 				->where($conditions)
-				->cache([
-					'name' => 'asset_filtered_' . $assetId,
-					'config' => 'nodes',
-				])
+				->cache('asset_filtered_' . $assetId, 'nodes')
 				->first();
 			if (!$assetUsage) {
 				$this->log(sprintf('%s - Asset not found for %s',
