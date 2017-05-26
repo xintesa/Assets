@@ -48,11 +48,12 @@ StorageManager::config('LegacyLocalAttachment', array(
 ));
 
 // TODO: make this configurable via backend
-$actions = array(
-	'Admin/Nodes/edit',
+$actions = [
 	'Admin/Blocks/edit',
+	'Admin/Contacts/edit',
+	'Admin/Nodes/edit',
 	'Admin/Types/edit',
-);
+];
 $tabTitle = __d('assets', 'Assets');
 foreach ($actions as $action):
 	list($controller, ) = explode('/', $action);
@@ -61,9 +62,14 @@ foreach ($actions as $action):
 endforeach;
 
 // TODO: make this configurable via backend
-$models = ['Croogo/Blocks.Blocks', 'Croogo/Nodes.Nodes', 'Croogo/Taxonomy.Types'];
+$models = [
+	'Croogo/Blocks.Blocks',
+	'Croogo/Contacts.Contacts',
+	'Croogo/Nodes.Nodes',
+	'Croogo/Taxonomy.Types',
+];
 foreach ($models as $model) {
-	Croogo::hookBehavior($model, 'Xintesa/Assets.LinkedAssets', array('priority' => 9));
+	Croogo::hookBehavior($model, 'Xintesa/Assets.LinkedAssets', ['priority' => 9]);
 }
 
 Croogo::hookHelper('*', 'Xintesa/Assets.AssetsFilter');
