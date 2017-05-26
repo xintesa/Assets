@@ -1,5 +1,5 @@
-<div class="<?php echo $this->Layout->cssClass('row'); ?>">
-	<div class="<?php echo $this->Layout->cssClass('columnFull'); ?>">
+<div class="<?php echo $this->Theme->getCssClass('row'); ?>">
+	<div class="<?php echo $this->Theme->getCssClass('columnFull'); ?>">
 	<?php
 		echo __d('croogo', 'Sort by:');
 		echo ' ' . $this->Paginator->sort('id', __d('croogo', 'Id'), array('class' => 'sort'));
@@ -9,37 +9,40 @@
 	</div>
 </div>
 
-<div class="<?php echo $this->Layout->cssClass('row'); ?>">
-	<div class="<?php echo $this->Layout->cssClass('columnFull'); ?>">
+<div class="<?php echo $this->Theme->getCssClass('row'); ?>">
+	<div class="<?php echo $this->Theme->getCssClass('columnFull'); ?>">
 		<?php //echo $this->element('FileManager.admin/attachments_search'); ?>
 		<hr />
 	</div>
 </div>
-<div class="<?php echo $this->Layout->cssClass('row'); ?>">
-	<div class="<?php echo $this->Layout->cssClass('columnFull'); ?>">
+<div class="<?php echo $this->Theme->getCssClass('row'); ?>">
+	<div class="<?php echo $this->Theme->getCssClass('columnFull'); ?>">
 		<ul id="attachments-for-links">
-		<?php foreach ($attachments as $attachment) { ?>
+		<?php foreach ($attachments as $attachment): ?>
 			<li>
 			<?php
-				echo $this->Html->link($attachment['AssetsAsset']['filename'],
-					$attachment['AssetsAsset']['path'],
+				echo $this->Html->link($attachment->asset->filename,
+					$attachment->asset->path,
 				array(
 					'class' => 'item-choose',
 					'data-chooser_type' => 'Node',
-					'data-chooser_id' => $attachment['AssetsAsset']['id'],
-					'data-chooser_title' => $attachment['AssetsAsset']['filename'],
-					'rel' => $attachment['AssetsAsset']['path']
+					'data-chooser_id' => $attachment->asset->id,
+					'data-chooser_title' => $attachment->asset->filename,
+					'rel' => $attachment->asset->path,
 				));
 
 				$popup = array();
-				$type = __d('croogo', $attachment['AssetsAsset']['mime_type']);
-				$popup[] = array(
-					__d('croogo', 'Preview'),
-					array($this->Html->image($attachment['AssetsAsset']['path']), array('class' => 'nowrap'))
-				);
+				$type = __d('croogo', $attachment->asset->mime_type);
+
+				if (preg_match('/^image/', $attachment->asset->mime_type)):
+					$popup[] = array(
+						__d('croogo', 'Preview'),
+						[$this->Html->image($attachment->asset->path, ['class' => 'img-thumbnail']), ['class' => 'nowrap']]
+					);
+				endif;
 				$popup[] = array(
 					__d('croogo', 'Created'),
-					array($this->Time->niceShort($attachment['AssetsAsset']['created']), array('class' => 'nowrap'))
+					[$this->Time->nice($attachment->asset->created), ['class' => 'nowrap']]
 				);
 				$popup = $this->Html->tag('table', $this->Html->tableCells($popup), array(
 					'class' => 'table table-condensed',
@@ -48,15 +51,15 @@
 					'class' => 'popovers action',
 					'icon' => $this->Theme->getIcon('info-sign'),
 					'data-title' => $type,
-					'data-trigger' => 'click',
+					'data-trigger' => 'click|focus',
 					'data-placement' => 'right',
-					'data-html' => true,
+					'data-html' => 'true',
 					'data-content' => h($popup),
 				));
-				echo $a;
+				echo '&nbsp;' . $a;
 			?>
 			</li>
-		<?php } ?>
+		<?php endforeach; ?>
 		</ul>
 		<?php echo $this->element('admin/pagination'); ?>
 	</div>

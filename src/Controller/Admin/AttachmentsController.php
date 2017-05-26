@@ -147,7 +147,7 @@ class AttachmentsController extends AppController {
 
 		if ($this->request->query('links') || $this->request->query('chooser')) {
 			$this->viewBuilder()->setLayout('admin_popup');
-			$this->render('admin_chooser');
+			$this->render('chooser');
 		}
 	}
 

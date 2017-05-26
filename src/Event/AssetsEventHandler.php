@@ -64,11 +64,11 @@ class AssetsEventHandler implements EventListenerInterface {
 	public function onSetupLinkChooser($event) {
 		$linkChoosers = array();
 		$linkChoosers['Images'] = array(
-			'title' => 'Asset Image Attachments',
-			'description' => 'Assets Attachments with image mime type',
+			'title' => 'Images',
+			'description' => 'Attachments with an image mime type.',
 			'url' => array(
-				'plugin' => 'assets',
-				'controller' => 'assets_attachments',
+				'plugin' => 'Xintesa/Assets',
+				'controller' => 'Attachments',
 				'acion' => 'index',
 				'?' => array(
 					'chooser_type' => 'image',
@@ -81,11 +81,11 @@ class AssetsEventHandler implements EventListenerInterface {
 			)
 		);
 		$linkChoosers['Files'] = array(
-			'title' => 'Asset Files Attachments',
-			'description' => 'Assets Attachments with other mime types, ie. pdf, xls, doc, etc.',
+			'title' => 'Files',
+			'description' => 'Attachments with other mime types, ie. pdf, xls, doc, etc.',
 			'url' => array(
-				'plugin' => 'assets',
-				'controller' => 'assets_attachments',
+				'plugin' => 'Xintesa/Assets',
+				'controller' => 'Attachments',
 				'acion' => 'index',
 				'?' => array(
 					'chooser_type' => 'file',
@@ -98,7 +98,7 @@ class AssetsEventHandler implements EventListenerInterface {
 			)
 		);
 
-		Croogo::mergeConfig('Menus.linkChoosers', $linkChoosers);
+		Croogo::mergeConfig('Croogo.linkChoosers', $linkChoosers);
 	}
 
 
