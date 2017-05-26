@@ -1,5 +1,7 @@
 <?php
 
+$this->loadHelper('Croogo/FileManager.Filemanager');
+
 $this->extend('/Common/admin_edit');
 
 $this->Breadcrumbs
@@ -32,7 +34,7 @@ $this->append('tab-content');
 			'label' => __d('croogo', 'Title'),
 		));
 		echo $this->Form->input('excerpt', array(
-			'label' => __d('croogo', 'Caption'),
+			'label' => __d('croogo', 'Excerpt'),
 		));
 
 		echo $this->Form->input('file_url', array(
@@ -83,11 +85,14 @@ $this->append('panels');
 	else:
 		$imgUrl = $this->Html->image('Croogo/Core./img/icons/' . $this->Filemanager->mimeTypeToImage($attachment->mime_type)) . ' ' . $attachment->mime_type;
 	endif;
-	echo $this->Html->beginBox(__d('croogo', 'Preview')) .
-		$this->Html->link($imgUrl, $attachment->asset->path, array(
-			'data-toggle' => 'lightbox',
-		));
-	echo $this->Html->endBox();
+
+	if (preg_match('/^image/', $attachment->asset->mime_type)):
+		echo $this->Html->beginBox(__d('croogo', 'Preview')) .
+			$this->Html->link($imgUrl, $attachment->asset->path, array(
+				'data-toggle' => 'lightbox',
+			));
+		echo $this->Html->endBox();
+	endif;
 
 $this->end();
 

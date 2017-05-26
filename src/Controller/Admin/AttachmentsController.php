@@ -273,8 +273,8 @@ class AttachmentsController extends AppController {
 				'Assets',
 			],
 		]);
-		if ($this->request->is('post')) {
-			$attachment = $this->Attachments->patchEntity($this->request->data());
+		if (!empty($this->request->data)) {
+			$attachment = $this->Attachments->patchEntity($attachment, $this->request->data());
 			if ($this->Attachments->save($attachment)) {
 				$this->Flash->success(__d('croogo', 'The Attachment has been saved'));
 				return $this->redirect($redirect);
