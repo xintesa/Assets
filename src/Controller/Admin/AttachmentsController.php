@@ -78,6 +78,10 @@ class AttachmentsController extends AppController {
 	public function index() {
 		$this->set('title_for_layout', __d('croogo', 'Attachments'));
 
+		$this->set('searchFields', [
+			'search',
+		]);
+
 		$query = $this->Attachments->find();
 
 		$isChooser = false;
@@ -108,6 +112,8 @@ class AttachmentsController extends AppController {
 					$this->Attachments->aliasField('id') => 'desc',
 				]);
 			}
+		} elseif ($this->request->query('search')) {
+			$finder = null;
 		} else {
 			if (empty($model) || empty($foreignKey)) {
 				$finder = 'versions';

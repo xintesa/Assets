@@ -25,11 +25,6 @@ class AttachmentsTable extends AssetsAppTable {
 
 	use LogTrait;
 
-	public $filterArgs = array(
-		'filter' => array('type' => 'query', 'method' => 'filterAttachments'),
-		'type' => array('type' => 'value', 'field' => 'AssetsAssetUsage.type'),
-	);
-
 	public $findMethods = array(
 		'duplicate' => true,
 		'modelAttachments' => true,
@@ -63,6 +58,14 @@ class AttachmentsTable extends AssetsAppTable {
 		//$this->addBehavior('Burzum/Imagine.Imagine');
 
 		$this->searchManager()
+			->add('title', 'Search.Like', [
+				'field' => $this->Assets->aliasField('filename'),
+				'before' => true,
+				'after' => true,
+			])
+			->add('search', 'Search.Callback', [
+				'callback' => [$this, 'filterAttachments'],
+			])
 			->add('filename', 'Search.Like', [
 				'field' => $this->Assets->aliasField('filename'),
 				'before' => true,
@@ -85,19 +88,22 @@ class AttachmentsTable extends AssetsAppTable {
 			]);
 	}
 
-	public function filterAttachments($data = array()) {
-		$conditions = array();
-		if (!empty($data['filter'])) {
-			$filter = '%' . $data['filter'] . '%s';
-			$conditions = array(
-				'OR' => array(
-					$this->escapeField('title') . ' LIKE' => $filter,
-					$this->escapeField('excerpt') . ' LIKE' => $filter,
-					$this->escapeField('body') . ' LIKE' => $filter,
-				),
-			);
+	public function filterAttachments($query, $args, $filter) {
+		$conditions = [];
+		if (!empty($args['search'])) {
+			$filter = '%' . $args['search'] . '%';
+			$conditions = [
+				'OR' => [
+					$this->aliasField('title') . ' LIKE' => $filter,
+					$this->aliasField('excerpt') . ' LIKE' => $filter,
+					$this->aliasField('body') . ' LIKE' => $filter,
+				],
+			];
+			$query
+				->contain('Assets')
+				->orWhere($conditions);
 		}
-		return $conditions;
+		return $query;
 	}
 
 /**

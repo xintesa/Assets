@@ -44,6 +44,8 @@ $this->append('table-heading');
 	echo $this->Html->tag('thead', $tableHeaders);
 $this->end();
 
+$this->append('search', $this->element('Croogo/Core.admin/search'));
+
 $this->append('table-body');
 	$rows = array();
 	foreach ($attachments as $attachment) {
