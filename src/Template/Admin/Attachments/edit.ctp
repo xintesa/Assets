@@ -83,7 +83,7 @@ $this->append('panels');
 			array('adapter' => $attachment->asset->adapter)
 		);
 	else:
-		$imgUrl = $this->Html->image('Croogo/Core./img/icons/' . $this->Filemanager->mimeTypeToImage($attachment->mime_type)) . ' ' . $attachment->mime_type;
+		$imgUrl = $this->Html->image('Croogo/Core./img/icons/' . $this->FileManager->mimeTypeToImage($attachment->mime_type)) . ' ' . $attachment->mime_type;
 	endif;
 
 	if (preg_match('/^image/', $attachment->asset->mime_type)):
