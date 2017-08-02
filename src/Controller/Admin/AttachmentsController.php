@@ -39,8 +39,6 @@ class AttachmentsController extends AppController {
 		'limit' => 5,
 	);
 
-	public $presetVars = true;
-
 	public function initialize() {
 		parent::initialize();
 		$this->loadComponent('Search.Prg', [
