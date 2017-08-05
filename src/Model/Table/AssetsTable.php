@@ -28,11 +28,11 @@ class AssetsTable extends AssetsAppTable {
 			'className' => 'Assets.Attachments',
 			'foreignKey' => 'foreign_key',
 			'conditions' => [
-				'AssetsAsset.model' => 'Attachments',
+				'Assets.model' => 'Attachments',
 			],
 			'counterCache' => 'asset_count',
 			'counterScope' => [
-				'AssetsAsset.model' => 'Attachments',
+				'Assets.model' => 'Attachments',
 			],
 		]);
 
