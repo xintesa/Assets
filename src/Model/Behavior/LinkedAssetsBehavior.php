@@ -62,6 +62,7 @@ class LinkedAssetsBehavior extends Behavior {
 		*/
 
 		$query->contain('AssetUsages.Assets');
+		$query->contain('AssetUsages.Assets.Attachments');
 
 		$query->formatResults(function ($resultSet) {
 			return $this->_formatResults($resultSet);
