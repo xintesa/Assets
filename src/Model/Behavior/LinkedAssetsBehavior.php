@@ -100,9 +100,7 @@ class LinkedAssetsBehavior extends Behavior {
 					unset($assetUsage->asset);
 					$assetUsage->clean();
 					$result->{$key}['DefaultAsset'][] = $assetUsage;
-				} elseif ($assetUsage->type === 'FeaturedImage') {
-
-					$result[$key][$assetUsage->type] = $assetUsage->asset;
+				} else {
 
 					$seedId = isset($assetUsage->asset->parent_asset_id) ?
 						$assetUsage->asset->parent_asset_id :
@@ -113,15 +111,19 @@ class LinkedAssetsBehavior extends Behavior {
 						])
 						->cache('linked_assets_' . $assetUsage->asset->id, 'nodes')
 						->order(['width' => 'DESC']);
-					if (!isset($result->{$key}['FeaturedImage']->versions)) {
-						$result->{$key}['FeaturedImage']->versions = [];
+					if (!$assetUsage->versions) {
+						$versions = [];
 					}
 					foreach ($relatedAssets as $related) {
-						$result->{$key}['FeaturedImage']->versions[] = $related;
+						$versions[] = $related;
 					}
+					$assetUsage->versions = $versions;
 
-				} else {
 					$result[$key][$assetUsage->type][] = $assetUsage->asset;
+
+
+				//} else {
+					//$result[$key][$assetUsage->type][] = $assetUsage->asset;
 				}
 			}
 			unset($result->asset_usages);
