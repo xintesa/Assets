@@ -27,7 +27,7 @@ class CollectShell extends Shell {
 
 	public function main() {
 		$dir = $this->args[0];
-		$regex = '.*\.(jpg)|(jpeg)|(png)';
+		$regex = '.*\.(jpg)|(jpeg)|(png)|(pdf)|(mp4)';
 		if (strpos($dir, ',') !== false) {
 			$dir = explode(',', $dir);
 		}
