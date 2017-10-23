@@ -128,6 +128,12 @@ foreach ($attachments as $attachment):
 		$preview .= $this->Html->tag('small', sprintf(
 			'Dimension: %sx%s', $attachment->asset->width, $attachment->asset->height
 		));
+	else:
+		if ($attachment->title):
+			$preview .= sprintf('<small title="%s">%s</small>',
+				$attachment->title, h($attachment->title)
+			);
+		endif;
 	endif;
 
 	$detailUrl['?']['asset_id'] = $attachment->asset->id;
