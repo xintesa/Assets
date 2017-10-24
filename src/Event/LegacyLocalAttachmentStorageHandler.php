@@ -5,6 +5,7 @@ namespace Xintesa\Assets\Event;
 use Cake\Event\Event;
 use Cake\Event\EventListenerInterface;
 use Cake\Log\LogTrait;
+use Xintesa\Assets\Utility\StorageManager;
 
 class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements EventListenerInterface {
 
@@ -79,14 +80,14 @@ class LegacyLocalAttachmentStorageHandler extends BaseStorageHandler implements 
 			return true;
 		}
 		$model = $Event->subject();
+		$entity = $Event->data('record');
 		$fields = array('adapter', 'filename');
-		$data = $model->findById($model->id, $fields);
-		$asset =& $data['AssetsAsset'];
+		$asset = $model->findById($entity->id, $fields)->first();
 		$adapter = StorageManager::adapter($asset['adapter']);
-		if ($adapter->has($asset['filename'])) {
-			$adapter->delete($asset['filename']);
+		if ($adapter->has('filename')) {
+			$adapter->delete($asset->filename);
 		}
-		return $model->deleteAll(array('parent_asset_id' => $model->id), true, true);
+		return $model->deleteAll(array('parent_asset_id' => $entity->id), true, true);
 	}
 
 	protected function _parentAsset($attachment) {
