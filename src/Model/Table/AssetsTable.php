@@ -25,7 +25,7 @@ class AssetsTable extends AssetsAppTable {
 		]);
 
 		$this->belongsTo('Attachments', [
-			'className' => 'Assets.Attachments',
+			'className' => 'Xintesa/Assets.Attachments',
 			'foreignKey' => 'foreign_key',
 			'conditions' => [
 				'Assets.model' => 'Attachments',
