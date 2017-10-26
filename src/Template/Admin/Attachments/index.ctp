@@ -71,9 +71,7 @@ $this->append('table-body');
 				),
 				array('?' => $query)
 			);
-		}
 
-		if (isset($resizeUrl)) {
 			$actions[] = $this->Croogo->adminRowAction('', $resizeUrl, array(
 				'icon' => $this->Theme->getIcon('resize'),
 				'tooltip' => __d('croogo', 'Resize this item'),
