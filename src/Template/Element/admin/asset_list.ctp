@@ -108,6 +108,11 @@ foreach ($attachments as $attachment):
 			'data-toggle' => 'lightbox',
 			'title' => $attachment->title
 		]);
+	elseif ($mimeType === 'video'):
+		$thumbnail = $this->Html->media($attachment->asset->path, [
+			'width' => 200,
+			'controls' => true,
+		]);
 	else:
 		$imgUrl = $this->Html->image('Croogo/Core./img/icons/page_white.png') . ' ';
 		$filename = $attachment->asset->filename;

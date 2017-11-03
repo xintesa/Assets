@@ -109,6 +109,12 @@ $this->append('table-body');
 					'title' => $attachment['AssetsAttachment']['title'],
 				]);
 			break;
+			case 'video':
+				$thumbnail = $this->Html->media($attachment->asset->path, [
+					'width' => 200,
+					'controls' => true,
+				]);
+			break;
 			default:
 				$thumbnail = sprintf('%s %s (%s)',
 					$this->Html->image('Croogo/Core./img/icons/page_white.png', [
