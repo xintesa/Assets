@@ -162,10 +162,10 @@ $script =<<<EOF
 				files: [filesToUpload[i]],
 				context: uploadContext[i]
 			})
-				.success(function(result, textStatus, jqXHR) {
+				.then(function(result, textStatus, jqXHR) {
 					uploadResults.push(result);
 				})
-				.error(function(jqXHR, textStatus, errorThrown) {
+				.catch(function(jqXHR, textStatus, errorThrown) {
 					if (jqXHR.responseJSON) {
 						uploadResults.push(jqXHR.responseJSON);
 					} else {
