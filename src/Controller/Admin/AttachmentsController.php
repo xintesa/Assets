@@ -78,6 +78,15 @@ class AttachmentsController extends AppController {
 
 		$this->set('searchFields', [
 			'search',
+			'model' => [
+				'type' => 'hidden',
+			],
+			'foreign_key' => [
+				'type' => 'hidden',
+			],
+			'all' => [
+				'type' => 'hidden',
+			],
 		]);
 
 		$query = $this->Attachments->find();
