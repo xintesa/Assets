@@ -55,7 +55,6 @@ $foreignKey = isset($this->request->query['foreign_key']) ? $this->request->quer
 
 $this->append('tab-heading');
 	echo $this->Croogo->adminTab(__d('croogo', 'Upload'), '#attachment-upload');
-	echo $this->Croogo->adminTabs();
 $this->end();
 
 $this->append('tab-content');
@@ -101,7 +100,6 @@ $this->append('tab-content');
 		));
 
 	echo $this->Html->tabEnd();
-	echo $this->Croogo->adminTabs();
 $this->end();
 
 $this->append('panels');
@@ -130,8 +128,6 @@ $this->append('panels');
 	echo $this->Html->endBox();
 	echo $this->Croogo->adminBoxes();
 $this->end();
-
-$this->append('form-end', $this->Form->end());
 
 $editorMode = isset($formUrl['editor']) ? $formUrl['editor'] : 0;
 $xhrUploadUrl = $this->Url->build($formUrl);
