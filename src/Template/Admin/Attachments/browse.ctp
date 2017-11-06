@@ -75,26 +75,6 @@ $this->append('action-buttons');
 	));
 $this->end();
 
-$this->append('search');
-	$filters = $this->Form->create('AssetsAttachment');
-	$filters .= $this->Form->input('filter', array(
-		'label' => false,
-		'placeholder' => true,
-		'div' => 'input text span4',
-	));
-	$filters .= $this->Form->input('filename', array(
-		'label' => false,
-		'placeholder' => true,
-		'div' => 'input text span4',
-	));
-	$filters .= $this->Form->submit(__d('croogo', 'Filter'), array(
-		'div' => 'input submit span2',
-	));
-	$filters .= $this->Form->end();
-	$filterRow = sprintf('<div class="clearfix filter">%s</div>', $filters);
-
-$this->end();
-
 $this->append('table-heading');
 	$tableHeaders = $this->Html->tableHeaders(array(
 		$this->Paginator->sort('AssetsAsset.id', __d('croogo', 'Id')),
