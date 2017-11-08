@@ -32,9 +32,11 @@ $indexUrl = [
 	'action' => 'index'
 ];
 
-$this->Breadcrumbs
-	->add(__d('croogo', 'Attachments'), $indexUrl)
-	->add(__d('croogo', 'Upload'), $this->request->getUri()->getPath());
+if (!$this->request->query('editor')):
+	$this->Breadcrumbs
+		->add(__d('croogo', 'Attachments'), $indexUrl)
+		->add(__d('croogo', 'Upload'), $this->request->getUri()->getPath());
+endif;
 
 if ($this->layout === 'admin_popup'):
 	$this->append('title', ' ');
