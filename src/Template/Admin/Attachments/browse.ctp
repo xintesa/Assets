@@ -243,6 +243,12 @@ $this->append('table-body');
 					)
 				);
 			endif;
+		} elseif ($mimeType == 'video') {
+			$thumbnail = $this->Html->media($attachment->asset->path, [
+				'width' => 200,
+				'controls' => true,
+			]);
+
 		} else {
 			$thumbnail = $this->Html->image('Croogo/Core./img/icons/page_white.png') . ' ' . $attachment->asset->mime_type . ' (' . $this->FileManager->filename2ext($attachment->slug) . ')';
 			$thumbnail = $this->Html->link($thumbnail, '#', array(
