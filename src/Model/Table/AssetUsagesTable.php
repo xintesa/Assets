@@ -11,7 +11,7 @@ use Cake\Event\Event;
  * AssetUsages Table
  *
  */
-class AssetUsagesTable extends AssetsAppTable {
+class AssetUsagesTable extends Table {
 
 	public function initialize(array $config) {
 		parent::initialize($config);

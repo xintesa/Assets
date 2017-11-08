@@ -12,7 +12,6 @@ use Cake\Utility\Hash;
 use Cake\Validation\Validator;
 use Croogo\Core\Croogo;
 use RuntimeException;
-use Xintesa\Assets\Model\Table\AssetsAppTable;
 use Xintesa\Assets\Utility\StorageManager;
 use Intervention\Image\ImageManagerStatic as Image;
 use InvalidArgumentException;
@@ -21,7 +20,7 @@ use InvalidArgumentException;
  * Attachments Model
  *
  */
-class AttachmentsTable extends AssetsAppTable {
+class AttachmentsTable extends Table {
 
 	use LogTrait;
 

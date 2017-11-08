@@ -8,7 +8,7 @@ use Cake\Datasource\EntityInterface;
 use Cake\Validation\Validator;
 use Croogo\Core\Croogo;
 
-class AssetsTable extends AssetsAppTable {
+class AssetsTable extends Table {
 
 	public $validate = array(
 		'file' => 'checkFileUpload'
