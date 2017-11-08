@@ -146,13 +146,31 @@ $script =<<<EOF
 			$.blueimp.fileupload.prototype.options.add.call(that, e, data)
 			filesToUpload.push(data.files[0]);
 			uploadContext.push(data.context);
+		},
+		fail: function(e, data) {
+			var that = this;
+			filesToUpload.pop(data.files[0])
+			uploadContext.pop(data.context)
+			$.blueimp.fileupload.prototype.options.fail.call(that, e, data)
 		}
 	});
 
 	var \$startUpload = $('#start_upload');
 
 	var uploadHandler = function(e) {
-		var self = this;
+		var enableStartUpload = function() {
+			\$startUpload
+				.one('click', uploadHandler)
+				.html('Upload')
+				.removeAttr('disabled');
+		}
+
+		if (filesToUpload.length == 0) {
+			alert('No files to upload');
+			enableStartUpload();
+			return false;
+		}
+
 		for (var i in filesToUpload) {
 			var xhr = \$form.fileupload('send', {
 				files: [filesToUpload[i]],
@@ -192,7 +210,6 @@ $script =<<<EOF
 						errorMessage = uploadResults[i].message;
 						uploadSuccess = false
 					}
-
 				}
 				if (!uploadSuccess) {
 					break;
@@ -209,7 +226,6 @@ $script =<<<EOF
 						.removeAttr('disabled')
 						.text('Close')
 						.one('click', function(e) {
-							e.preventDefault();
 							window.close();
 							return false;
 						});
@@ -224,10 +240,7 @@ $script =<<<EOF
 				filesToUpload = [];
 				uploadContext = [];
 				uploadResults = [];
-				\$('#start_upload')
-					.html('Upload')
-					.removeAttr('disabled')
-					.one('click', self);
+				enableStartUpload();
 			}
 		}, 1000);
 
