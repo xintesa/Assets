@@ -179,8 +179,14 @@ $script =<<<EOF
 			var errorMessage = false;
 			for (var i = 0; i < uploadCount; i++) {
 				if (typeof uploadResults[i] !== 'undefined') {
-					if (typeof uploadResults[i].error !== 'undefined') {
-						uploadSuccess = uploadResults[i].error === false;
+					var errorType = typeof uploadResults[i].error;
+					if (errorType !== 'undefined') {
+						if (errorType === 'string') {
+							uploadSuccess = false;
+							errorMessage = uploadResults[i].error;
+						} else {
+							uploadSuccess = uploadResults[i].error === false;
+						}
 					}
 					if (typeof uploadResults[i].message !== 'undefined') {
 						errorMessage = uploadResults[i].message;

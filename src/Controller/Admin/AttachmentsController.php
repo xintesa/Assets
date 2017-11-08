@@ -192,12 +192,16 @@ class AttachmentsController extends AppController {
 			if (empty($errors)) {
 				$attachment = $this->Attachments->save($entity);
 
-				if ($attachment) {
+				$errors = $entity->errors();
+				if (empty($errors) && $attachment) {
 					$eventKey = 'Controller.AssetsAttachment.newAttachment';
 					Croogo::dispatchEvent($eventKey, $this, compact('attachment'));
+				} else {
+					Log::error('Failed saving attachments:');
+					Log::error(print_r($errors, true));
 				}
 			} else {
-				Log::error('Failed saving attachments:');
+				Log::error('Failed validating attachments:');
 				Log::error(print_r($errors, true));
 			}
 

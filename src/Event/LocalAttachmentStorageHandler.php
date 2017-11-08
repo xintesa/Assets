@@ -79,7 +79,8 @@ class LocalAttachmentStorageHandler extends BaseStorageHandler implements EventL
 			$storage['height'] = $imageInfo['height'];
 			$storage['extension'] = $extension;
 			return $result;
-		} catch (Exception $e) {
+		} catch (\Exception $e) {
+			$event->data['record']->setErrors(['path' => $e->getMessage()]);
 			$this->log($e->getMessage());
 			return false;
 		}
